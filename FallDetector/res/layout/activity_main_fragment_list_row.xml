@@ -71,6 +71,7 @@
             android:id="@+id/row_play_pause_button"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:contentDescription="@null"
             android:src="@drawable/ic_action_pause" />
 
         <ImageButton
@@ -80,6 +81,7 @@
             android:layout_gravity="center_vertical|center_horizontal"
             android:layout_toEndOf="@id/row_play_pause_button"
             android:layout_toRightOf="@id/row_play_pause_button"
+            android:contentDescription="@null"
             android:src="@drawable/ic_action_stop" />
     </RelativeLayout>
 
