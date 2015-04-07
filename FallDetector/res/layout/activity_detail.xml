@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="it.unipd.dei.esp1415.falldetector.MainActivity" >
+    tools:context="it.unipd.dei.esp1415.falldetector.DetailActivity" >
 
     <!--
     Use [-right/-end] for a better support of right to left layout
@@ -10,7 +10,7 @@
     -->
 
     <fragment
-        android:id="@+id/main_list"
+        android:id="@+id/detail"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_alignParentEnd="true"

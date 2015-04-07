@@ -4,5 +4,11 @@
     <string name="app_name">FallDetector</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="tag_start">Starts on\u0020</string>
+    <string name="tag_second">\u0020at\u0020</string>
+    <string name="tag_duration">Duration:\u0020</string>
+    <string name="tag_falls">Falls:\u0020</string>
+    <string name="test">Test</string>
+    <string name="title_activity_detail">DetailActivity</string>
 
 </resources>
