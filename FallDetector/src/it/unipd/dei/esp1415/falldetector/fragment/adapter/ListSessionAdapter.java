@@ -132,17 +132,17 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		mViewHolder.thumbnail.setBackgroundColor(Color.parseColor("BLUE"));
 		mViewHolder.sessionName.setText(mArray.get(position).getName());// TODO get name from session
 		
-		for(int i=0; i<mExpCol.length; i++){
-			switch(mExpCol[position]){
-			case TO_COLLAPSE:
-				collapse(position);
-				mExpCol[position] = COLLAPSED;
-				break;
-			case TO_EXPAND:
-			    expand(position);
-			    mExpCol[position] = EXPANDED;
-				break;
-			}
+
+		switch(mExpCol[position]){
+		case TO_COLLAPSE:
+			collapse(position);
+			mExpCol[position] = COLLAPSED;
+			break;
+		case TO_EXPAND:
+			expand(position);
+			mExpCol[position] = EXPANDED;
+			break;
+
 		}
 
 		return view;
