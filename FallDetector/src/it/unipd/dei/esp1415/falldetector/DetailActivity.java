@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
-
+//TODO ALL CLASS AND LAYOUT
 public class DetailActivity extends ActionBarActivity {
 
 	@Override
@@ -41,7 +41,9 @@ public class DetailActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
+	
+	
+	//TODO make a new fragment class and define layout
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */

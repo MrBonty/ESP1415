@@ -1,7 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
     tools:context="it.unipd.dei.esp1415.falldetector.MainActivity" >
 
     <!--
@@ -9,22 +11,22 @@
     right to left layout and for compatibility for API less than 17
     -->
 
-    <fragment
+    <FrameLayout 
+        android:name="it.unipd.dei.esp1415.falldetector.fragment.ListFragmentSession"
         android:id="@+id/main_list"
-        android:layout_width="wrap_content"
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_weight="0.35"/>
+    
+    <View
+        android:layout_width="8dp"
         android:layout_height="fill_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true" />
+        android:background="@drawable/shadow" />
 
     <FrameLayout
-        android:id="@+id/land_secondary"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/main_list"
-        android:layout_toRightOf="@id/main_list" />
+        android:id="@+id/main_secondary"
+        android:layout_width="0px"
+        android:layout_height="match_parent"
+        android:layout_weight="0.65"/>
 
-</RelativeLayout>
+</LinearLayout>
