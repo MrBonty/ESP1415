@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content" >
 
     <!-- Content Description is for default set to null, we can set it on code to describe the thumbnail image -->
@@ -18,7 +18,9 @@
         android:layout_marginRight="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
+        android:clickable="false"
         android:contentDescription="@null"
+        android:focusable="false"
         android:src="@drawable/ic_launcher" />
 
     <TextView
@@ -28,6 +30,9 @@
         android:layout_centerInParent="true"
         android:layout_toEndOf="@id/row_thumbnail"
         android:layout_toRightOf="@id/row_thumbnail"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:text="@string/test"
         android:textSize="25sp" />
 

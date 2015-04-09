@@ -1,6 +1,6 @@
 package it.unipd.dei.esp1415.falldetector;
 
-import it.unipd.dei.esp1415.falldetector.fragment.ListFragmentSession;
+import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 
 import java.util.ArrayList;
@@ -9,11 +9,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.ListFragment;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 public class MainActivity extends ActionBarActivity {
 	private Context mContext;
@@ -53,19 +55,11 @@ public class MainActivity extends ActionBarActivity {
 		tmp.add(new Session("p"));
 		tmp.add(new Session("q"));
 		FragmentManager manager = getSupportFragmentManager();
-		Fragment listFragment = ListFragmentSession.newInstance(mContext, tmp,
+		
+		Fragment listFragment = ListSessionFragment.newInstance(mContext, tmp,
 				mIsLandscape);
-
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.main_list, listFragment);
-		// transaction.add(listFragment, TAG_INSTANCE_FRAGMENT);
-		
-		
-		if(mIsLandscape){
-			
-			Fragment ft = new DetailActivity.PlaceholderFragment();
-			transaction.replace(R.id.main_secondary, ft);
-		}
 		
 		transaction.commit();
 		setContentView(R.layout.activity_main);

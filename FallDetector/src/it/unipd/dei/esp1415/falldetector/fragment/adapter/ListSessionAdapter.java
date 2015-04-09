@@ -3,10 +3,18 @@ package it.unipd.dei.esp1415.falldetector.fragment.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unipd.dei.esp1415.falldetector.DetailActivity;
 import it.unipd.dei.esp1415.falldetector.R;
+import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
+import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -118,6 +126,23 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 			mViewHolder.expandButton
 					.setOnClickListener(expandListener(position, view, parent));
 
+			mViewHolder.expandButton.setFocusable(false);
+			mViewHolder.expandButton.setFocusableInTouchMode(false);
+			
+			switch(mExpCol[position]){
+			case COLLAPSED:
+			case TO_COLLAPSE:
+				collapse(position);
+				mExpCol[position] = COLLAPSED;
+				break;
+			case TO_EXPAND:
+			case EXPANDED:
+				expand(position);
+				mExpCol[position] = EXPANDED;
+				break;
+
+			}
+			
 		} else {
 
 			if (mIsLarge) {
@@ -131,19 +156,6 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		// TODO get color from session
 		mViewHolder.thumbnail.setBackgroundColor(Color.parseColor("BLUE"));
 		mViewHolder.sessionName.setText(mArray.get(position).getName());// TODO get name from session
-		
-
-		switch(mExpCol[position]){
-		case TO_COLLAPSE:
-			collapse(position);
-			mExpCol[position] = COLLAPSED;
-			break;
-		case TO_EXPAND:
-			expand(position);
-			mExpCol[position] = EXPANDED;
-			break;
-
-		}
 
 		return view;
 	}// [m] getView
@@ -233,5 +245,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		private TextView duration;
 		private TextView falls;
 	}// {c} ViewHolder
+	
+	
 
 }// {c} ListSessionAdapter

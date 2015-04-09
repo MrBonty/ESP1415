@@ -1,8 +1,17 @@
 package it.unipd.dei.esp1415.falldetector;
 
+import java.util.ArrayList;
+
+import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
+import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
+import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,17 +19,44 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
-//TODO ALL CLASS AND LAYOUT
+
 public class DetailActivity extends ActionBarActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_detail);
-		if (savedInstanceState == null) {
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.detail, new PlaceholderFragment()).commit();
+
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			finish();
+			return;
 		}
+
+		Intent i = getIntent();
+		setContentView(R.layout.activity_detail);
+		ArrayList<Session> tmp = new ArrayList<Session>();
+		tmp.add(new Session("a"));
+		tmp.add(new Session("b"));
+		tmp.add(new Session("c"));
+		tmp.add(new Session("d"));
+		tmp.add(new Session("e"));
+		tmp.add(new Session("f"));
+		tmp.add(new Session("g"));
+		tmp.add(new Session("h"));
+		tmp.add(new Session("i"));
+		tmp.add(new Session("l"));
+		tmp.add(new Session("m"));
+		tmp.add(new Session("n"));
+		tmp.add(new Session("o"));
+		tmp.add(new Session("p"));
+		tmp.add(new Session("q"));
+		int index = i.getIntExtra("index", 0);
+		Fragment detailSession = DetailSessionFragment.newInstance(index, tmp);
+		FragmentManager manager = getSupportFragmentManager();
+
+		FragmentTransaction transaction = manager.beginTransaction();
+		transaction.replace(R.id.detail, detailSession);
+
+		transaction.commit();
 	}
 
 	@Override
@@ -41,23 +77,5 @@ public class DetailActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
-	//TODO make a new fragment class and define layout
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
 
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.activity_detail_fragment,
-					container, false);
-			return rootView;
-		}
-	}
 }

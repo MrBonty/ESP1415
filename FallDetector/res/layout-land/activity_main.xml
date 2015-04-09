@@ -21,7 +21,7 @@
     <View
         android:layout_width="8dp"
         android:layout_height="fill_parent"
-        android:background="@drawable/shadow" />
+        android:background="@drawable/shadow_left_to_right" />
 
     <FrameLayout
         android:id="@+id/main_secondary"

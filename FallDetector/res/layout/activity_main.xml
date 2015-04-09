@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="it.unipd.dei.esp1415.falldetector.MainActivity" >
+    tools:context="it.unipd.dei.esp1415.falldetector.MainActivity">
 
     <!-- Use [-right/-end] for a better support of right to left layout and for compatibility for API less than 17 -->
 

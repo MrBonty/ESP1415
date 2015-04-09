@@ -9,7 +9,7 @@
     and for compatibility for API less than 17
     -->
 
-    <fragment
+    <FrameLayout
         android:id="@+id/detail"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
