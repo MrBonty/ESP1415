@@ -31,12 +31,7 @@ public class MainActivity extends ActionBarActivity {
 		mContext = getApplication();
 
 		int orientation = this.getResources().getConfiguration().orientation;
-
-		if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-			mIsLandscape = false;
-		} else {
-			mIsLandscape = true;
-		}
+		mIsLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE;
         //TODO REMOVE ARRAY FOR TEST
 		ArrayList<Session> tmp = new ArrayList<Session>();
 		tmp.add(new Session("a"));
@@ -54,15 +49,20 @@ public class MainActivity extends ActionBarActivity {
 		tmp.add(new Session("o"));
 		tmp.add(new Session("p"));
 		tmp.add(new Session("q"));
-		FragmentManager manager = getSupportFragmentManager();
 		
-		Fragment listFragment = ListSessionFragment.newInstance(mContext, tmp,
+		
+		FragmentManager manager = getSupportFragmentManager();
+		Fragment listFragment = manager.findFragmentById(R.id.main_list);
+		if(listFragment == null){
+			listFragment = ListSessionFragment.newInstance(mContext, tmp,
 				mIsLandscape);
+		}
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.main_list, listFragment);
-		
 		transaction.commit();
+		
 		setContentView(R.layout.activity_main);
+		
 	}
 
 	@Override

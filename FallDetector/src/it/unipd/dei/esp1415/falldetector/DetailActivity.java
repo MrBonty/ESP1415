@@ -13,6 +13,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,7 +33,6 @@ public class DetailActivity extends ActionBarActivity {
 			return;
 		}
 
-		Intent i = getIntent();
 		setContentView(R.layout.activity_detail);
 		ArrayList<Session> tmp = new ArrayList<Session>();
 		tmp.add(new Session("a"));
@@ -49,6 +50,8 @@ public class DetailActivity extends ActionBarActivity {
 		tmp.add(new Session("o"));
 		tmp.add(new Session("p"));
 		tmp.add(new Session("q"));
+
+		Intent i = getIntent();
 		int index = i.getIntExtra("index", 0);
 		Fragment detailSession = DetailSessionFragment.newInstance(index, tmp);
 		FragmentManager manager = getSupportFragmentManager();

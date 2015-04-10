@@ -3,19 +3,28 @@ package it.unipd.dei.esp1415.falldetector.fragment;
 import java.util.ArrayList;
 
 import it.unipd.dei.esp1415.falldetector.DetailActivity;
+import it.unipd.dei.esp1415.falldetector.MainActivity;
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.fragment.adapter.ListSessionAdapter;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class ListSessionFragment extends ListFragment {
 
@@ -25,6 +34,7 @@ public class ListSessionFragment extends ListFragment {
 	private static int mCurCheckPosition;
 	
 	public static final String SAVE_CURRENT_CHOICE = "curChoice";
+	public static final int START_FRAG_POS = -1;
 
 	/**
 	 * [c] Void Constructor use instead ListFragmentSession name =
@@ -38,35 +48,45 @@ public class ListSessionFragment extends ListFragment {
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) { 
 		Log.i("CLICK", "[onListItemClick] Selected Position "+ position);
-		showDetail(position);
+			showDetail(position);
+		
 	}// [m] onListItemClick
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		mIsLandscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
 		ListSessionAdapter adapter = new ListSessionAdapter(mContext, mArray,
 				mIsLandscape);
-		setListAdapter(adapter);
 		
 		if (savedInstanceState != null) {
-            // Restore last state for checked position.
-            mCurCheckPosition = savedInstanceState.getInt(SAVE_CURRENT_CHOICE, 0);
-        }
-		
+			// Restore last state for checked position.
+			mCurCheckPosition = savedInstanceState.getInt(SAVE_CURRENT_CHOICE, START_FRAG_POS);
+		}
+
 		if (mIsLandscape) {
 			// In dual-pane mode, the list view highlights the selected item.
 			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 			// Make sure our UI is in the correct state.
 			showDetail(mCurCheckPosition);
-        }
+			
+		}else{
+
+			Log.i("CALLOF", "on " + mCurCheckPosition);
+			showDetail(mCurCheckPosition);
+
+		}
+		
+		setListAdapter(adapter);
 	}// [m] onActivityCreated
 	
-	
-    @Override
+
+	@Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.i("SAVE", "save of " + mCurCheckPosition);
         outState.putInt(SAVE_CURRENT_CHOICE, mCurCheckPosition);
+        
     }
 
 	/**
@@ -85,8 +105,9 @@ public class ListSessionFragment extends ListFragment {
 		mArray = objects;
 		mContext = context;
 		mIsLandscape = isLandsacape;
-		mCurCheckPosition = 0;
+		mCurCheckPosition = START_FRAG_POS;
 		return tmp;
+		
 	}// Builder class
 	
 	/**
@@ -97,22 +118,25 @@ public class ListSessionFragment extends ListFragment {
 	 */
 	private void showDetail(int pos){
 		mCurCheckPosition = pos;
-		if (mIsLandscape) {
-			Fragment detailSession = DetailSessionFragment.newInstance(mCurCheckPosition, mArray);
-			FragmentManager manager = getFragmentManager();
+		if(mCurCheckPosition != START_FRAG_POS){
+			if (mIsLandscape) {
 
-			FragmentTransaction transaction = manager.beginTransaction();
-			transaction.replace(R.id.main_secondary, detailSession);
+				Fragment detailSession = DetailSessionFragment.newInstance(mCurCheckPosition, mArray);
+				FragmentManager manager = getFragmentManager();
 
-			transaction.commit();
-			
+				FragmentTransaction transaction = manager.beginTransaction();
+				transaction.replace(R.id.main_secondary, detailSession);
+				transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+				transaction.commit();
 
-		} else {
-			Intent intent = new Intent();
-			intent.setClass(getActivity(), DetailActivity.class);
-			intent.putExtra("index", pos);
-			startActivity(intent);
+
+			} else {
+
+				Intent intent = new Intent();
+				intent.setClass(getActivity(), DetailActivity.class);
+				intent.putExtra("index", pos);
+				startActivity(intent);
+			}
 		}
 	}
-
 }
