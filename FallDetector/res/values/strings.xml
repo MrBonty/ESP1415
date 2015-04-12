@@ -4,5 +4,6 @@
     <string name="app_name">FallDetector</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    <string name="current_acceleration">Current Acceleration</string>
+    <string name="max_acceleration">Maximum Acceleration</string>
 </resources>
