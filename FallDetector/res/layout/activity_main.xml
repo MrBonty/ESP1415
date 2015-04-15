@@ -3,8 +3,14 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <TextView android:id="@+id/hello_world"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_world"/>
     
-    <TextView android:id="@+id/acceleration"
+<!-- GForceMeter -->
+<!--    <TextView android:id="@+id/acceleration"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,5 +29,6 @@
         android:text="@string/max_acceleration"
         android:singleLine="true"
         android:layout_margin="10dp"
-    />    
+    /> -->
+<!-- End GForceMeter -->    
 </LinearLayout>
