@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fall_event"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout android:id="@+id/event" 
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        
+
+       	<TextView android:id="@+id/session_name"
+       		android:layout_width="wrap_content"
+       		android:layout_height="wrap_content"
+       		android:layout_margin="30dp"
+       		android:text="@string/session_name"
+       		android:drawableBottom="@drawable/paint"
+   		/>
+        
+        <LinearLayout android:id="@+id/event_data"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp">
+            
+            <TextView android:id="@+id/date"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_margin="5dp"
+            	android:gravity="center_horizontal"
+            	android:layout_gravity="bottom"
+       			android:text="@string/date"/>
+            
+            <TextView android:id="@+id/time"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_margin="5dp"
+            	android:gravity="center_horizontal"
+            	android:layout_gravity="bottom"
+       			android:text="@string/time"/>
+            
+            <TextView android:id="@+id/latitude"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_margin="5dp"
+            	android:gravity="center_horizontal"
+            	android:layout_gravity="bottom"
+       			android:text="@string/latitude"/>"
+            
+            <TextView android:id="@+id/longitude"
+            	android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_margin="5dp"
+            	android:gravity="center_horizontal"
+            	android:layout_gravity="bottom"
+       			android:text="@string/longitude"/>
+            
+            <CheckBox android:id="@+id/notified"
+                android:layout_width="wrap_content"
+            	android:layout_height="wrap_content"
+            	android:layout_margin="5dp"
+            	android:gravity="center_horizontal"
+            	android:layout_gravity="bottom"
+       			android:text="@string/notified"
+       			android:checked="true"/>
+            
+        </LinearLayout>
+        
+    </LinearLayout>
+    
+    <LinearLayout android:id="@+id/id_graph"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        
+    </LinearLayout>
+    
+</LinearLayout>

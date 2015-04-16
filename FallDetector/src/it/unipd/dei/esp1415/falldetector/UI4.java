@@ -15,7 +15,7 @@ public class UI4 extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.user_interface_4);
 	}
 	
 	@Override

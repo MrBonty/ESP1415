@@ -2,11 +2,19 @@
 <resources>
 
     <string name="app_name">Fall Event</string>
-    <string name="hello_world">Hello world!</string>
     
     <!-- Menu's items -->
     <string name="menu_settings">Settings</string>
     <string name="menu_delete">Delete</string>
-    <string name="current_acceleration">Current Acceleration</string>
-    <string name="max_acceleration">Maximum Acceleration</string>
+    
+    <!-- Fall Event -->
+    <string name="session_name">Sessione</string>
+    <string name="thumbnail">Thumbnail</string>
+    
+    <string name="date">date:	gg/mm/aaaa</string>
+    <string name="time">time:	hh:mm:ss</string>
+    <string name="latitude">latitude:	gg pp ss</string>
+    <string name="longitude">longitude:	gg pp ss</string>
+    <string name="notified">notified</string>
+    
 </resources>
