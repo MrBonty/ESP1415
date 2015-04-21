@@ -3,27 +3,21 @@ package it.unipd.dei.esp1415.falldetector;
 import java.util.ArrayList;
 
 import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
-import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
+import it.unipd.dei.esp1415.falldetector.utility.Moderator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.os.Build;
 
 public class DetailActivity extends ActionBarActivity {
 
+	private Moderator mod;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,8 +27,11 @@ public class DetailActivity extends ActionBarActivity {
 			return;
 		}
 
+		mod = new Moderator();
 		setContentView(R.layout.activity_detail);
-		ArrayList<Session> tmp = new ArrayList<Session>();
+		ArrayList<Session> tmp = mod.getDataSession();
+		
+		/*
 		tmp.add(new Session("a"));
 		tmp.add(new Session("b"));
 		tmp.add(new Session("c"));
@@ -50,9 +47,9 @@ public class DetailActivity extends ActionBarActivity {
 		tmp.add(new Session("o"));
 		tmp.add(new Session("p"));
 		tmp.add(new Session("q"));
-
-		Intent i = getIntent();
-		int index = i.getIntExtra("index", 0);
+*/
+		//Intent i = getIntent();
+		int index = /*i.getIntExtra("index", 0);*/ mod.getCurretnPosSession();
 		Fragment detailSession = DetailSessionFragment.newInstance(index, tmp);
 		FragmentManager manager = getSupportFragmentManager();
 
@@ -81,4 +78,10 @@ public class DetailActivity extends ActionBarActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+	
+	@Override
+	public void onBackPressed(){
+		mod.resetCurretnPosSessionFromBack();
+		super.onBackPressed();
+	}
 }

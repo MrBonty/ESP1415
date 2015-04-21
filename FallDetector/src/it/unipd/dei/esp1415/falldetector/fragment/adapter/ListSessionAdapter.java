@@ -90,6 +90,10 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 					.findViewById(R.id.row_thumbnail);
 			mViewHolder.sessionName = (TextView) view
 					.findViewById(R.id.row_session_name);
+			mViewHolder.date = (TextView) view
+					.findViewById(R.id.row_expand_date);
+			mViewHolder.time = (TextView) view
+					.findViewById(R.id.row_expand_time);
 
 			// // hide expandable layout
 			// mViewHolder.expandLayout.setVisibility(View.GONE);
@@ -114,10 +118,6 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 					.findViewById(R.id.row_execute_play_pause_button);
 			mViewHolder.stop = (ImageButton) view
 					.findViewById(R.id.row_execute_stop_button);
-			mViewHolder.date = (TextView) view
-					.findViewById(R.id.row_expand_date);
-			mViewHolder.time = (TextView) view
-					.findViewById(R.id.row_expand_time);
 			mViewHolder.duration = (TextView) view
 					.findViewById(R.id.row_expand_duration);
 			mViewHolder.falls = (TextView) view
@@ -156,7 +156,9 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		// TODO get color from session
 		mViewHolder.thumbnail.setBackgroundColor(Color.parseColor("BLUE"));
 		mViewHolder.sessionName.setText(mArray.get(position).getName());// TODO get name from session
-
+		mViewHolder.date.setText("TODO");// TODO get date from session
+		mViewHolder.time.setText("TODO");// TODO get time from session
+		
 		return view;
 	}// [m] getView
 
@@ -206,8 +208,6 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 			mViewHolder.stop.setOnClickListener(null); // TODO listener
 		}// if
 		
-		mViewHolder.date.setText("TODO");// TODO get date from session
-		mViewHolder.time.setText("TODO");// TODO get time from session
 		mViewHolder.duration.setText("TODO");// TODO get duration from session
 		mViewHolder.falls.setText("TODO");// TODO get falls from session
 	}// [m] expand

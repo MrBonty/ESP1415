@@ -1,6 +1,7 @@
 package it.unipd.dei.esp1415.falldetector;
 
 import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
+import it.unipd.dei.esp1415.falldetector.utility.Moderator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 
 import java.util.ArrayList;
@@ -9,20 +10,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.ListFragment;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 
 public class MainActivity extends ActionBarActivity {
 	private Context mContext;
-
-	private boolean mIsLandscape;
-
-	private final String TAG_INSTANCE_FRAGMENT = "istanceTarget";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +24,9 @@ public class MainActivity extends ActionBarActivity {
 
 		mContext = getApplication();
 
-		int orientation = this.getResources().getConfiguration().orientation;
-		mIsLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE;
-        //TODO REMOVE ARRAY FOR TEST
+		Moderator mod = new Moderator(mContext, this);
+
+		//TODO REMOVE ARRAY FOR TEST
 		ArrayList<Session> tmp = new ArrayList<Session>();
 		tmp.add(new Session("a"));
 		tmp.add(new Session("b"));
@@ -50,12 +44,12 @@ public class MainActivity extends ActionBarActivity {
 		tmp.add(new Session("p"));
 		tmp.add(new Session("q"));
 		
+		mod.setDataSession(tmp);
 		
 		FragmentManager manager = getSupportFragmentManager();
 		Fragment listFragment = manager.findFragmentById(R.id.main_list);
 		if(listFragment == null){
-			listFragment = ListSessionFragment.newInstance(mContext, tmp,
-				mIsLandscape);
+			listFragment = new ListSessionFragment();
 		}
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.main_list, listFragment);
