@@ -1,7 +1,7 @@
 package it.unipd.dei.esp1415.falldetector;
 
 import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
-import it.unipd.dei.esp1415.falldetector.utility.Moderator;
+import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class MainActivity extends ActionBarActivity {
 
 		mContext = getApplication();
 
-		Moderator mod = new Moderator(mContext, this);
+		Mediator mod = new Mediator(mContext, this);
 
 		//TODO REMOVE ARRAY FOR TEST
 		ArrayList<Session> tmp = new ArrayList<Session>();

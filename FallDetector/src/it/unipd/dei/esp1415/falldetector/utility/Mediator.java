@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.content.Context;
 
-public class Moderator {
+public class Mediator {
 	
 	public static final int START_FRAG_POS = -1;
 	
@@ -15,12 +15,12 @@ public class Moderator {
 	private static ArrayList<Session> mSessions;
 	private static boolean mIsCalledFromBack;
 	
-	public Moderator(Context context, Activity main){ //called from mainActivity
-		Moderator.mainAct = main;
-		Moderator.mContext = context;
+	public Mediator(Context context, Activity main){ //called from mainActivity
+		Mediator.mainAct = main;
+		Mediator.mContext = context;
 	}
 	
-	public Moderator(){}
+	public Mediator(){}
 	
 	public void setDataSession(ArrayList<Session> session){
 		mSessions = session;
@@ -52,7 +52,5 @@ public class Moderator {
 		mIsCalledFromBack = true;
 		
 	}
-	
-	
-	
+
 }

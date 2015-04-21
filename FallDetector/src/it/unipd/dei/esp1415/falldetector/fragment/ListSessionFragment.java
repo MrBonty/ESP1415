@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import it.unipd.dei.esp1415.falldetector.DetailActivity;
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.fragment.adapter.ListSessionAdapter;
-import it.unipd.dei.esp1415.falldetector.utility.Moderator;
+import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.content.Context;
 import android.content.Intent;
@@ -25,7 +25,7 @@ public class ListSessionFragment extends ListFragment {
 	private static Context mContext;
 	private static boolean mIsLandscape;
 	private static int mCurCheckPosition;
-	private static Moderator mMod;
+	private static Mediator mMod;
 	
 	public static final String SAVE_CURRENT_CHOICE = "curChoice";
 	
@@ -35,7 +35,7 @@ public class ListSessionFragment extends ListFragment {
 	 * isLandsacape); at the creation of a new ListFragmentSession
 	 */
 	public ListSessionFragment() {
-		mMod = new Moderator();
+		mMod = new Mediator();
 		mArray = mMod.getDataSession();
 		mContext = mMod.getContext();
 		mCurCheckPosition = mMod.getCurretnPosSession();
@@ -70,7 +70,7 @@ public class ListSessionFragment extends ListFragment {
 			ListView tmp = getListView();
 			tmp.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
-			if(mCurCheckPosition != Moderator.START_FRAG_POS){
+			if(mCurCheckPosition != Mediator.START_FRAG_POS){
 				tmp.setItemChecked(mCurCheckPosition, true);
 				Log.i("CHECKED", "Checked Pos = " + mCurCheckPosition);
 				tmp.requestFocus();
@@ -111,7 +111,7 @@ public class ListSessionFragment extends ListFragment {
 	private void showDetail(int pos){
 		mMod.setCurretnPosSession(pos);
 		mCurCheckPosition = pos;
-		if(mCurCheckPosition != Moderator.START_FRAG_POS){
+		if(mCurCheckPosition != Mediator.START_FRAG_POS){
 			if (mIsLandscape) {
 
 				Fragment detailSession = new DetailSessionFragment();

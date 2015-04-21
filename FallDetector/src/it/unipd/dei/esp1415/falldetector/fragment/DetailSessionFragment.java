@@ -3,7 +3,7 @@ package it.unipd.dei.esp1415.falldetector.fragment;
 import java.util.ArrayList;
 
 import it.unipd.dei.esp1415.falldetector.R;
-import it.unipd.dei.esp1415.falldetector.utility.Moderator;
+import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,10 +16,10 @@ public class DetailSessionFragment extends Fragment {
 	
 	private static ArrayList<Session> mArray;
 	private static int mIndex;
-	private static Moderator mMod; 
+	private static Mediator mMod; 
 
 	public DetailSessionFragment() {
-		mMod = new Moderator();
+		mMod = new Mediator();
 		mArray = mMod.getDataSession();
 		mIndex = mMod.getCurretnPosSession();
 	}
