@@ -290,11 +290,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				chartZAxis.invalidate();
 				accelerationDataZ.setText("Z: " + z);
 				accelerationDataZ.invalidate();
-				
-//				if(count < chartWidth)
-//					count++;
-//				else
-//					count = 0;
 			}
 		});
 	}
