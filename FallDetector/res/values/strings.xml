@@ -1,8 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">FallDetector</string>
+    <string name="app_name">TODO change session name</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-
+    
+    <!-- session information labe -->
+    
+	<string name="title">Current session name</string>
+	<string name="thumbnail">Thumbnail</string>
+	<string name="date">Session start time</string>
+	<string name="not_started">Session not yet started</string>
+	<string name="duration">Duration</string>
+	<string name="end_button">End</string>
+	<string name="play_button">Play</string>
+	
+	<!-- Chart -->
+	
+	<string name="x">X: </string>
+	<string name="y">Y: </string>
+	<string name="z">Z: </string>
+	<string name="acc_not_started">Not started</string>
 </resources>

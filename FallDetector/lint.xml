@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="ByteOrderMark" severity="error" />
+    <issue id="WrongCall">
+        <ignore path="src/it/unipd/dei/esp1415/falldetector/CurrentSessionActivity.java" />
+    </issue>
+</lint>
