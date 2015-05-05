@@ -70,7 +70,7 @@ public class ColorUtil {
 			invBB = invBB & MAX_VAL;
 		}
 		
-		int invColor = aa | (invRR<<16) | (invGG<<8) | (invBB);
+		int invColor = (aa<<24) | (invRR<<16) | (invGG<<8) | (invBB);
 		
 		Bitmap image =bitmap.copy(Bitmap.Config.ARGB_8888, true);;
 		int heigth = image.getHeight();
