@@ -16,7 +16,7 @@ import android.view.MenuItem;
 
 public class DetailActivity extends ActionBarActivity {
 
-	private Mediator mod;
+	private Mediator mMed;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,29 +27,11 @@ public class DetailActivity extends ActionBarActivity {
 			return;
 		}
 
-		mod = new Mediator();
+		mMed = new Mediator();
 		setContentView(R.layout.activity_detail);
-		ArrayList<Session> tmp = mod.getDataSession();
-		
-		/*
-		tmp.add(new Session("a"));
-		tmp.add(new Session("b"));
-		tmp.add(new Session("c"));
-		tmp.add(new Session("d"));
-		tmp.add(new Session("e"));
-		tmp.add(new Session("f"));
-		tmp.add(new Session("g"));
-		tmp.add(new Session("h"));
-		tmp.add(new Session("i"));
-		tmp.add(new Session("l"));
-		tmp.add(new Session("m"));
-		tmp.add(new Session("n"));
-		tmp.add(new Session("o"));
-		tmp.add(new Session("p"));
-		tmp.add(new Session("q"));
-*/
-		//Intent i = getIntent();
-		int index = /*i.getIntExtra("index", 0);*/ mod.getCurretnPosSession();
+		ArrayList<Session> tmp = mMed.getDataSession();
+
+		int index = mMed.getCurretnPosSession();
 		Fragment detailSession = DetailSessionFragment.newInstance(index, tmp);
 		FragmentManager manager = getSupportFragmentManager();
 
@@ -81,7 +63,7 @@ public class DetailActivity extends ActionBarActivity {
 	
 	@Override
 	public void onBackPressed(){
-		mod.resetCurretnPosSessionFromBack();
+		mMed.resetCurretnPosSessionFromBack();
 		super.onBackPressed();
 	}
 }

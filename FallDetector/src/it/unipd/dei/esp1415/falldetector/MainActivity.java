@@ -3,6 +3,7 @@ package it.unipd.dei.esp1415.falldetector;
 import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
+import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 
 import java.util.ArrayList;
 
@@ -24,28 +25,38 @@ public class MainActivity extends ActionBarActivity {
 
 		mContext = getApplication();
 
-		Mediator mod = new Mediator(mContext, this);
+		Mediator med = new Mediator(mContext, this);
+		
+		if(!med.hasDataSession()){
 
-		//TODO REMOVE ARRAY FOR TEST
-		ArrayList<Session> tmp = new ArrayList<Session>();
-		tmp.add(new Session("a"));
-		tmp.add(new Session("b"));
-		tmp.add(new Session("c"));
-		tmp.add(new Session("d"));
-		tmp.add(new Session("e"));
-		tmp.add(new Session("f"));
-		tmp.add(new Session("g"));
-		tmp.add(new Session("h"));
-		tmp.add(new Session("i"));
-		tmp.add(new Session("l"));
-		tmp.add(new Session("m"));
-		tmp.add(new Session("n"));
-		tmp.add(new Session("o"));
-		tmp.add(new Session("p"));
-		tmp.add(new Session("q"));
-		
-		mod.setDataSession(tmp);
-		
+			//TODO REMOVE ARRAY FOR TEST
+			ArrayList<Session> tmp = new ArrayList<Session>();
+			tmp.add(new Session("a"));
+			tmp.add(new Session("b"));
+			tmp.add(new Session("c"));
+			tmp.add(new Session("d"));
+			tmp.add(new Session("e"));
+			tmp.add(new Session("f"));
+			tmp.add(new Session("g"));
+			tmp.add(new Session("h"));
+			tmp.add(new Session("i"));
+			tmp.add(new Session("l"));
+			tmp.add(new Session("m"));
+			tmp.add(new Session("n"));
+			tmp.add(new Session("o"));
+			tmp.add(new Session("p"));
+			tmp.add(new Session("q"));
+
+			for(int i = tmp.size()-1; i >= 0; i--){
+				if(i+1 == tmp.size()){
+					tmp.get(i).setColorThumbnail(ColorUtil.imageColorSelector(null));
+				}else{
+					tmp.get(i).setColorThumbnail(ColorUtil.imageColorSelector(tmp.get(i+1)));
+				}
+			}
+
+			med.setDataSession(tmp);
+		}
 		FragmentManager manager = getSupportFragmentManager();
 		Fragment listFragment = manager.findFragmentById(R.id.main_list);
 		if(listFragment == null){
@@ -54,9 +65,9 @@ public class MainActivity extends ActionBarActivity {
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.main_list, listFragment);
 		transaction.commit();
-		
+
 		setContentView(R.layout.activity_main);
-		
+
 	}
 
 	@Override

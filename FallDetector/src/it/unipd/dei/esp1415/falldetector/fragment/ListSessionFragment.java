@@ -17,6 +17,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 public class ListSessionFragment extends ListFragment {
@@ -25,7 +27,7 @@ public class ListSessionFragment extends ListFragment {
 	private static Context mContext;
 	private static boolean mIsLandscape;
 	private static int mCurCheckPosition;
-	private static Mediator mMod;
+	private static Mediator mMed;
 	
 	public static final String SAVE_CURRENT_CHOICE = "curChoice";
 	
@@ -35,10 +37,10 @@ public class ListSessionFragment extends ListFragment {
 	 * isLandsacape); at the creation of a new ListFragmentSession
 	 */
 	public ListSessionFragment() {
-		mMod = new Mediator();
-		mArray = mMod.getDataSession();
-		mContext = mMod.getContext();
-		mCurCheckPosition = mMod.getCurretnPosSession();
+		mMed = new Mediator();
+		mArray = mMed.getDataSession();
+		mContext = mMed.getContext();
+		mCurCheckPosition = mMed.getCurretnPosSession();
 	}// [c] ListFragmentSession
 
 	@Override
@@ -62,7 +64,7 @@ public class ListSessionFragment extends ListFragment {
 			mod.resetCurretnPosSession();
 		}*/
 		
-		mCurCheckPosition = mMod.getCurretnPosSession();
+		mCurCheckPosition = mMed.getCurretnPosSession();
 		Log.i("POSITION","Current pos= " + mCurCheckPosition);
 
 		if (mIsLandscape) {
@@ -95,28 +97,34 @@ public class ListSessionFragment extends ListFragment {
         super.onSaveInstanceState(outState);
         Log.i("SAVE", "save of " + mCurCheckPosition);
         //outState.putInt(SAVE_CURRENT_CHOICE, mCurCheckPosition);
-        if(!mMod.isCalledFromBack()){
-            mMod.setCurretnPosSession(mCurCheckPosition);
+        if(!mMed.isCalledFromBack()){
+            mMed.setCurretnPosSession(mCurCheckPosition);
         }else {
-        	mMod.resetIsCalledFromBack();
+        	mMed.resetIsCalledFromBack();
         }
     }
 	
 	/**
 	 * [m]
+	 * show detail of a Session as fragment on landscape or as a new activity if on portrait
 	 * 
-	 * 
-	 * @param pos
+	 * @param pos receive the position to show
 	 */
 	private void showDetail(int pos){
-		mMod.setCurretnPosSession(pos);
+		mMed.setCurretnPosSession(pos);
 		mCurCheckPosition = pos;
 		if(mCurCheckPosition != Mediator.START_FRAG_POS){
 			if (mIsLandscape) {
 
 				Fragment detailSession = new DetailSessionFragment();
+				
+				//hide background image on void fragment
+				FrameLayout tmp = (FrameLayout) mMed.getMain().findViewById(R.id.main_secondary);
+				ImageView  image = (ImageView) tmp.findViewById(R.id.main_secondary_image_on_void);
+				image.setVisibility(View.GONE);
+				
 				FragmentManager manager = getFragmentManager();
-
+				
 				FragmentTransaction transaction = manager.beginTransaction();
 				transaction.replace(R.id.main_secondary, detailSession);
 				transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -124,13 +132,17 @@ public class ListSessionFragment extends ListFragment {
 
 
 			} else {
-
+				mMed.setCurretnPosSession(pos);
+				
 				Intent intent = new Intent();
 				intent.setClass(getActivity(), DetailActivity.class);
-				intent.putExtra("index", pos);
-				mMod.setCurretnPosSession(pos);
 				startActivity(intent);
 			}
+		}else if(mIsLandscape) {
+			//show background image on void fragment
+			FrameLayout tmp = (FrameLayout) mMed.getMain().findViewById(R.id.main_secondary);
+			ImageView  image = (ImageView) tmp.findViewById(R.id.main_secondary_image_on_void);
+			image.setVisibility(View.VISIBLE);
 		}
-	}
+	}//[m] showDetail
 }

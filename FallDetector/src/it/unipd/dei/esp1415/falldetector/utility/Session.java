@@ -3,18 +3,24 @@ package it.unipd.dei.esp1415.falldetector.utility;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import android.graphics.Bitmap;
+
 public class Session {
 	private String name;
-	private Calendar date;
-	private long timeStamp;
-	private String duration;
-	private String colorThumbnail; // as #RRGGBB or #AARRGGBB
+	private Calendar startDate;
+	private long startTimeStamp;
+	private long durationTimeStamp;
+	private long duration;  
+	private int colorThumbnail; // as #RRGGBB or #AARRGGBB
 	private long id;
 	private int falls;
 	private boolean isActive;
+	private String xmlFile;
 	private ArrayList<String> fallsEvent; // TODO describe fall event with a
 											// class
 
+	private Bitmap bitmapIcon = null;
+	
 	/**
 	 * [c] Create a Session object At the creation of the Session it make a
 	 * timestamp
@@ -24,8 +30,9 @@ public class Session {
 	 */
 	public Session(String name) {
 		this.name = name;
-		date = Calendar.getInstance();
-		timeStamp = date.getTimeInMillis();
+		startDate = Calendar.getInstance();
+		startTimeStamp = startDate.getTimeInMillis();
+		setDuration(startTimeStamp);
 	}//[c] Session
 
 	/**
@@ -38,8 +45,9 @@ public class Session {
 	 */
 	public Session(String name, long timeStamp) {
 		this.name = name;
-		date.setTimeInMillis(timeStamp);
-		this.timeStamp = timeStamp;
+		startDate.setTimeInMillis(timeStamp);
+		this.startTimeStamp = timeStamp;
+		setDuration(startTimeStamp);
 	}//[c] Session
 	
 	/**
@@ -68,12 +76,193 @@ public class Session {
 	 * 
 	 * @return the string of the date
 	 */
-	public String getDate() {
-		return date.get(Calendar.DAY_OF_MONTH) + "/"
-				+ (date.get(Calendar.MONTH) + 1) + "/"
-				+ date.get(Calendar.YEAR);
+	public String getStartDate() {
+		return startDate.get(Calendar.DAY_OF_MONTH) + "/"
+				+ (startDate.get(Calendar.MONTH) + 1) + "/"
+				+ startDate.get(Calendar.YEAR);
 
 	}//[m] getDate
-
-	// public void save
+	
+	public long getStartTimestamp() {
+		return startTimeStamp;
+	}//[m] getStartTimestamp
+	
+	/**
+	 * [m]
+	 * method to set the id
+	 * 
+	 * @param id the id of database for current session
+	 */
+	public void setId(long id){
+		this.id = id;
+	}//[m] setId
+	
+	/**
+	 * [m]
+	 * method to get the id
+	 * 
+	 * @return the id of database for current session
+	 */
+	public long getId(){
+		return id;		
+	}//[m] getId
+	
+	/**
+	 * [m]
+	 * method to set the color of current session as AARRGGBB
+	 * 
+	 * @param color the color for the thumbnail as AARRGGBB
+	 */
+	public void setColorThumbnail(int color){
+		colorThumbnail = color;
+	}
+	
+	/**
+	 * [m]
+	 * method to get the color of current session as AARRGGBB
+	 * 
+	 * @return the color for the thumbnail as AARRGGBB
+	 */
+	public int getColorThumbnail(){
+		return colorThumbnail;
+	}
+	
+	/**
+	 * [m]
+	 * method to set the number of falls of current session
+	 * 
+	 * @param number the number of falls of current session
+	 */
+	public void setFallsNum(int number){
+		falls = number;
+	}
+	
+	/**
+	 * [m]
+	 * method to get the number of falls of current session
+	 * 
+	 * @return number of falls of current session
+	 */
+	public int getFallsNum(){
+		return falls;
+	}
+	
+	/**
+	 * [m]
+	 * method to set the duration of current session
+	 */
+	public void setDuration(){
+		durationTimeStamp = Calendar.getInstance().getTimeInMillis();
+		duration = durationTimeStamp - startTimeStamp;
+	}
+	
+	/**
+	 * [m]
+	 * method to set the duration of current session
+	 * 
+	 * @param timeStamp the new timeStamp -> duration = timeStamp - startTimeStamp
+	 */
+	public void setDuration(long timeStamp){
+		durationTimeStamp = timeStamp;
+		duration = durationTimeStamp - startTimeStamp;
+	}
+	
+	/**
+	 * [m]
+	 * method to get the duration of current session
+	 * 
+	 * @return if the duration is more than 0 return it -1 otherwise 
+	 */
+	public long getDuration(){
+		if(duration != 0){
+			return duration;
+		}
+		return -1;
+	}
+	
+	/**
+	 * [m]
+	 * Method to see if current session is active. Use method setToActive to set this value on start
+	 * 
+	 * @see setToActive
+	 *
+	 * @return true if the session is active, false otherwise
+	 */
+	public boolean isActive(){
+		return isActive;
+	}
+	
+	/**
+	 * [m]
+	 * Set if the session is active
+	 * 
+	 * @param value if is 0 isActive return false, otherwise it return true
+	 * 
+	 * @see isActive
+	 */
+	public void setToActive(int value){
+		if(value == 0) isActive = false;
+		else isActive = true;
+	}
+	
+	/**
+	 * [m]
+	 * Set if the session is active
+	 * 
+	 * @param value
+	 * 
+	 * @see isActive
+	 */
+	public void setToActive(boolean value){
+		isActive = value;
+	}
+	
+	/**
+	 * [m]
+	 * Method to get the name of the file xml
+	 * 
+	 * @return the name of the xml file
+	 */
+	public String getXmlFileName(){
+		return xmlFile;
+	}
+	
+	/**
+	 * [m]
+	 * Method to set name of file xml as hhmmssmmmddmmaaaa
+	 */
+	public void generateXmlName(){
+		xmlFile = "" + startDate.get(Calendar.HOUR)
+				+ startDate.get(Calendar.MINUTE)
+				+ startDate.get(Calendar.SECOND)
+				+ startDate.get(Calendar.MILLISECOND)
+				+ startDate.get(Calendar.DAY_OF_MONTH)
+				+ (startDate.get(Calendar.MONTH) + 1)
+				+ startDate.get(Calendar.YEAR);
+	}
+	/**
+	 * [m]
+	 * Method to save the bitmap for the session 
+	 * 
+	 * @param bitmapIcon the bitmap to save
+	 */
+	public void setBitmap(Bitmap bitmapIcon){
+		this.bitmapIcon = bitmapIcon;
+	}
+	/**
+	 * [m]
+	 * Method to return the saved bitmap for current session
+	 * 
+	 * @return the saved bitmap
+	 */
+	public Bitmap getBitmap(){
+		return bitmapIcon;
+	}
+	
+	public String getStartTimeToString(){
+		String tmp = startDate.get(Calendar.HOUR)
+				+ ":" + startDate.get(Calendar.MINUTE)
+				+ ":" + startDate.get(Calendar.SECOND);
+		return tmp;
+	}
 }

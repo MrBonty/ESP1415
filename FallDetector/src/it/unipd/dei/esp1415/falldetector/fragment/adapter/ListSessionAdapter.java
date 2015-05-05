@@ -3,18 +3,12 @@ package it.unipd.dei.esp1415.falldetector.fragment.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import it.unipd.dei.esp1415.falldetector.DetailActivity;
 import it.unipd.dei.esp1415.falldetector.R;
-import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
-import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
+import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Color;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -82,6 +76,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	@Override
 	public View getView(int position, View view, ViewGroup parent) {
 		mViewHolder = new ViewHolder();
+		Session session = mArray.get(position);
 
 		if (view == null) {
 			view = mInflater.inflate(R.layout.activity_main_fragment_list_row,
@@ -153,11 +148,21 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 		}// if(!mIsLandscape)... else...
 
+		
+		
 		// TODO get color from session
-		mViewHolder.thumbnail.setBackgroundColor(Color.parseColor("BLUE"));
-		mViewHolder.sessionName.setText(mArray.get(position).getName());// TODO get name from session
-		mViewHolder.date.setText("TODO");// TODO get date from session
-		mViewHolder.time.setText("TODO");// TODO get time from session
+		Bitmap image = null;
+		if((image = session.getBitmap()) == null) {
+			image = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.thumblr);
+			image = ColorUtil.recolorIconBicolor(session.getColorThumbnail(), image);
+			session.setBitmap(image);
+		}
+		
+		mViewHolder.thumbnail.setImageBitmap(image);
+		
+		mViewHolder.sessionName.setText(session.getName());// TODO get name from session
+		mViewHolder.date.setText(session.getStartDate());// TODO get date from session
+		mViewHolder.time.setText(session.getStartTimeToString());// TODO get time from session
 		
 		return view;
 	}// [m] getView
@@ -166,7 +171,6 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		final View vw = view;
 		final int pos = position;
 		final ViewGroup vg = parent;
-		final View tmp;
 		
 		return new OnClickListener() {
 
@@ -245,7 +249,5 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		private TextView duration;
 		private TextView falls;
 	}// {c} ViewHolder
-	
-	
 
 }// {c} ListSessionAdapter
