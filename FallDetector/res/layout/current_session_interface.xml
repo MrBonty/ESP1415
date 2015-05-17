@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="3">
     
     <TextView
         android:id="@+id/current_sesstion_name"
@@ -15,25 +16,21 @@
         android:text="@string/title"
     />
     
-    <LinearLayout android:id="@+id/session_information_label"
-        android:orientation="horizontal"
+    <LinearLayout android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1">
         
 	    <ImageView 
 	        android:id="@+id/current_thumbnail"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:layout_marginStart="5dp"
-	        android:layout_marginLeft="5dp"
-	        android:layout_marginEnd="5dp"
-	        android:layout_marginRight="5dp"
+	        android:layout_margin="5dp"
 	        android:src="@drawable/paint"
 	        android:contentDescription="@string/thumbnail"
 	    />
 	    
-	    <LinearLayout android:id="@+id/current_session_data"
-	        android:orientation="vertical"
+	    <LinearLayout android:orientation="vertical"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content">
 	        
@@ -73,8 +70,7 @@
 	            android:gravity="center"
 	        />
 	        
-	        <LinearLayout android:id="@+id/buttons"
-	            android:orientation="horizontal"
+	        <LinearLayout android:orientation="horizontal"
 	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
 	            android:gravity="center">
@@ -100,73 +96,99 @@
 	    </LinearLayout>	<!-- current session data -->
 	    
     </LinearLayout>	<!-- session information label -->
-	    
-    <it.unipd.dei.esp1415.falldetector.ChartView
-        android:id="@+id/chart_x_axis"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_margin="3dp"
-        android:background="#ff0000"
-    />
-   
-    <it.unipd.dei.esp1415.falldetector.ChartView
-	    android:id="@+id/chart_y_axis"
-	    android:layout_width="match_parent"
-	    android:layout_height="40dp"
-	    android:layout_margin="3dp"
-	    android:background="#00ff00"
-	/>
-      
-    <it.unipd.dei.esp1415.falldetector.ChartView 
-        android:id="@+id/chart_z_axis"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_margin="3dp"
-        android:background="#0000ff"
-    />
 
-    <LinearLayout android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="3">
+	<LinearLayout android:orientation="vertical"
+	    android:layout_width="match_parent"
+	    android:layout_height="0dp"
+	    android:layout_weight="1">
 	    
-        <TextView android:id="@+id/acc_data_x"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:singleLine="true"
-            android:textSize="12sp"
-            android:textColor="#ff0000"
-            android:text="@string/acc_not_started"
-        />
+		<LinearLayout android:orientation="horizontal"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content">
+
+			<TextView
+			    android:id="@+id/acc_data_x"
+			    android:layout_width="wrap_content"
+			    android:layout_height="wrap_content"
+			    android:layout_marginTop="15dp"
+			    android:maxEms="5"
+	            android:minEms="5"
+			    android:gravity="fill|end"
+			    android:singleLine="true"
+			    android:text="@string/acc_not_started"
+			    android:textColor="#ff0000"
+			    android:textSize="12sp" />
+	        
+	        <it.unipd.dei.esp1415.falldetector.ChartView
+	        	android:id="@+id/chart_x_axis"
+	        	android:layout_width="fill_parent"
+	        	android:layout_height="35dp"
+	        	android:layout_margin="3dp"
+	        	android:background="#ff0000"
+	    	/>
+	        
+		</LinearLayout>
+	
+		<LinearLayout android:orientation="horizontal"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content">
+		
+		    <TextView android:id="@+id/acc_data_y"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginTop="15dp"
+	            android:maxEms="5"
+	            android:minEms="5"
+	            android:gravity="fill|end"
+	            android:singleLine="true"
+	            android:textSize="12sp"
+	            android:textColor="#00ff00"
+	            android:text="@string/acc_not_started"
+	        />
+		    
+	        <it.unipd.dei.esp1415.falldetector.ChartView
+			    android:id="@+id/chart_y_axis"
+			    android:layout_width="fill_parent"
+			    android:layout_height="35dp"
+			    android:layout_margin="3dp"
+			    android:background="#00ff00"
+			/>
+	        
+		</LinearLayout>
+	
+		<LinearLayout android:orientation="horizontal"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content">
         
-        <TextView android:id="@+id/acc_data_y"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:singleLine="true"
-            android:textSize="12sp"
-            android:textColor="#00ff00"
-            android:text="@string/acc_not_started"
-        />
+		    <TextView android:id="@+id/acc_data_z"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_marginTop="15dp"
+	            android:maxEms="5"
+	            android:minEms="5"
+	            android:gravity="fill|end"
+	            android:singleLine="true"
+	            android:textSize="12sp"
+	            android:textColor="#0000ff"
+	            android:text="@string/acc_not_started"
+	        />
+	    
+		    <it.unipd.dei.esp1415.falldetector.ChartView 
+	        	android:id="@+id/chart_z_axis"
+	        	android:layout_width="fill_parent"
+	        	android:layout_height="35dp"
+	        	android:layout_margin="3dp"
+        		android:background="#0000ff"
+    		/>
         
-        <TextView android:id="@+id/acc_data_z"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:singleLine="true"
-            android:textSize="12sp"
-            android:textColor="#0000ff"
-            android:text="@string/acc_not_started"
-        />
-    </LinearLayout>
+    	</LinearLayout>
+	    
+	</LinearLayout>
     
     <ListView android:id="@+id/session_falls"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
     />
     
 </LinearLayout>

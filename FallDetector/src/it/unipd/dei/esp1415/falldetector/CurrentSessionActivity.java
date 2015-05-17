@@ -24,38 +24,65 @@ import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class CurrentSessionActivity extends ActionBarActivity {
 	
-	// startDateTime is the start time of the current session
-	private Calendar startDateTime;
 	
-	// isSessionStarted is a flag which indicates if the session has started
-	private boolean isSessionStarted = false;
+	/**
+	 * Indicates session started time
+	 */
+	private Calendar sessionStartTime;
 	
-	/* isSessionPaused is a flag which indicates if the session has paused
-	 *  and stoppedTime saves the elapsed time */
-	private boolean isSessionPaused = false;
-	private long stoppedTime;
+	/**
+	 *  Displays the start time of the session
+	 */
+	private TextView txtvStartTime;
 	
-	// Sensor manager which manages accelerometer sensor
-	private SensorManager sensorManager;
+	/**
+	 * Indicates whether this session starts
+	 */
+	private boolean isSessionStarted;
 	
-	// TODO finish comments chartView
+	
+	/**
+	 *  Indicates whether this session pauses
+	 */
+	private boolean isSessionPaused;
+	
+	
+	/**
+	 *  Display the duration of the session
+	 */
+	private Chronometer chroDuration;
+	
+	
+	/**  
+	 *  Total duration of the session being active
+	 */
+	private long duration;
+	
+	
+	/**
+	 * Button which start, play and pause the session 
+	 */
+	private ImageButton ibtnPlayPause;
+	
+	// Customize view for chart
 	private ChartView chartXAxis;
 	private ChartView chartYAxis;
 	private ChartView chartZAxis;
 	
+	// Uses for drawing chart
 	private Paint paint;
 	
-//	//Counter
-//	private long count;
-//	private int chartWidth;
+	// Sensor manager which manages accelerometer sensor
+	private SensorManager sensorManager;
 	
-	// Accelerometer text view
-	private TextView accelerationDataX;
-	private TextView accelerationDataY;
-	private TextView accelerationDataZ;
+	// Text view for displaying acceleromter data
+	private TextView txtvAccDataX;
+	private TextView txtvAccDataY;
+	private TextView txtvAccDataZ;
 	
 	// Accelerometer data
 	private double x;
@@ -63,83 +90,100 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	private double z;
 	
 	public CurrentSessionActivity(){
-
-		//chartWidth = chartXAxis.getWidht();
 		
-		stoppedTime = 0l;
+		// Initialize variables
+		
+		isSessionStarted = false;
+		isSessionPaused = false;
+		
+		txtvStartTime = null;
+		ibtnPlayPause = null;
+		chroDuration = null;
+		
+		duration = 0l;
+		
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setColor(Color.WHITE);
+		
 		x = 0.0d;
 		y = 0.0d;
 		z = 0.0d;
 	}
 	
+	/**
+	 * Used for gathering accelerometer data
+	 */
 	private final SensorEventListener sensorEventListener 
 		= new SensorEventListener() {
 			
 			public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 			
-			public void onSensorChanged(SensorEvent event) { 
+			// Store the data from the accelerometer
+			public void onSensorChanged(SensorEvent event) {
 				
-				x = event.values[0];
-				y = event.values[1];
-				z = event.values[2];
+				// Ensure mutually exclusive access to the sensor.
+				synchronized(this){
+					x = event.values[0];
+					y = event.values[1];
+					z = event.values[2];
+				}
 			} 
 		};
 	
+	/**
+	 *  Updates accelerometer text view and chart using thread
+	 */
+	private void updateGUI() {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				
+				// Update chart X axis data and text
+				chartXAxis.setChartHeightData ((float) x);
+				chartXAxis.invalidate();
+				txtvAccDataX.setText("X: " + x);
+				txtvAccDataX.invalidate();
+				
+				// Update chart Y axis data and text
+				chartYAxis.setChartHeightData ((float) y);
+				chartYAxis.invalidate();
+				txtvAccDataY.setText("Y: " + y);
+				txtvAccDataY.invalidate();
+				
+				// Update chart Z axis data and text
+				chartZAxis.setChartHeightData ((float) z);
+				chartZAxis.invalidate();
+				txtvAccDataZ.setText("Z: " + z);
+				txtvAccDataZ.invalidate();
+			}
+		});
+	}
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.current_session_interface);
 		
-//		// TODO tmp
-//		ChartView cv = new ChartView(this);
-//		cv.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-//		this.addContentView(cv, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-//		
-//		//Bitmap b = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-//		Canvas c = new Canvas();
-//		Paint paint = new Paint();
-//		paint.setColor(Color.WHITE);
-//		c.drawLine(0, 0, 30, 30, paint);
-//		chartX = (View) findViewById(R.id.chart_x_axis);
-//		chartX.draw(c);
-//		chartX.invalidate();
-//		//-----------tmp
+		// Initialize txtvStartTime view
+		txtvStartTime = (TextView) findViewById(R.id.session_start_time);
 		
-		// txtvStartTime display the start time of the session
-		final TextView txtvStartTime 
-			= (TextView) findViewById(R.id.session_start_time);
+		// Initialize the sensor manager
+		sensorManager =
+				(SensorManager)getSystemService(Context.SENSOR_SERVICE);
 		
-		// chrmDuration display the duration of the session
-		final Chronometer chroDuration 
-			= (Chronometer) findViewById(R.id.session_duration);
+		// Initialize the chronometer
+		chroDuration = (Chronometer) findViewById(R.id.session_duration);
 		
-		// ibtnPlayPause button which start, play and pause the session 
-		final ImageButton ibtnPlayPause 
-			= (ImageButton) findViewById(R.id.play_button);
+		// Initialize the play-pause button view
+		ibtnPlayPause = (ImageButton) findViewById(R.id.play_button);
 		
 		// TODO end the session and add to UI2
 		final ImageButton ibtnEnd 
 			= (ImageButton) findViewById(R.id.end_button);
 		
-		// Initialize the sensor manager
-		sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-		
-		//chartXAxis shows the acceleration x axis data in a graphic way
-		chartXAxis = (ChartView) findViewById(R.id.chart_x_axis);
-		chartYAxis = (ChartView) findViewById(R.id.chart_y_axis);
-		chartZAxis = (ChartView) findViewById(R.id.chart_z_axis);
-		
-		// accelerationData* displays acceleration value in each axis
-		accelerationDataX = (TextView) findViewById(R.id.acc_data_x);
-		accelerationDataY = (TextView) findViewById(R.id.acc_data_y);
-		accelerationDataZ = (TextView) findViewById(R.id.acc_data_z);
-		
 		// lstvFalls referes to the ListView in the layout
 		ListView lstvFalls = (ListView) findViewById(R.id.session_falls);
 		
-		// List of falls occurs during the session
+		// List of falls occur during the session
 		final ArrayList<String> falls = new ArrayList<String>();
 		
 		// Array adapter of the list view
@@ -150,11 +194,24 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				this,android.R.layout.simple_list_item_1,falls);
 		lstvFalls.setAdapter(arrayAdapter);
 		
+		// Get default accelerometer sensor
 		Sensor accelerometer =
 			sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		
+		// Attach sensorListener to our accelerometer sensor
 		sensorManager.registerListener(sensorEventListener,
 									   accelerometer,
 									   SensorManager.SENSOR_DELAY_FASTEST);
+		
+		//Shows the acceleration axises data in a graphic way
+		chartXAxis = (ChartView) findViewById(R.id.chart_x_axis);
+		chartYAxis = (ChartView) findViewById(R.id.chart_y_axis);
+		chartZAxis = (ChartView) findViewById(R.id.chart_z_axis);
+		
+		//Displays acceleration value in each axis
+		txtvAccDataX = (TextView) findViewById(R.id.acc_data_x);
+		txtvAccDataY = (TextView) findViewById(R.id.acc_data_y);
+		txtvAccDataZ = (TextView) findViewById(R.id.acc_data_z);
 		
 		// Manages play and pause events
 		ibtnPlayPause.setOnClickListener(new View.OnClickListener() {
@@ -163,26 +220,33 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				
 				if(isSessionStarted){
-					// The session has already started and has paused
+					
+					// The session has already started and it's paused
 					if(isSessionPaused){
 						// Resume the chronometer from the stopped time
-						chroDuration.setBase(stoppedTime + SystemClock.elapsedRealtime());
+						chroDuration.setBase(SystemClock.elapsedRealtime() -
+								duration);
 						chroDuration.start();
 						
-						// Change the icon of play-pause button
-						ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
+						// Change the icon of play-pause button to pause
+						ibtnPlayPause.setImageResource(
+								R.drawable.pause_button_default);
 						
 						isSessionPaused = false;
 					}
 					// The session has already started and is not paused
 					else{
 						// Save the passed time and stop the chronometer
-						stoppedTime = chroDuration.getBase() - SystemClock.elapsedRealtime();
+						duration = SystemClock.elapsedRealtime() -
+								chroDuration.getBase();
+						
 						chroDuration.stop();
 						
-						// Change the icon of play-pause button
-						ibtnPlayPause.setImageResource(R.drawable.play_button_default);
+						// Change the icon of play-pause button to play
+						ibtnPlayPause.setImageResource(
+								R.drawable.play_button_default);
 						
+						// Swtich flag
 						isSessionPaused = true;
 						
 					}
@@ -191,19 +255,22 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				else{
 					
 					// Get the current time
-					startDateTime = Calendar.getInstance(TimeZone.getDefault());
+					sessionStartTime = Calendar.getInstance(
+							TimeZone.getDefault());
 					
 					// Set the current time to the text view field
-					txtvStartTime.setText(startDateTime.getTime().toString());
+					txtvStartTime.setText(
+							sessionStartTime.getTime().toString());
 					
 					// Start the chronometer
 					chroDuration.setBase(SystemClock.elapsedRealtime());
 					chroDuration.start();
 					
 					// Change the icon of play-pause button
-					ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
+					ibtnPlayPause.setImageResource(
+							R.drawable.pause_button_default);
 					
-					// Set session started
+					// Session starts
 					isSessionStarted = true;
 				}
 			}
@@ -216,25 +283,28 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				
 				// TODO this is just a TEMPORARY code
-				startDateTime = Calendar.getInstance(TimeZone.getDefault());
-				falls.add(0,startDateTime.getTime().toString()
+				sessionStartTime = Calendar.getInstance(TimeZone.getDefault());
+				falls.add(0,sessionStartTime.getTime().toString()
 							+ "  SENT");
 				arrayAdapter.notifyDataSetChanged();
+				Toast.makeText(getApplicationContext(), "Item added",
+						   Toast.LENGTH_LONG).show();
 			}
 		});
 		
-		// Update UI every 100milliseconds
+		// UpdateGUI throw thread every 100milliseconds
 		Timer updateTimer = new Timer("AccelerometerTimer");
 		updateTimer.scheduleAtFixedRate(new TimerTask(){
 			public void run(){
-				updateGUI();
+				if(isSessionStarted && !isSessionPaused)
+					updateGUI();
 			}
 		}, 0, 100);
+		
 	}
 
 	@Override
 	protected void onResume() {
-		
 		super.onResume();
 		Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sensorManager.registerListener(sensorEventListener,
@@ -247,6 +317,86 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	protected void onPause() {
 		sensorManager.unregisterListener(sensorEventListener);
 		super.onPause();
+	};
+	
+	@Override
+	protected void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+
+		// Saves session start time
+		savedInstanceState.putString("sessionStartTime",
+				txtvStartTime.getText().toString());
+		
+		// Saves whether this session starts
+		savedInstanceState.putBoolean("isSessionStarted", isSessionStarted);
+		
+		// Saves whether this session pauses
+		savedInstanceState.putBoolean("isSessionPaused", isSessionPaused);
+		
+		// Saves play-pause button status and chronometer
+		if(isSessionStarted){
+			if(isSessionPaused){
+				savedInstanceState.putLong("duration", duration);
+				savedInstanceState.putInt("ibtnPlayPause", 
+						R.drawable.play_button_default);
+			}				
+			else{
+				savedInstanceState.putLong("duration",
+					SystemClock.elapsedRealtime() - chroDuration.getBase());
+				savedInstanceState.putInt("ibtnPlayPause", 
+						R.drawable.pause_button_default);
+			}
+		}else{
+			savedInstanceState.putInt("ibtnPlayPause", 
+					R.drawable.play_button_default);
+			savedInstanceState.putLong("duration", 0l);
+		}
+		
+		// Saves chart axes data
+		savedInstanceState.putFloatArray("chartXAxis",
+				chartXAxis.getArrayFloat());
+		savedInstanceState.putFloatArray("chartYAxis",
+				chartYAxis.getArrayFloat());
+		savedInstanceState.putFloatArray("chartZAxis", 
+				chartZAxis.getArrayFloat());
+	};
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		
+		// Restore session start time
+		txtvStartTime.setText(
+				savedInstanceState.getString("sessionStartTime"));
+		
+		// Restore session start flag
+		isSessionStarted = savedInstanceState.getBoolean("isSessionStarted");
+		
+		// Set session paused everytime runtime changes occur
+		isSessionPaused = savedInstanceState.getBoolean("isSessionPaused");
+		
+		// Set play-pause button to play
+		ibtnPlayPause.setImageResource(
+				savedInstanceState.getInt("ibtnPlayPause"));
+		
+		// Restore session duration
+		duration = savedInstanceState.getLong("duration");
+		
+		// Restore chronometer data
+		chroDuration.setBase(SystemClock.elapsedRealtime() - duration);
+		
+		if(isSessionStarted && !isSessionPaused)
+			chroDuration.start();
+		else
+			chroDuration.stop();
+		
+		// Restore chart's axes data
+		chartXAxis.setChartHeightData(
+				savedInstanceState.getFloatArray("chartXAxis"));
+		chartYAxis.setChartHeightData(
+				savedInstanceState.getFloatArray("chartYAxis"));
+		chartZAxis.setChartHeightData(
+				savedInstanceState.getFloatArray("chartZAxis"));
 	};
 	
 	@Override
@@ -268,29 +418,5 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	// Updates the text view which new x, y, z values
-	private void updateGUI() {
-		runOnUiThread(new Runnable() {
-			public void run() {
-				
-				// Chart X axis data and text
-				chartXAxis.setHeight ((float) x);
-				chartXAxis.invalidate();
-				accelerationDataX.setText("X: " + x);
-				accelerationDataX.invalidate();
-				
-				// Chart Y axis data and text
-				chartYAxis.setHeight ((float) y);
-				chartYAxis.invalidate();
-				accelerationDataY.setText("Y: " + y);
-				accelerationDataY.invalidate();
-				
-				// Chart Z axis data and text
-				chartZAxis.setHeight ((float) z);
-				chartZAxis.invalidate();
-				accelerationDataZ.setText("Z: " + z);
-				accelerationDataZ.invalidate();
-			}
-		});
-	}
+	
 }
