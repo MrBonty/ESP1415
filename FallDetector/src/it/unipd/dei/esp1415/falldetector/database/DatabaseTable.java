@@ -68,8 +68,7 @@ public class DatabaseTable {
 	 * @param db the database to set
 	 */
 	public static void onCreate(SQLiteDatabase db){	
-		db.execSQL(SET_FK_ON);
-		
+		db.execSQL(SET_FK_ON);	
 		db.execSQL(CREATE_SESSION);
 		db.execSQL(CREATE_FALL_EVENTS);
 	}

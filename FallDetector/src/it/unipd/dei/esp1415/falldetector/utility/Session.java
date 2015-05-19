@@ -19,6 +19,9 @@ public class Session {
 	private ArrayList<String> fallsEvent; // TODO describe fall event with a
 											// class
 
+	private static final int TRUE = 1;
+	private static final int FALSE = 0;
+	
 	private Bitmap bitmapIcon = null;
 	
 	/**
@@ -171,13 +174,10 @@ public class Session {
 	 * [m]
 	 * method to get the duration of current session
 	 * 
-	 * @return if the duration is more than 0 return it -1 otherwise 
+	 * @return the value of duration 
 	 */
 	public long getDuration(){
-		if(duration != 0){
-			return duration;
-		}
-		return -1;
+		return duration;
 	}
 	
 	/**
@@ -194,6 +194,21 @@ public class Session {
 	
 	/**
 	 * [m]
+	 * Method to see if current session is active as integer. Use method setToActive to set this value on start
+	 * 
+	 * @see setToActive
+	 *
+	 * @return 1 if the session is active as true, 0 otherwise as false
+	 */
+	public int isActiveAsInteger(){
+		if(isActive){
+			return TRUE;
+		}
+		return FALSE; 
+	}
+	
+	/**
+	 * [m]
 	 * Set if the session is active
 	 * 
 	 * @param value if is 0 isActive return false, otherwise it return true
@@ -201,7 +216,7 @@ public class Session {
 	 * @see isActive
 	 */
 	public void setToActive(int value){
-		if(value == 0) isActive = false;
+		if(value == FALSE) isActive = false;
 		else isActive = true;
 	}
 	
@@ -229,6 +244,15 @@ public class Session {
 	
 	/**
 	 * [m]
+	 * Method to get the name of the file xml from existing on stored on db
+	 * 
+	 * @param xml the name get from db
+	 */
+	public void setXmlFileName(String xml){
+		xmlFile = xml;
+	}
+	/**
+	 * [m]
 	 * Method to set name of file xml as hhmmssmmmddmmaaaa
 	 */
 	public void generateXmlName(){
@@ -240,6 +264,7 @@ public class Session {
 				+ (startDate.get(Calendar.MONTH) + 1)
 				+ startDate.get(Calendar.YEAR);
 	}
+	
 	/**
 	 * [m]
 	 * Method to save the bitmap for the session 
@@ -249,6 +274,7 @@ public class Session {
 	public void setBitmap(Bitmap bitmapIcon){
 		this.bitmapIcon = bitmapIcon;
 	}
+	
 	/**
 	 * [m]
 	 * Method to return the saved bitmap for current session
@@ -259,6 +285,12 @@ public class Session {
 		return bitmapIcon;
 	}
 	
+	/**
+	 * [m]
+	 * Method to get the start time as string
+	 * 
+	 * @return start time as hh:mm:ss
+	 */
 	public String getStartTimeToString(){
 		String tmp = startDate.get(Calendar.HOUR)
 				+ ":" + startDate.get(Calendar.MINUTE)

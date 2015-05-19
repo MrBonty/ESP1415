@@ -13,8 +13,8 @@
 
         <ImageView
             android:id="@+id/row_thumbnail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
@@ -27,7 +27,7 @@
             android:clickable="false"
             android:contentDescription="@null"
             android:focusable="false"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/thumbnail" />
 
         <TextView
             android:id="@+id/row_session_name"
@@ -42,22 +42,25 @@
             android:text="@string/test"
             android:textSize="25sp" />
 
-        <Button
+        <ImageButton
             android:id="@+id/row_expand_button"
             android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
-            android:background="@drawable/ic_action_expand" />
+            android:src="@drawable/ic_action_expand"
+            android:contentDescription="@null" />
         
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginTop="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_toLeftOf="@id/row_expand_button"
             android:layout_toStartOf="@id/row_expand_button"
             android:orientation="vertical" >

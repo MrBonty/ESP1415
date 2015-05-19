@@ -14,7 +14,11 @@ public class ColorUtil {
 		  									 0x07080808};*/
 	
 	private final static int MAX_VAL = 0xFF;
-	private final static int MIN_VAL = 0x00;
+	//private final static int MIN_VAL = 0x00;
+
+	private final static int LAYER_TH = 6; 
+	private final static int SQUARE_NUM_FOR_ROOT = 2; //total size of thumbnail is 90 (acepted value 1, 2, 3, 5, 6, 9, 15,...)
+	private final static int SQUARE_NUM = SQUARE_NUM_FOR_ROOT *SQUARE_NUM_FOR_ROOT;
 	/**
 	 * [m]
 	 * This method calculate the color of the image for a new session
@@ -23,32 +27,29 @@ public class ColorUtil {
 	 * @return the value of the color in ARGB
 	 */
 	public static int imageColorSelector(Session lastSession){
-		long color = 0L;
-		/*
-		if(lastSession != null){
-			color = lastSession.getColorThumbnail();
-		}
+		int color = 0;
 		
-		for(int i=((int) Math.random()*20+10); i >= 0 ;i-- ){
-			color = color + COLOR_STEP[(int) Math.random()*10];		
-			color = color & 0x00000000FFFFFFFF;
-		}
-		*/
 		Random random = new Random();
 
-		int aa = /*((int)(( random.nextDouble()*201)+55))*/ MAX_VAL << 24;
+		int aa = MAX_VAL << 24;
 		int rr = ((int)(( random.nextDouble()*256)))<< 16;
 		int gg = ((int)(( random.nextDouble()*256)))<< 8;
 		int bb = ((int)(( random.nextDouble()*256)));
 		
 		color = (((aa | rr) | gg) | bb);
-		color = color & 0x00000000FFFFFFFF;
-		System.out.printf("aa=%h rr=%h gg=%h bb=%h t=%h\n", aa, rr, gg, bb, color);
 		
-		return (int) color;
+		return color;
 	}
 	
 
+	/**
+	 * [m]
+	 * Method to recolor the thumbnail image
+	 * 
+	 * @param color first color as aarrggbb, second color is get from ((0xff)-rr) | ((0xff)-gg) | ((0xff)-bb)
+	 * @param bitmap thumbnail image
+	 * @return recolored image
+	 */
 	public static Bitmap recolorIconBicolor(int color, Bitmap bitmap){
 		int aa = color >> 24;
 		int rr = (color >> 16) & MAX_VAL;
@@ -75,32 +76,44 @@ public class ColorUtil {
 		Bitmap image =bitmap.copy(Bitmap.Config.ARGB_8888, true);;
 		int heigth = image.getHeight();
 		int width = image.getWidth();
+
+		int line = 0;
+		int columns = 0;
+		int xVal = LAYER_TH;
+		int yVal = LAYER_TH;
+		int heigthSquare = (heigth - 2*LAYER_TH)/SQUARE_NUM_FOR_ROOT; 
+		int widthSquare = (width - 2*LAYER_TH)/SQUARE_NUM_FOR_ROOT;
 		
-		for(int y = 0; y<heigth; y++){
-			int min;
-			for(min= 0; min< width; min++){
-				if(((image.getPixel(min, y))>>24)>MIN_VAL){
-					break;
-				}
-			}
+		
+		for(int i= 0; i<SQUARE_NUM; i++){
 			
-			int max;
-			for(max= width-1; max <= 0 && min < width ; max--){
-				if(((image.getPixel(max, y))>>24)>MIN_VAL){
-					break;
-				}
-			}
-			
-			if(min < width && min != max){
-				for (int x = min+1; x < max; x++){
-					int c = image.getPixel(x, y);
-					
-					if((c>>24)!=MIN_VAL){
-						image.setPixel(x, y, color);
+			for(int y = yVal; y < (yVal+heigthSquare); y++){
+				for (int x = xVal; x < (xVal + widthSquare) ; x++){
+					if(line%2 != 0){
+						if(columns%2 != 0){
+							image.setPixel(x, y, color);
+						}else{
+							image.setPixel(x, y, invColor);
+						}
 					}else{
-						image.setPixel(x, y, invColor);
+						if(columns%2 != 0){
+							image.setPixel(x, y, invColor);
+						}else{
+							image.setPixel(x, y, color);
+						}
 					}
 				}
+				
+			}
+			columns++;
+			
+			if(columns == SQUARE_NUM_FOR_ROOT){
+				columns = 0;
+				line++;
+				yVal = LAYER_TH + line*heigthSquare;
+				xVal = LAYER_TH + columns*widthSquare;
+			}else{
+				xVal = LAYER_TH + columns*widthSquare;
 			}
 		}
 		

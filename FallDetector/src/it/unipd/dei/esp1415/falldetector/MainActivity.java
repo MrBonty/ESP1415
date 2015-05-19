@@ -56,7 +56,9 @@ public class MainActivity extends ActionBarActivity {
 			}
 
 			med.setDataSession(tmp);
+			//TODO END REMOVE ARRAY FOR TEST
 		}
+		
 		FragmentManager manager = getSupportFragmentManager();
 		Fragment listFragment = manager.findFragmentById(R.id.main_list);
 		if(listFragment == null){

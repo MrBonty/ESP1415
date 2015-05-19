@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -103,7 +102,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 		if (!mIsLandscape) {
 			
-			mViewHolder.expandButton = (Button) view
+			mViewHolder.expandButton = (ImageButton) view
 					.findViewById(R.id.row_expand_button);
 			mViewHolder.expandLayout = (LinearLayout) view
 					.findViewById(R.id.row_expand_layout);
@@ -153,7 +152,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		// TODO get color from session
 		Bitmap image = null;
 		if((image = session.getBitmap()) == null) {
-			image = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.thumblr);
+			image = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.thumbnail);
 			image = ColorUtil.recolorIconBicolor(session.getColorThumbnail(), image);
 			session.setBitmap(image);
 		}
@@ -198,11 +197,9 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	 * @param position
 	 *            get the position of the item to expand
 	 */
-	@SuppressWarnings("deprecation")
 	// for use of old method for API8
 	private void expand(int position) {
-		mViewHolder.expandButton.setBackgroundDrawable(mContext.getResources()
-				.getDrawable(R.drawable.ic_action_collapse));
+		mViewHolder.expandButton.setImageResource(R.drawable.ic_action_collapse);
 		mViewHolder.expandLayout.setVisibility(View.VISIBLE);
 
 		if (position == FIRST_POS && true) { // TODO get is active from session
@@ -222,11 +219,9 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	 * @param position
 	 *            get the position of the item to collapse
 	 */
-	@SuppressWarnings("deprecation")
 	// for use of old method for API8
 	private void collapse(int position) {
-		mViewHolder.expandButton.setBackgroundDrawable(mContext.getResources()
-				.getDrawable(R.drawable.ic_action_expand));
+		mViewHolder.expandButton.setImageResource(R.drawable.ic_action_expand);
 		mViewHolder.expandLayout.setVisibility(View.GONE);
 
 		if (position == FIRST_POS && true) { // TODO get is active from session
@@ -239,7 +234,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	static class ViewHolder {
 		private ImageView thumbnail;
 		private TextView sessionName;
-		private Button expandButton;
+		private ImageButton expandButton;
 		private LinearLayout expandLayout;
 		private RelativeLayout executeLayout;
 		private ImageButton playPause;
