@@ -15,6 +15,7 @@ public class Mediator {
 	private static ArrayList<Session> mSessions;
 	private static boolean mIsCalledFromBack;
 	private static boolean mIsSessionSet = false;
+	private static boolean mIsLand = false;
 
 	
 	/**
@@ -122,4 +123,12 @@ public class Mediator {
 		return mIsSessionSet;
 	}
 	
+	
+	public boolean isLand(){	
+		return mIsLand;
+	}
+	public boolean isLand(boolean isLand){
+		mIsLand = isLand;
+		return mIsLand;
+	}
 }

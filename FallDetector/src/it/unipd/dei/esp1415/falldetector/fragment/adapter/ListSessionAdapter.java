@@ -24,7 +24,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 	private ArrayList<Session> mArray;
 	private Context mContext;
-	private boolean mIsLandscape;
+	private boolean mDualPanel;
 	private LayoutInflater mInflater;
 	private boolean mIsLarge;
 	private ViewHolder mViewHolder;
@@ -61,12 +61,12 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	 *            receive an ArrayList of Session object
 	 */
 	private ListSessionAdapter(Context context, int resource,
-			List<Session> objects, boolean isLand) {
+			List<Session> objects, boolean isDual) {
 		super(context, resource, objects);
 
 		mArray = (ArrayList<Session>) objects;
 		mContext = context;
-		mIsLandscape = isLand;
+		mDualPanel = isDual;
 		mInflater = LayoutInflater.from(context);
 		mIsLarge = true;
 		mExpCol = new int[mArray.size()];
@@ -100,7 +100,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 		}// if... else...
 
-		if (!mIsLandscape) {
+		if (!mDualPanel) {
 			
 			mViewHolder.expandButton = (ImageButton) view
 					.findViewById(R.id.row_expand_button);

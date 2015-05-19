@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +27,8 @@ public class MainActivity extends ActionBarActivity {
 		mContext = getApplication();
 
 		Mediator med = new Mediator(mContext, this);
+		
+		boolean isLand = med.isLand(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
 		
 		if(!med.hasDataSession()){
 
@@ -60,6 +63,7 @@ public class MainActivity extends ActionBarActivity {
 		}
 		
 		FragmentManager manager = getSupportFragmentManager();
+		
 		Fragment listFragment = manager.findFragmentById(R.id.main_list);
 		if(listFragment == null){
 			listFragment = new ListSessionFragment();
@@ -67,7 +71,13 @@ public class MainActivity extends ActionBarActivity {
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.main_list, listFragment);
 		transaction.commit();
-
+		
+		Fragment detailFragment = manager.findFragmentById(R.id.main_details);
+		if(detailFragment != null && isLand){
+			transaction.replace(R.id.main_details, detailFragment);
+			transaction.commit();
+		}
+		
 		setContentView(R.layout.activity_main);
 
 	}

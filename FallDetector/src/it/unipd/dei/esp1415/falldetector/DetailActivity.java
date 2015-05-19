@@ -1,13 +1,10 @@
 package it.unipd.dei.esp1415.falldetector;
 
-import java.util.ArrayList;
-
 import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
+import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
-import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -17,25 +14,30 @@ import android.view.MenuItem;
 public class DetailActivity extends ActionBarActivity {
 
 	private Mediator mMed;
+	private boolean mIsDual = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+		
+		if(savedInstanceState != null){
+			mIsDual = savedInstanceState.getBoolean(ListSessionFragment.TAG_DUAL);
+		}
+		
+		mMed = new Mediator();
+		
+		if (mIsDual && mMed.isLand(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)) {
 			finish();
 			return;
 		}
-
-		mMed = new Mediator();
+		
 		setContentView(R.layout.activity_detail);
-		ArrayList<Session> tmp = mMed.getDataSession();
-
-		int index = mMed.getCurretnPosSession();
-		Fragment detailSession = DetailSessionFragment.newInstance(index, tmp);
-		FragmentManager manager = getSupportFragmentManager();
-
-		FragmentTransaction transaction = manager.beginTransaction();
+		
+		
+		
+		Fragment detailSession = new DetailSessionFragment();
+		
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 		transaction.replace(R.id.detail, detailSession);
 
 		transaction.commit();
