@@ -18,8 +18,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-
-
 public class XmlEditor{
 	
 	//TODO
@@ -134,7 +132,7 @@ public class XmlEditor{
 		return toSearch;
 	}
 	
-	
+	//TODO modify methods
 	private int save(){
 		DOMSource domSource = new DOMSource(mDoc);
 		StreamResult streamResult = new StreamResult(new File(mPath));

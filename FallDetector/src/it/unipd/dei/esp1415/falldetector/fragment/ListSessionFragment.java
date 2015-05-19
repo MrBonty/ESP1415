@@ -2,6 +2,7 @@ package it.unipd.dei.esp1415.falldetector.fragment;
 
 import java.util.ArrayList;
 
+import it.unipd.dei.esp1415.falldetector.CurrentSessionActivity;
 import it.unipd.dei.esp1415.falldetector.DetailActivity;
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.fragment.adapter.ListSessionAdapter;
@@ -30,6 +31,8 @@ public class ListSessionFragment extends ListFragment {
 	
 	public static final String SAVE_CURRENT_CHOICE = "curChoice";
 	public static final String TAG_DUAL = "isDual";
+	
+	public static final int FIRST_ITEM = 0;
 	
 	/**
 	 * [c] Void Constructor use instead ListFragmentSession name =
@@ -121,27 +124,35 @@ public class ListSessionFragment extends ListFragment {
 		mCurCheckPosition = pos;
 		boolean toSwipe = mCurCheckPosition != Mediator.START_FRAG_POS;
 
-		if (mDualPanel) {
+		if(pos == FIRST_ITEM && mMed.getDataSession().get(FIRST_ITEM).isActive()){
 			
+			Intent intent = new Intent();
+			intent.setClass(getActivity(), CurrentSessionActivity.class);
+			startActivity(intent);
+			
+		}else{
+			if (mDualPanel) {
+
 				//hide background image on void fragment
 				FrameLayout tmp = (FrameLayout) mMed.getMain().findViewById(R.id.main_secondary);
 				ImageView  image = (ImageView) tmp.findViewById(R.id.main_secondary_image_on_void);
 				if(toSwipe){
-				image.setVisibility(View.GONE);
+					image.setVisibility(View.GONE);
 				}else {
 					image.setVisibility(View.VISIBLE);
 				}
-			
-				((DetailSessionFragment)mDetailFrag).changeLayout();
-				
-		}else { 
-			if (toSwipe){			
-				mMed.setCurretnPosSession(pos);
 
-				Intent intent = new Intent();
-				intent.putExtra(TAG_DUAL, mDualPanel);
-				intent.setClass(getActivity(), DetailActivity.class);
-				startActivity(intent);
+				((DetailSessionFragment)mDetailFrag).changeLayout();
+
+			}else { 
+				if (toSwipe){			
+					mMed.setCurretnPosSession(pos);
+
+					Intent intent = new Intent();
+					intent.putExtra(TAG_DUAL, mDualPanel);
+					intent.setClass(getActivity(), DetailActivity.class);
+					startActivity(intent);
+				}
 			}
 		}
 

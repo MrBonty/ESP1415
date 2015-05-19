@@ -51,14 +51,17 @@ public class XmlFile {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
 		catch (IllegalArgumentException e) {
 		    // TODO Auto-generated catch block
 		    e.printStackTrace();
+		    return null;
 		}
 		catch (IllegalStateException e) {
 		    // TODO Auto-generated catch block
 		    e.printStackTrace();
+		    return null;
 		}
 		
 		return new XmlEditor(this);

@@ -49,7 +49,9 @@ public class MainActivity extends ActionBarActivity {
 			tmp.add(new Session("o"));
 			tmp.add(new Session("p"));
 			tmp.add(new Session("q"));
-
+			
+			tmp.get(0).setToActive(true);
+			
 			for(int i = tmp.size()-1; i >= 0; i--){
 				if(i+1 == tmp.size()){
 					tmp.get(i).setColorThumbnail(ColorUtil.imageColorSelector(null));
