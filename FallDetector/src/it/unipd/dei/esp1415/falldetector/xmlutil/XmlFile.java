@@ -22,7 +22,7 @@ public class XmlFile {
 	public XmlFile(String name, Context context){
 		try {
 			name = name + ".xml";
-			mFileOS = context.openFileOutput(name, Context.MODE_PRIVATE);
+			mFileOS = context.openFileOutput(name, Context.MODE_APPEND);
 			mFileIS = context.openFileInput(name);
 			
 			mPath = context.getFileStreamPath(name).getAbsolutePath();
@@ -37,33 +37,6 @@ public class XmlFile {
 	}
 	
 	public XmlEditor edit(){
-		try {
-			if(mFileIS.available() == 0){
-			    XmlSerializer xmlSerializer = Xml.newSerializer();              
-			    StringWriter writer = new StringWriter();
-			    xmlSerializer.setOutput(writer);
-			    xmlSerializer.startDocument("UTF-8", true);
-			    xmlSerializer.endDocument();
-			    xmlSerializer.flush();
-			    String dataWrite = writer.toString();
-			    mFileOS.write(dataWrite.getBytes());
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		catch (IllegalArgumentException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-		    return null;
-		}
-		catch (IllegalStateException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-		    return null;
-		}
-		
 		return new XmlEditor(this);
 	}
 	

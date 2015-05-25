@@ -16,11 +16,14 @@ public class Session {
 	private int falls;
 	private boolean isActive;
 	private String xmlFile;
-	private ArrayList<String> fallsEvent; // TODO describe fall event with a
+	private ArrayList<Fall> fallsEvent; // TODO describe fall event with a
 											// class
 
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
+	
+	public static final int DESC = 0;
+	public static final int ASC = 1;
 	
 	private Bitmap bitmapIcon = null;
 	
@@ -296,5 +299,38 @@ public class Session {
 				+ ":" + startDate.get(Calendar.MINUTE)
 				+ ":" + startDate.get(Calendar.SECOND);
 		return tmp;
+	}
+	
+	public void setFallEvents(ArrayList<Fall> items){
+		fallsEvent = items;
+		orderFalls(DESC);
+		
+	}
+	public void addFall(Fall object){
+		fallsEvent.add(object);
+	}
+	
+	public void addFallEvents(ArrayList<Fall> items){
+		for (int i = 0; i< items.size(); i++){
+			Fall obj = items.get(i);
+			
+			int j;
+			for (j = 0; j< fallsEvent.size() && obj.getTimeStampFallEvent() > fallsEvent.get(j).getTimeStampFallEvent(); j++);
+			
+			fallsEvent.add(j, obj);
+		}
+	}
+	public Fall getFall(int index){
+		return fallsEvent.get(index);
+	}
+	public Fall removeFall(int index){
+		return fallsEvent.remove(index);
+	}
+	public ArrayList<Fall> getFallEvents(){
+		return fallsEvent;
+	}
+	
+	private void orderFalls(int or){
+		//TODO SELECT ORDER ALGORITHM
 	}
 }
