@@ -1,12 +1,9 @@
 package it.unipd.dei.esp1415.falldetector;
 
-import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
-
 import java.util.ArrayList;
-
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,11 +21,18 @@ public class MainActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		setContentView(R.layout.activity_main);
+		
+		Configuration conf = getResources().getConfiguration();
 		mContext = getApplication();
 
 		Mediator med = new Mediator(mContext, this);
 		
-		boolean isLand = med.isLand(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE);
+		boolean isLand = med.isLand(conf.orientation == Configuration.ORIENTATION_LANDSCAPE);
+		boolean xlarge = ((conf.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE);
+	    boolean large = ((conf.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
+	    
+		med.isLarge(xlarge || large);
 		
 		if(!med.hasDataSession()){
 
@@ -67,20 +71,18 @@ public class MainActivity extends ActionBarActivity {
 		FragmentManager manager = getSupportFragmentManager();
 		
 		Fragment listFragment = manager.findFragmentById(R.id.main_list);
-		if(listFragment == null){
-			listFragment = new ListSessionFragment();
-		}
+
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.main_list, listFragment);
-		transaction.commit();
 		
 		Fragment detailFragment = manager.findFragmentById(R.id.main_details);
+
 		if(detailFragment != null && isLand){
 			transaction.replace(R.id.main_details, detailFragment);
-			transaction.commit();
 		}
+
+		transaction.commit();
 		
-		setContentView(R.layout.activity_main);
 
 	}
 
@@ -102,4 +104,5 @@ public class MainActivity extends ActionBarActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
 }

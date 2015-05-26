@@ -162,7 +162,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		mViewHolder.sessionName.setText(session.getName());// TODO get name from session
 		mViewHolder.date.setText(session.getStartDate());// TODO get date from session
 		mViewHolder.time.setText(session.getStartTimeToString());// TODO get time from session
-		
+
 		return view;
 	}// [m] getView
 

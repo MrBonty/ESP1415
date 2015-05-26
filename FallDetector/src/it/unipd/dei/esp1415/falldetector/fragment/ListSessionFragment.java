@@ -56,14 +56,24 @@ public class ListSessionFragment extends ListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+
+		Log.i("FUCK", "OK");
 		
 		mDetailFrag = getFragmentManager().findFragmentById(R.id.main_details);
-		mDualPanel = mDetailFrag != null;
 		
+		mMed = new Mediator();
+		mArray = mMed.getDataSession();
+		mContext = mMed.getContext();
+		mCurCheckPosition = mMed.getCurretnPosSession();
+		
+		Log.i("FUCK1", (mArray == null) + "");
+		
+		mDualPanel = mMed.isLarge() && mMed.isLand();
 		
 		ListSessionAdapter adapter = new ListSessionAdapter(mContext, mArray,
 				mDualPanel);
 		
+		Log.i("FUCK2", (adapter == null) + "");
 		/*
 		if (!mod.hasCurretnPosSessionSet()) {
 			// Restore last state for checked position.
@@ -92,12 +102,10 @@ public class ListSessionFragment extends ListFragment {
 
  			Log.i("CALLOF", "on " + mCurCheckPosition);
 			showDetail(mCurCheckPosition);
-
 		}
 		
 		setListAdapter(adapter);
 	}// [m] onActivityCreated
-	
 
 	@Override
     public void onSaveInstanceState(Bundle outState) {
@@ -118,7 +126,6 @@ public class ListSessionFragment extends ListFragment {
 	 * @param pos receive the position to show
 	 */
 	private void showDetail(int pos){
-		
 		
 		mMed.setCurretnPosSession(pos);
 		mCurCheckPosition = pos;
@@ -149,7 +156,6 @@ public class ListSessionFragment extends ListFragment {
 					mMed.setCurretnPosSession(pos);
 
 					Intent intent = new Intent();
-					intent.putExtra(TAG_DUAL, mDualPanel);
 					intent.setClass(getActivity(), DetailActivity.class);
 					startActivity(intent);
 				}

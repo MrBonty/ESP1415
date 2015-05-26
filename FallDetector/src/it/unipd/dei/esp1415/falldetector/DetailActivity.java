@@ -1,7 +1,6 @@
 package it.unipd.dei.esp1415.falldetector;
 
 import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
-import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
@@ -20,20 +19,18 @@ public class DetailActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		if(savedInstanceState != null){
-			mIsDual = savedInstanceState.getBoolean(ListSessionFragment.TAG_DUAL);
-		}
+		Configuration conf = getResources().getConfiguration();
 		
 		mMed = new Mediator();
 		
-		if (mIsDual && mMed.isLand(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)) {
+		mIsDual = mMed.isLarge() && mMed.isLand(conf.orientation == Configuration.ORIENTATION_LANDSCAPE);
+		
+		if (mIsDual ) {
 			finish();
 			return;
 		}
 		
 		setContentView(R.layout.activity_detail);
-		
-		
 		
 		Fragment detailSession = new DetailSessionFragment();
 		

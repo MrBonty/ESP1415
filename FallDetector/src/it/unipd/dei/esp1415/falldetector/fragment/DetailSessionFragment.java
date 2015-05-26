@@ -19,8 +19,7 @@ public class DetailSessionFragment extends Fragment {
 	private static int mIndex;
 	private Mediator mMod; 
 	
-	private RelativeLayout lt;
-	private TextView sessionName;
+	private ViewHolder viewHolder;
 	
 
 	public DetailSessionFragment() {
@@ -35,10 +34,11 @@ public class DetailSessionFragment extends Fragment {
 		
 		View rootView = inflater.inflate(R.layout.activity_detail_fragment,
 				container, false);
+		viewHolder= new ViewHolder();
 		
-		//FOR TEST CREATE AN ADAPTER creating the adapter private of the class
-		lt = (RelativeLayout) rootView.findViewById(R.id.detail_layout);
-		sessionName = (TextView) rootView.findViewById(R.id.detailFrag_session_name);
+		//FOR TEST
+		viewHolder.lt = (RelativeLayout) rootView.findViewById(R.id.detail_layout);
+		viewHolder.sessionName = (TextView) rootView.findViewById(R.id.detailFrag_session_name);
 		
 		changeLayout();
 		//END FOR TEST
@@ -48,17 +48,25 @@ public class DetailSessionFragment extends Fragment {
 	
 	public void changeLayout(){
 		mIndex = mMod.getCurretnPosSession();
-		
+
 		if(mIndex == Mediator.START_FRAG_POS){
-			lt.setVisibility(View.GONE);
+			if(viewHolder.lt != null){
+				viewHolder.lt.setVisibility(View.GONE);
+			}
 		}else{
-			if(lt != null){
-				lt.setVisibility(View.VISIBLE);
+			if(viewHolder.lt != null){
+				viewHolder.lt.setVisibility(View.VISIBLE);
 			}
 
-			//FOR TEST CREATE AN ADAPTER creating the adapter private of the class
-			sessionName.setText(mArray.get(mIndex).getName());
+			//FOR TEST
+			viewHolder.sessionName.setText(mArray.get(mIndex).getName());
 			//END FOR TEST
 		}
+	
+	}
+	
+	private class ViewHolder{
+		private RelativeLayout lt;
+		private TextView sessionName;
 	}
 }

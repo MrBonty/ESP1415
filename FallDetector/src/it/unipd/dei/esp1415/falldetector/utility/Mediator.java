@@ -16,7 +16,7 @@ public class Mediator {
 	private static boolean mIsCalledFromBack;
 	private static boolean mIsSessionSet = false;
 	private static boolean mIsLand = false;
-
+	private static boolean mIsLarge = false;
 	
 	/**
 	 * [c]
@@ -130,5 +130,13 @@ public class Mediator {
 	public boolean isLand(boolean isLand){
 		mIsLand = isLand;
 		return mIsLand;
+	}
+	
+	public boolean isLarge(){	
+		return mIsLarge;
+	}
+	public boolean isLarge(boolean isLarge){
+		mIsLarge = isLarge;
+		return mIsLarge;
 	}
 }

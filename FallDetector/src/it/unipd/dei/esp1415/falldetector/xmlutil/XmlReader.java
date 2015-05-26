@@ -89,16 +89,15 @@ public class XmlReader {
 		return tmp;
 	}
 	
-	public String[][] readNode(Element node){
-		NamedNodeMap nnm = node.getAttributes();
-		int l = nnm.getLength();
-		
+	public String/*[][]*/ readNode(Element node){
+		String tmp = node.getAttribute("*");
+		/*
 		String[][] tmp= new String[l][2];
 		for(int i = 0; i<l ;i++){
 			tmp[i][0] = ""+ nnm.;
 			tmp[i][1] = "";
 		}
-		
+		*/
 		return tmp;
 	}
 	

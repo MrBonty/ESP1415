@@ -12,7 +12,7 @@
     right to left layout and for compatibility for API less than 17-->
 	       
     
-    <FrameLayout
+    <fragment
         android:id="@+id/main_list"
         android:name="it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment"
         android:layout_width="0dp"
