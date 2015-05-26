@@ -1,5 +1,7 @@
 package it.unipd.dei.esp1415.falldetector.utility;
 
+import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
+
 import java.util.ArrayList;
 
 import android.app.Activity;
@@ -17,6 +19,8 @@ public class Mediator {
 	private static boolean mIsSessionSet = false;
 	private static boolean mIsLand = false;
 	private static boolean mIsLarge = false;
+	
+	private static DetailSessionFragment mDetailSessionFragment;
 	
 	/**
 	 * [c]
@@ -138,5 +142,12 @@ public class Mediator {
 	public boolean isLarge(boolean isLarge){
 		mIsLarge = isLarge;
 		return mIsLarge;
+	}
+	
+	public void setDetailFrag(DetailSessionFragment detailFrag){
+		mDetailSessionFragment = detailFrag;
+	}
+	public DetailSessionFragment getDetatilFrag(){
+		return mDetailSessionFragment;
 	}
 }

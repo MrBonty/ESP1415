@@ -12,10 +12,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -57,13 +58,10 @@ public class ListSessionFragment extends ListFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
-		mDetailFrag = getFragmentManager().findFragmentById(R.id.main_details);
-		
 		mMed = new Mediator();
 		mArray = mMed.getDataSession();
 		mContext = mMed.getContext();
 		mCurCheckPosition = mMed.getCurretnPosSession();
-		
 		
 		mDualPanel = mMed.isLarge() && mMed.isLand();
 		
@@ -135,17 +133,21 @@ public class ListSessionFragment extends ListFragment {
 			
 		}else{
 			if (mDualPanel) {
+				
+				FragmentManager manager = getFragmentManager();
 
+				mDetailFrag = new DetailSessionFragment();
+				
 				//hide background image on void fragment
-				FrameLayout tmp = (FrameLayout) mMed.getMain().findViewById(R.id.main_secondary);
-				ImageView  image = (ImageView) tmp.findViewById(R.id.main_secondary_image_on_void);
+				ImageView  image = (ImageView)  mMed.getMain().findViewById(R.id.main_secondary_image_on_void);
 				if(toSwipe){
 					image.setVisibility(View.GONE);
 				}else {
 					image.setVisibility(View.VISIBLE);
 				}
-
-				((DetailSessionFragment)mDetailFrag).changeLayout();
+				
+				FragmentTransaction transiction = manager.beginTransaction();
+				transiction.replace(R.id.main_details, mDetailFrag).commit();	
 
 			}else { 
 				if (toSwipe){			

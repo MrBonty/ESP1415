@@ -24,27 +24,29 @@
         android:layout_height="fill_parent"
         android:background="@drawable/shadow_left_to_right" />
 
-    <FrameLayout
+    <RelativeLayout
         android:id="@+id/main_secondary"
         android:layout_width="0dp"
         android:layout_height="match_parent" 
         android:layout_weight="0.6">
-             
+
+      
+        <FrameLayout
+            android:id="@+id/main_details"
+            android:name="it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment"
+        	android:layout_width="match_parent"
+        	android:layout_height="match_parent"/>
+
         <ImageView
             android:id="@+id/main_secondary_image_on_void"
             android:layout_width="300dp"
             android:layout_height="300dp"
-            android:contentDescription="@null"
-            android:layout_gravity="center_vertical|center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:alpha="0.1"
+            android:contentDescription="@null"
             android:src="@drawable/image_icon" />
-      
-        <fragment
-            android:id="@+id/main_details"
-            android:name="it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment"
-        	android:layout_width="match_parent"
-        	android:layout_height="match_parent"
-            android:visibility="gone"/>
-    </FrameLayout>
+        
+    </RelativeLayout>
 
 </LinearLayout>

@@ -1,9 +1,12 @@
 package it.unipd.dei.esp1415.falldetector;
 
+import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
+
 import java.util.ArrayList;
+
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,6 +14,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -75,14 +79,7 @@ public class MainActivity extends ActionBarActivity {
 		FragmentTransaction transaction = manager.beginTransaction();
 		transaction.replace(R.id.main_list, listFragment);
 		
-		Fragment detailFragment = manager.findFragmentById(R.id.main_details);
-
-		if(detailFragment != null && isLand){
-			transaction.replace(R.id.main_details, detailFragment);
-		}
-
 		transaction.commit();
-		
 
 	}
 
