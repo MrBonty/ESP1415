@@ -56,8 +56,6 @@ public class ListSessionFragment extends ListFragment {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
-		Log.i("FUCK", "OK");
 		
 		mDetailFrag = getFragmentManager().findFragmentById(R.id.main_details);
 		
@@ -66,14 +64,12 @@ public class ListSessionFragment extends ListFragment {
 		mContext = mMed.getContext();
 		mCurCheckPosition = mMed.getCurretnPosSession();
 		
-		Log.i("FUCK1", (mArray == null) + "");
 		
 		mDualPanel = mMed.isLarge() && mMed.isLand();
 		
 		ListSessionAdapter adapter = new ListSessionAdapter(mContext, mArray,
 				mDualPanel);
 		
-		Log.i("FUCK2", (adapter == null) + "");
 		/*
 		if (!mod.hasCurretnPosSessionSet()) {
 			// Restore last state for checked position.
