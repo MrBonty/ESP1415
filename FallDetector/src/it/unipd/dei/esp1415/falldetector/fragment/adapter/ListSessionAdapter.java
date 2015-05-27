@@ -30,6 +30,8 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	private ViewHolder mViewHolder;
 	private int[] mExpCol; // 0 to expand, 1 to collapse
 	
+	private Session mSession;
+	
 	private static final int COLLAPSED = 0;
 	private static final int TO_COLLAPSE = 1;
 	private static final int TO_EXPAND = 2;
@@ -76,6 +78,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	public View getView(int position, View view, ViewGroup parent) {
 		mViewHolder = new ViewHolder();
 		Session session = mArray.get(position);
+		mSession = session;
 
 		if (view == null) {
 			view = mInflater.inflate(R.layout.activity_main_fragment_list_row,
@@ -202,15 +205,15 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		mViewHolder.expandButton.setImageResource(R.drawable.ic_action_collapse);
 		mViewHolder.expandLayout.setVisibility(View.VISIBLE);
 
-		if (position == FIRST_POS && true) { // TODO get is active from session
+		if (position == FIRST_POS && mSession.isActive()) { // TODO get is active from session
 												// position == 0
 			mViewHolder.executeLayout.setVisibility(View.VISIBLE);
 			mViewHolder.playPause.setOnClickListener(null); // TODO listener
 			mViewHolder.stop.setOnClickListener(null); // TODO listener
 		}// if
 		
-		mViewHolder.duration.setText("TODO");// TODO get duration from session
-		mViewHolder.falls.setText("TODO");// TODO get falls from session
+		mViewHolder.duration.setText(mSession.getDurationString());
+		mViewHolder.falls.setText(mSession.getFallsNum()+"");
 	}// [m] expand
 
 	/**
@@ -224,7 +227,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		mViewHolder.expandButton.setImageResource(R.drawable.ic_action_expand);
 		mViewHolder.expandLayout.setVisibility(View.GONE);
 
-		if (position == FIRST_POS && true) { // TODO get is active from session
+		if (position == FIRST_POS && mSession.isActive()) { // TODO get is active from session
 												// position == 0
 			mViewHolder.executeLayout.setVisibility(View.GONE);
 		}// if

@@ -9,11 +9,11 @@ public class Session {
 	private String name;
 	private Calendar startDate;
 	private long startTimeStamp;
-	private long durationTimeStamp;
-	private long duration;  
+	private long endTimeStamp;
+	private long duration = 0;  
 	private int colorThumbnail; // as #RRGGBB or #AARRGGBB
 	private long id;
-	private int falls;
+	private int falls = 0;
 	private boolean isActive;
 	private String xmlFile;
 	private ArrayList<Fall> fallsEvent; // TODO describe fall event with a
@@ -158,8 +158,8 @@ public class Session {
 	 * method to set the duration of current session
 	 */
 	public void setDuration(){
-		durationTimeStamp = Calendar.getInstance().getTimeInMillis();
-		duration = durationTimeStamp - startTimeStamp;
+		endTimeStamp = Calendar.getInstance().getTimeInMillis();
+		duration = endTimeStamp - startTimeStamp;
 	}
 	
 	/**
@@ -169,8 +169,8 @@ public class Session {
 	 * @param timeStamp the new timeStamp -> duration = timeStamp - startTimeStamp
 	 */
 	public void setDuration(long timeStamp){
-		durationTimeStamp = timeStamp;
-		duration = durationTimeStamp - startTimeStamp;
+		endTimeStamp = timeStamp;
+		duration = endTimeStamp - startTimeStamp;
 	}
 	
 	/**
@@ -333,4 +333,25 @@ public class Session {
 	private void orderFalls(int or){
 		//TODO SELECT ORDER ALGORITHM
 	}
+
+	/**[m]
+	 * Method to get the duration as String HH:MM
+	 * 
+	 * @return the duration as HH:MM
+	 */
+	public String getDurationString() {
+		String tmp = "00:00";
+		if(duration > 0){
+			int s = (int) (duration / 1000);
+		  
+		    int h = (int) (s / 3600);
+			
+		    int m = (int) ((s % 3600)/60);
+		    
+		    tmp = h+ ":"+ m;
+		}
+		return tmp;
+	}
+	
+	
 }
