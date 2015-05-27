@@ -18,7 +18,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
+/**
+ * Class to create or modify an exemplar of XmlFile
+ */
 public class XmlEditor{
 	
 	//TODO
@@ -67,7 +69,8 @@ public class XmlEditor{
 			
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			mTransf  = transformerFactory.newTransformer();
-			
+
+			mFile.setDoc(mDoc);
 			isReady = true;
 			
 		} catch (ParserConfigurationException e) {
@@ -83,7 +86,7 @@ public class XmlEditor{
 			isReady = false;
 			e.printStackTrace();
 		}
-		
+
 	}
 	
 	/**
@@ -236,11 +239,18 @@ public class XmlEditor{
 		return save();
 	}
 	
-	
-	
+	/**
+	 * [m]
+	 * Method to get a Node
+	 * 
+	 * @param nodeName the name of the node to get
+	 * @param attributeKey the keys of node
+	 * @param attributeValue the values of the node
+	 * @param isFirstId set to true if first attribute is a id 
+	 * @return the node searched, or null if is not found or if attributeKey.length is different from attributeValue.length
+	 */
 	public Element getANode(String nodeName, String[] attributeKey, String[] attributeValue, boolean isFirstId){
 		Element toSearch = null;
-
 		
 		int kl = NOT_VALUES;
 		int vl = NOT_VALUES;
@@ -287,7 +297,12 @@ public class XmlEditor{
 		return toSearch;
 	}
 	
-	
+	/**
+	 * [m]
+	 * Private method to upgrade file
+	 * 
+	 * @return NEW_DATA_NOT_SAVED or ALL_GOOD
+	 */
 	private int save(){
 		DOMSource domSource = new DOMSource(mDoc);
 		StreamResult streamResult = new StreamResult(new File(mPath));
@@ -311,8 +326,18 @@ public class XmlEditor{
 	public Element getLastNodeUsed(){
 		return lastNode;
 	}
-	
-	//TODO modify methods
+
+	/**
+	 * [m]
+	 * Method to modify attribute value or add new attribute
+	 * 
+	 * @param node the node to modify
+	 * @param attributeKey new key or key to modify value
+	 * @param attributeValue the values of the attributes
+	 * @return ALL_GOOD if has not encounter error, or MISS_MATCH_ERROR if length of attributeValue is different form attributeKey, 
+	 * or NOTHING_TO_DO if (attributeKey.length == 0 || attributeValue.length == 0) 
+	 * or NEW_DATA_NOT_SAVED if has encounter an problem on saving data.
+	 */
 	public int modifyOrAddAttribute(Element node, String[] attributeKey, String[] attributeValue){
 		int kl = attributeKey.length; 
 		int vl = attributeValue.length;
@@ -331,6 +356,14 @@ public class XmlEditor{
 		return save();
 	}
 	
+	/**
+	 * [m]
+	 * Method to remove attribute from a node
+	 * 
+	 * @param node the node to modify
+	 * @param attributeKey the key of attribute to remove
+	 * @return ALL_GOOD if has not encounter error, or NEW_DATA_NOT_SAVED if has encounter an problem on saving data. 
+	 */
 	public int removeAttribute(Element node, String[] attributeKey){
 		int kl = attributeKey.length; 
 		
@@ -341,28 +374,76 @@ public class XmlEditor{
 		return save();
 	}
 	
+	/**
+	 * [m]
+	 * Method to remove a node
+	 * 
+	 * @param node the node to remove
+	 * @return ALL_GOOD if has not encounter error, or NEW_DATA_NOT_SAVED if has encounter an problem on saving data. 
+	 */
 	public int removeNode(Element node){
 		mainNode.removeChild(node);
 		
 		return save();
 	}
 	
+	/**
+	 * [m]
+	 * Method to remove a inner node
+	 * 
+	 * @param parent the parent node
+	 * @param node the node to remove 
+	 * @return ALL_GOOD if has not encounter error, or NEW_DATA_NOT_SAVED if has encounter an problem on saving data.
+	 */
 	public int removeInnerNode(Element parent, Element node){
 		parent.removeChild(node);
 		
 		return save();
 	}
-	public int removeMainNode(Element node){
-		mDoc.removeChild(node);
+	
+	/**
+	 * [m]
+	 * Method to remove main node
+	 * 
+	 * @return ALL_GOOD if has not encounter error, or NEW_DATA_NOT_SAVED if has encounter an problem on saving data.
+	 */
+	public int removeMainNode(){
+		mDoc.removeChild(mainNode);
 		
 		return save();
 	}
 	
+	/**
+	 * [m]
+	 * Method to count all node with same name
+	 * 
+	 * @param nodeName
+	 * @return the number of node matching
+	 */
 	public int countNodesByName(String nodeName){
 		NodeList nodes = mDoc.getElementsByTagName(nodeName);
 		return nodes.getLength();
 	}
 	
+	/**
+	 * [m]
+	 * Method to count all inner node with same name for a node
+	 * 
+	 * @param node the parent node
+	 * @param nodeName the inner node name
+	 * @return the number of inner node matching
+	 */
+	public int countInnerNodesByName(Element node, String nodeName){
+		NodeList nodes = node.getElementsByTagName(nodeName);
+		return nodes.getLength();
+	}
+	
+	/**
+	 * [m]
+	 * Method to get main node (the root of the document)
+	 * 
+	 * @return main node
+	 */
 	public Element getMainNode(){
 		return mainNode;
 	}

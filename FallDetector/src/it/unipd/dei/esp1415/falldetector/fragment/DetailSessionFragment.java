@@ -5,11 +5,8 @@ import java.util.ArrayList;
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +18,7 @@ public class DetailSessionFragment extends Fragment {
 	private static ArrayList<Session> mArray;
 	private static int mIndex;
 	private Mediator mMod; 
-	
-	private static LayoutInflater mInflater;
-	private static ViewGroup mContainer;
-	
+
 	private ViewHolder viewHolder;
 	
 

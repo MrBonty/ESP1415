@@ -1,6 +1,5 @@
 package it.unipd.dei.esp1415.falldetector;
 
-import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
@@ -14,12 +13,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends ActionBarActivity {
 	private Context mContext;
+	
+	public static final int SCREENLAYOUT_SIZE_XLARGE = 0x04; //For compatibility with API 8 same value of Configuration.SCREENLAYOUT_SIZE_XLARGE
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +32,8 @@ public class MainActivity extends ActionBarActivity {
 
 		Mediator med = new Mediator(mContext, this);
 		
-		boolean isLand = med.isLand(conf.orientation == Configuration.ORIENTATION_LANDSCAPE);
-		boolean xlarge = ((conf.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE);
+		med.isLand(conf.orientation == Configuration.ORIENTATION_LANDSCAPE);
+		boolean xlarge = ((conf.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == SCREENLAYOUT_SIZE_XLARGE);
 	    boolean large = ((conf.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
 	    
 		med.isLarge(xlarge || large);
