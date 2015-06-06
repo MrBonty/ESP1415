@@ -32,7 +32,7 @@
         </activity>
         
         <service android:enabled="true"
-            android:name=".FallDetectorService"
+            android:name="it.unipd.dei.esp1415.falldetector.service.FallDetectorService"
         />
     </application>
 
