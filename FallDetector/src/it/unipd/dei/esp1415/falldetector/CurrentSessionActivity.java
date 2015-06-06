@@ -325,7 +325,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sensorManager.registerListener(sensorEventListener, accelerometer,
 				SensorManager.SENSOR_DELAY_FASTEST);
-
 	};
 
 	@Override

@@ -124,6 +124,6 @@ public class XmlFile {
 	}
 	
 	protected boolean hasDocSet(){
-		return mDoc == null;
+		return mDoc != null;
 	}
 }

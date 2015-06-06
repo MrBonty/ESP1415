@@ -7,6 +7,8 @@ import it.unipd.dei.esp1415.falldetector.xmlutil.XmlReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.w3c.dom.Element;
 
@@ -35,6 +37,8 @@ public class FallDetectorService extends Service {
 	private double x;
 	private double y;
 	private double z;
+	
+	private int count;
 	
 	private Calendar currentTime;
 	
@@ -67,37 +71,55 @@ public class FallDetectorService extends Service {
 		sensorManager.registerListener(sensorEventListener, accelerometer,
 				SensorManager.SENSOR_DELAY_FASTEST);
 		
-		if(edit.isReady()){
-			mainNode = edit.getMainNode();
-			
-			// If main node doesn't exists
-			if(mainNode == null){
-				edit.addMainNode("root", null, null, false);
-				mainNode = edit.getMainNode();
-			}
-			
-			currentTime = Calendar.getInstance(TimeZone.getDefault());
-			attrVal[0] = currentTime.getTime().toString();
-			attrVal[1] = Double.toString(x);
-			attrVal[2] = Double.toString(y);
-			attrVal[3] = Double.toString(z);
-			attrVal[4] = Integer.toString(0);
-			
-			edit.addNode("data", attrKey, attrVal, true);
-		}
-		if(read.isReady() && read.hasElement()){
-			mainNode = read.getMainNode();
-			
-			ArrayList<Element> tp = read.getInternalNodes(mainNode);
-			Element tmp = tp.get(0);
-			
-			Log.w("TimeStamp",tmp.getAttribute("TimeStamp"));
-			Log.w("X",tmp.getAttribute("X"));
-			Log.w("Y",tmp.getAttribute("Y"));
-			Log.w("Z",tmp.getAttribute("Z"));
-			Log.w("read",tmp.getAttribute("Read"));
-		}
 		Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show();
+		
+		count = 0;
+		
+		// UpdateGUI throw thread every 100milliseconds
+		Timer updateTimer = new Timer("AccelerometerTimer");
+		updateTimer.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				if(edit.isReady()){
+					mainNode = edit.getMainNode();
+					
+					// If main node doesn't exists
+					if(mainNode == null){
+						edit.addMainNode("root", null, null, false);
+						mainNode = edit.getMainNode();
+					}
+					
+					currentTime = Calendar.getInstance(TimeZone.getDefault());
+					attrVal[0] = currentTime.getTime().toString();
+					attrVal[1] = Double.toString(x);
+					attrVal[2] = Double.toString(y);
+					attrVal[3] = Double.toString(z);
+					attrVal[4] = Integer.toString(0);
+					
+					edit.addNode("data", attrKey, attrVal, true);
+				}
+				if(read.isReady() && read.hasElement()){
+					mainNode = read.getMainNode();
+					
+					ArrayList<Element> tp = read.getInternalNodes(mainNode);
+					
+					Log.w("count",Integer.toString(count));
+					Element tmp = tp.get(count);
+					
+					Log.w("TimeStamp",tmp.getAttribute("TimeStamp"));
+					Log.w("X",tmp.getAttribute("X"));
+					Log.w("Y",tmp.getAttribute("Y"));
+					Log.w("Z",tmp.getAttribute("Z"));
+					Log.w("read",tmp.getAttribute("Read"));
+					
+					count++;
+				}
+				
+//				if(count > 10){
+//					stopSelf();
+//				}
+			}
+		}, 0, 100);
+		
 		return START_STICKY;
 	}
 	
