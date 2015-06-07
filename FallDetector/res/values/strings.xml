@@ -2,15 +2,18 @@
 <resources>
 
     <string name="app_name">Fall Detector</string>
+    <string name="title_activity_detail">Detail Activity</string>
+    <string name="title_active_session">Active Session</string>
+    <string name="title_settings">Settings</string>
+    
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="action_add">Add</string>
     <string name="tag_start">Starts on\u0020</string>
     <string name="tag_second">\u0020at\u0020</string>
     <string name="tag_duration">Duration:\u0020</string>
     <string name="tag_falls">Falls:\u0020</string>
     <string name="test">Test</string>
-    <string name="title_activity_detail">Detail Activity</string>
-    
     
 	<string name="title_current">Current session name</string>
 	<string name="thumbnail">Thumbnail</string>
@@ -20,11 +23,40 @@
 	<string name="end_button">End</string>
 	<string name="play_button">Play</string>
 	
+    <string name= "modify">Modify</string>
+    <string name= "delete">Delete</string>
+    <string name= "save">Save</string>
+    <string name= "cancel">Cancel</string>
+    
+    <string name= "no_value">Insert a name for the session</string>
+    <string name= "modify_made">Session modified</string>
+    <string name= "modify_no_made">Session no modified</string>
+    
+    <string name= "title_modify_dialog">Modify Session:</string>
+    <string name= "title_add_dialog">Add Session:</string>
+    <string name= "tag_name_dialog">Session Name:</string>
+    <string name= "add_session">New Session Added</string>
+    <string name= "name_session">Insert a name for the session</string>
+    
+    <string name= "dialog_message">A session is just started, stop it before create a new one</string>
+    <string name= "dialog_title">Can\u0027t create a Session</string>
 	<!-- Chart -->
 	
 	<string name="x">X: </string>
 	<string name="y">Y: </string>
 	<string name="z">Z: </string>
 	<string name="acc_not_started">Not started</string>
-
+	
+	<!-- Settings -->
+	
+	<string name="general_tag">General Settings</string>
+	<string name="ring_tag">Remember me</string>
+	<string name="accel_tag">Select Accelerometer</string>
+	<string name="frequency_tag">Accelerometer Frequency</string>
+	<string name="mail_tag">Mail Settings</string>	
+    <string name="rapid_mail_tag">Send mail immediately</string>	
+    <string name="mail_list_tag">Mail List</string>
+    <string name="mail_add_tag">Add new</string>	
+    
+	<string name="default_tag">No value</string>
 </resources>

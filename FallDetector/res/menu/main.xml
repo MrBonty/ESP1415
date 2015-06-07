@@ -2,7 +2,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="it.unipd.dei.esp1415.falldetector.MainActivity" >
-
+    
+ 	<item android:id="@+id/action_add"
+          android:icon="@drawable/ic_add_box_white_24dp"
+          android:title="@string/action_add" 
+          app:showAsAction="always"/>
+ 	
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

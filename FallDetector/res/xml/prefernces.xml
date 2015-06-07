@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+        
+    <PreferenceCategory
+        android:title= "@string/general_tag"
+        android:key= "key_general_settings">
+        
+        <CheckBoxPreference
+            android:title = "@string/ring_tag"
+            android:summary = "@string/default_tag"
+            android:key="key_ring"
+            android:defaultValue="false" />
+        
+        <Preference
+            android:key="key_accel"
+            android:title="@string/accel_tag"
+            android:summary = "@string/default_tag" />
+        
+        <Preference
+            android:title = "@string/frequency_tag"
+            android:key="key_frequency"
+            android:summary = "@string/default_tag"/>
+        
+    </PreferenceCategory>
+    
+    <PreferenceCategory  
+        android:title= "@string/mail_tag"
+        android:key= "key_mail_settings">
+        
+        <CheckBoxPreference
+           	android:title = "@string/rapid_mail_tag"
+            android:key="key_rapid_mail" 
+            android:defaultValue="false"/>
+ 
+        <Preference
+            android:title="@string/mail_add_tag"
+			android:key="key_mail_add" />
+            
+    </PreferenceCategory>
+
+</PreferenceScreen>

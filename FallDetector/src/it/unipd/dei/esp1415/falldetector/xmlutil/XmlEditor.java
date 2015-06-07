@@ -22,8 +22,7 @@ import org.xml.sax.SAXException;
  * Class to create or modify an exemplar of XmlFile
  */
 public class XmlEditor{
-	
-	//TODO
+
 	private String mPath;
 	private XmlFile mFile;
 	private Document mDoc;

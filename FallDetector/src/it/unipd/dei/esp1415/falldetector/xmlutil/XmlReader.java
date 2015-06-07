@@ -20,7 +20,6 @@ import org.w3c.dom.NodeList;
  */
 public class XmlReader {
 
-	//TODO
 	private XmlFile mFile;
 	private Document mDoc;
 	
@@ -38,22 +37,14 @@ public class XmlReader {
 		
 		if(mFile.hasDocSet()){
 			mDoc = mFile.getDoc();
-			try {
-				if(in.available()>0 ){	
-					mDoc.getDocumentElement().normalize();
-					mainNode = (Element) mDoc.getFirstChild();
+				
+			mDoc.getDocumentElement().normalize();
+			mainNode = (Element) mDoc.getFirstChild();
 
-					hasElement = true;
-				}else{
-
-					hasElement = false;
-				}
-
-				isReady = true;
-			} catch (IOException e) {
-				isReady = false;
-				e.printStackTrace();
-			}
+			hasElement = true;
+		
+			isReady = true;
+			
 			
 		}else{
 			try {

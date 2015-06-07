@@ -23,10 +23,9 @@ public class ColorUtil {
 	 * [m]
 	 * This method calculate the color of the image for a new session
 	 * 
-	 * @param lastSession precedent session or null
 	 * @return the value of the color in ARGB
 	 */
-	public static int imageColorSelector(Session lastSession){
+	public static int imageColorSelector(){
 		int color = 0;
 		
 		Random random = new Random();

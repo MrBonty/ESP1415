@@ -5,10 +5,14 @@ import java.util.ArrayList;
 import it.unipd.dei.esp1415.falldetector.CurrentSessionActivity;
 import it.unipd.dei.esp1415.falldetector.DetailActivity;
 import it.unipd.dei.esp1415.falldetector.R;
+import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
+import it.unipd.dei.esp1415.falldetector.extraview.SessionDialog;
 import it.unipd.dei.esp1415.falldetector.fragment.adapter.ListSessionAdapter;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,9 +20,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class ListSessionFragment extends ListFragment {
 
@@ -26,11 +35,15 @@ public class ListSessionFragment extends ListFragment {
 	private static Context mContext;
 	private static int mCurCheckPosition;
 	private static Mediator mMed;
+	public static ListSessionAdapter mAdapter;
+	
+	private SessionDialog mDialog;
 	
 	private Fragment mDetailFrag;
 	private boolean mDualPanel;
 	
 	public static final String SAVE_CURRENT_CHOICE = "curChoice";
+	public static final String SAVE_MODIFY_DIALOG = "modifyDialog";
 	public static final String TAG_DUAL = "isDual";
 	
 	public static final int FIRST_ITEM = 0;
@@ -53,10 +66,42 @@ public class ListSessionFragment extends ListFragment {
 		showDetail(position);
 		
 	}// [m] onListItemClick
+	
+	@Override
+	public void onCreateContextMenu(android.view.ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+
+		MenuInflater inflater = this.getActivity().getMenuInflater();
+	    inflater.inflate(R.menu.list_modify_menu, menu);
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+		int pos = info.position;
+		
+	    switch (item.getItemId()) {
+
+	        case R.id.action_modify:
+	        	modify(pos);
+	        	return true;
+
+	        case R.id.action_delete:
+	        	if(delete(pos)){
+	        		Toast.makeText(mContext, pos + " delete", Toast.LENGTH_SHORT).show();
+	        	}else {
+
+	        	}	
+	        	return true;
+	        default:
+	            return super.onContextItemSelected(item);
+	    }
+	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		registerForContextMenu(getListView());
 		
 		mMed = new Mediator();
 		mArray = mMed.getDataSession();
@@ -65,7 +110,7 @@ public class ListSessionFragment extends ListFragment {
 		
 		mDualPanel = mMed.isLarge() && mMed.isLand();
 		
-		ListSessionAdapter adapter = new ListSessionAdapter(mContext, mArray,
+		mAdapter = new ListSessionAdapter(mContext, mArray,
 				mDualPanel);
 		
 		/*
@@ -98,7 +143,30 @@ public class ListSessionFragment extends ListFragment {
 			showDetail(mCurCheckPosition);
 		}
 		
-		setListAdapter(adapter);
+		setListAdapter(mAdapter);
+		
+		if(savedInstanceState != null){
+			String restore = savedInstanceState.getString(SAVE_MODIFY_DIALOG);
+			if(restore != null && (!(restore.equals("")))){
+				
+				String[] splitted = restore.split(SessionDialog.DIVISOR);
+
+				int pos = Integer.parseInt(splitted[0]);
+				int color = Integer.parseInt(splitted[2]);
+				
+				mDialog = new SessionDialog(mMed.getMain(), pos, false);
+				mDialog.restoreValue(splitted[1], color);
+				mDialog.show();
+				mDialog.setOnDismissListener(new OnDismissListener() {
+					
+					@Override
+					public void onDismiss(DialogInterface dialog) {
+						mAdapter.notifyDataSetChanged();
+						mDialog = null;
+					}
+				});
+			}
+		}
 	}// [m] onActivityCreated
 
 	@Override
@@ -111,6 +179,10 @@ public class ListSessionFragment extends ListFragment {
         }else {
         	mMed.resetIsCalledFromBack();
         }
+        
+        if(mDialog != null && mDialog.isShowing()){
+        	outState.putString(SAVE_MODIFY_DIALOG, mDialog.getStringToSave());
+		}
     }
 	
 	/**
@@ -161,4 +233,34 @@ public class ListSessionFragment extends ListFragment {
 		}
 
 	}//[m] showDetail
+	
+	private boolean delete(int pos){
+		Session tmp= mArray.get(pos);
+		DatabaseManager dbm = new DatabaseManager(mContext);
+		
+		int i = dbm.deleteASession(tmp.getId());
+		if(i>0){
+			mArray.remove(pos);
+			mAdapter.notifyDataSetChanged();
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private void modify(int pos){
+		
+		mDialog = new SessionDialog(mMed.getMain(), pos, false);
+		mDialog.show();
+		mDialog.setOnDismissListener(new OnDismissListener() {
+			
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				mAdapter.notifyDataSetChanged();
+				mDialog = null;
+			}
+		});
+		
+	}
+
 }
