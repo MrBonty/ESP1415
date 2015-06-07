@@ -48,7 +48,8 @@ public class FallDetectorService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		
-		// Instantiate xml file, editor, reader
+		// Instantiate xml file, editor, reader 
+		// TODO GET NAME OF FILE FROM SESSION....
 		file = new XmlFile("ServiceAccData", this.getApplicationContext());
 		edit = file.edit();
 		read = file.read();
@@ -89,7 +90,7 @@ public class FallDetectorService extends Service {
 					}
 					
 					currentTime = Calendar.getInstance(TimeZone.getDefault());
-					attrVal[0] = currentTime.getTime().toString();
+					attrVal[0] = /*currentTime.getTime().toString();*/ Long.toString(System.currentTimeMillis());
 					attrVal[1] = Double.toString(x);
 					attrVal[2] = Double.toString(y);
 					attrVal[3] = Double.toString(z);
@@ -97,6 +98,7 @@ public class FallDetectorService extends Service {
 					
 					edit.addNode("data", attrKey, attrVal, true);
 				}
+				
 				if(read.isReady() && read.hasElement()){
 					mainNode = read.getMainNode();
 					
@@ -112,6 +114,8 @@ public class FallDetectorService extends Service {
 					Log.w("read",tmp.getAttribute("Read"));
 					
 					count++;
+				}else{
+					
 				}
 				
 //				if(count > 10){
@@ -127,6 +131,8 @@ public class FallDetectorService extends Service {
 	public void onDestroy() {
 		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_SHORT).show();
 		sensorManager.unregisterListener(sensorEventListener);
+		
+		file.close();
 		super.onDestroy();
 	}
 	

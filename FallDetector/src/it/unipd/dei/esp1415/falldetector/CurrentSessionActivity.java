@@ -274,7 +274,9 @@ public class CurrentSessionActivity extends ActionBarActivity {
 					txtvStartTime
 							.setText(sessionStartTime.getTime().toString());
 					
-					// Start service					
+					// Start service 
+					//TODO GET JUST STARTED SERVICE NOT START A NEW ONE
+					
 					Intent i = new Intent(getApplicationContext(), FallDetectorService.class);
 					startService(i);
 

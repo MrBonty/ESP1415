@@ -1,29 +1,21 @@
 package it.unipd.dei.esp1415.falldetector.xmlutil;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
 /**
  * Class to create or modify an exemplar of XmlFile
  */
 public class XmlEditor{
 	
-	//TODO
 	private String mPath;
 	private XmlFile mFile;
 	private Document mDoc;
@@ -56,37 +48,12 @@ public class XmlEditor{
 		mFile = file;
 		mPath = mFile.getPath();
 		
-		try {
-			InputStream in = mFile.getFileInputStream();
-			DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			if(in.available()>0 ){	
-				mDoc = docBuilder.parse(in);
-				mainNode = (Element) mDoc.getFirstChild();
-			}else{
-				mDoc = docBuilder.newDocument();
-			}
-			
-			
-			TransformerFactory transformerFactory = TransformerFactory.newInstance();
-			mTransf  = transformerFactory.newTransformer();
-
-			mFile.setDoc(mDoc);
+		if(mFile.hasDoc()){
+			mDoc = mFile.getDoc();
+			mTransf = mFile.getTransformer();
+			mainNode = (Element) mDoc.getFirstChild();
 			isReady = true;
-			
-		} catch (ParserConfigurationException e) {
-			isReady = false;
-			e.printStackTrace();
-		} catch (SAXException e) {
-			isReady = false;
-			e.printStackTrace();
-		} catch (IOException e) {
-			isReady = false;
-			e.printStackTrace();
-		} catch (TransformerConfigurationException e) {
-			isReady = false;
-			e.printStackTrace();
 		}
-
 	}
 	
 	/**
@@ -138,8 +105,11 @@ public class XmlEditor{
 		
 		lastNode = rootEl;
 		if(mainNode == null){
-			mainNode =  rootEl;
+			
+			mFile.mainNode = rootEl;
+			mainNode = mFile.mainNode;
 		}
+		
 		return save();
 	}
 	
