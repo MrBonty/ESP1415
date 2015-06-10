@@ -225,6 +225,12 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 			mViewHolder.executeLayout.setVisibility(View.VISIBLE);
 			mViewHolder.playPause.setOnClickListener(null); // TODO listener
 			mViewHolder.stop.setOnClickListener(null); // TODO listener
+			
+			mViewHolder.playPause.setFocusable(false);
+			mViewHolder.playPause.setFocusableInTouchMode(false);
+			
+			mViewHolder.stop.setFocusable(false);
+			mViewHolder.stop.setFocusableInTouchMode(false);
 		}// if
 		
 		mViewHolder.duration.setText(mSession.getDurationString());

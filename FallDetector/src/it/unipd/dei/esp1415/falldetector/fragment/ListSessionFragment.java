@@ -200,7 +200,9 @@ public class ListSessionFragment extends ListFragment {
 		mCurCheckPosition = pos;
 		boolean toSwipe = mCurCheckPosition != Mediator.START_FRAG_POS;
 
-		if(pos == FIRST_ITEM && mMed.getDataSession().get(FIRST_ITEM).isActive()){
+		if(pos == FIRST_ITEM && 
+				(mMed.getDataSession().get(FIRST_ITEM).isActive() || 
+						mMed.getDataSession().get(FIRST_ITEM).getStartTimestamp() == 0)){
 			
 			Intent intent = new Intent();
 			intent.setClass(getActivity(), CurrentSessionActivity.class);

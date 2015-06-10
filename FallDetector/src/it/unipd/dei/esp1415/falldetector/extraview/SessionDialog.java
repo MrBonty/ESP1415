@@ -33,6 +33,8 @@ public class SessionDialog extends Dialog{
 	private int mPos;
 	private boolean mIsNew;
 	
+	private boolean mIsModColor = false;
+	
 	public final static String DIVISOR = "&&";
 	
 	/**[c]
@@ -119,6 +121,7 @@ public class SessionDialog extends Dialog{
 				mSessionImage = ColorUtil.recolorIconBicolor(mSessionColor, mThumb);
 
 				mViewHolder.image.setImageBitmap(mSessionImage);
+				mIsModColor= true;
 			}
 		};
 	}
@@ -162,7 +165,7 @@ public class SessionDialog extends Dialog{
 						if(toShow != null && toShow.getView().getWindowVisibility() == View.VISIBLE){
 							toShow.cancel();
 						}
-						if(!(name.equals(mSession.getName()))){
+						if((!(name.equals(mSession.getName()))) || mIsModColor){
 							mSession.setName(name);
 
 							mSession.setColorThumbnail(mSessionColor);
