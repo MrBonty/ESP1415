@@ -27,6 +27,7 @@
     <string name= "delete">Delete</string>
     <string name= "save">Save</string>
     <string name= "cancel">Cancel</string>
+    <string name= "add">Add</string>
     
     <string name= "no_value">Insert a name for the session</string>
     <string name= "modify_made">Session modified</string>
@@ -49,14 +50,43 @@
 	
 	<!-- Settings -->
 	
-	<string name="general_tag">General Settings</string>
-	<string name="ring_tag">Remember me</string>
+	<string name="advise_tag">ADVISE SETTINGS</string>
+	<string name="ring_tag">Active advise:</string>
+	<string name="time_tag">Set advise time</string>
+	<string name="accel_set_tag">ACCELEROMETER SETTINGS</string>
 	<string name="accel_tag">Select Accelerometer</string>
 	<string name="frequency_tag">Accelerometer Frequency</string>
-	<string name="mail_tag">Mail Settings</string>	
+	<string name="mail_tag">MAIL SETTINGS</string>	
     <string name="rapid_mail_tag">Send mail immediately</string>	
-    <string name="mail_list_tag">Mail List</string>
+    <string name="mail_list_tag">Mail Address List</string>
     <string name="mail_add_tag">Add new</string>	
     
 	<string name="default_tag">No value</string>
+	
+	<string name="standard">Standard</string>
+	<string name="low">Low</string>
+	<string name="middle">Middle</string>
+	<string name="high">High</string>
+	
+	<string name="quality">Quality</string>
+	
+	<string name="accelerometer">Accelerometer</string>
+	<string name="frequency">Frequency</string>
+	
+	<string name="time_set_at">Time set at\u0020</string>
+	<string name="no_active_adv">Advise no active</string>
+	<string name="no_active_mail">Rapid send mail no active</string>
+	
+	<string name="log_in">Log In:</string>
+	<string name="gmail_addr">Gmail Address\u2026</string>
+	<string name="password">Password\u2026</string>
+	
+	<string name="on_start_sign_in">Insert email address and password of a Gmail account</string>
+	<string name="not_valid_value">Email address or password not valid, please insert email address and password of a Gmail account</string>
+	<string name="not_valid_address">No a @gmail.com account, please insert email address and password of a Gmail account</string>
+	
+	<string name="not_start">Not Started</string>
+	<string name="error_advise">An Error Occurred</string>
+	
+	<string name="dialog_message_tostart">A new Session is yet crated and waits to start</string>
 </resources>

@@ -3,8 +3,18 @@ package it.unipd.dei.esp1415.falldetector.xmlutil;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import android.content.Context;
 
@@ -19,6 +29,10 @@ public class XmlFile {
 	private String mName;
 	
 	private Document mDoc = null;
+	private boolean hasDoc = false;
+	private Transformer mTransf;
+	
+	protected Element mainNode;
 	
 	
 	/**
@@ -37,12 +51,46 @@ public class XmlFile {
 			
 			mPath = context.getFileStreamPath(name).getAbsolutePath();
 			
-			isReady = true;
+			
 			mContext = context;
 			mName = name;
+
 			
+			DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			if(mFileIS.available()>0 ){	
+				mDoc = docBuilder.parse(mFileIS);
+			}else{
+				mDoc = docBuilder.newDocument();
+			}
+
+
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			mTransf  = transformerFactory.newTransformer();
+			
+			mainNode = (Element) mDoc.getFirstChild();
+			
+			hasDoc = true;
+			isReady = true;
+
 		} catch (FileNotFoundException e) {
 			isReady = false;
+			hasDoc = false;
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			isReady = false;
+			hasDoc = false;
+			e.printStackTrace();
+		} catch (SAXException e) {
+			isReady = false;
+			hasDoc = false;
+			e.printStackTrace();
+		} catch (IOException e) {
+			isReady = false;
+			hasDoc = false;
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			isReady = false;
+			hasDoc = false;
 			e.printStackTrace();
 		}
 		
@@ -115,15 +163,17 @@ public class XmlFile {
 		return mFileOS;
 	}
 	
-	protected void setDoc(Document doc){
-		mDoc = doc;
-	}
-	
 	protected Document getDoc(){
 		return mDoc;
 	}
 	
-	protected boolean hasDocSet(){
-		return mDoc != null;
+	protected boolean hasDoc(){
+		return hasDoc;
 	}
+	
+	protected Transformer getTransformer(){
+		return mTransf;
+	}
+	
+
 }

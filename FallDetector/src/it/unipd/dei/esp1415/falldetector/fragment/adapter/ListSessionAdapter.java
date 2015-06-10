@@ -89,6 +89,8 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 					.findViewById(R.id.row_session_name);
 			mViewHolder.date = (TextView) view
 					.findViewById(R.id.row_expand_date);
+			mViewHolder.at = (TextView) view
+					.findViewById(R.id.row_expand_second_tag);
 			mViewHolder.time = (TextView) view
 					.findViewById(R.id.row_expand_time);
 
@@ -163,9 +165,20 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		mViewHolder.thumbnail.setImageBitmap(image);
 		
 		mViewHolder.sessionName.setText(session.getName());// TODO get name from session
-		mViewHolder.date.setText(session.getStartDate());// TODO get date from session
-		mViewHolder.time.setText(session.getStartTimeToString());// TODO get time from session
+		
+		if (session.getStartTimestamp()> 0){
+			mViewHolder.date.setVisibility(View.VISIBLE);
+			mViewHolder.at.setVisibility(View.VISIBLE);
+			
+			mViewHolder.date.setText(session.getStartDate());// TODO get date from session
+			mViewHolder.time.setText(session.getStartTimeToString());// TODO get time from session
+		}else{
 
+			mViewHolder.date.setVisibility(View.GONE);
+			mViewHolder.at.setVisibility(View.GONE);
+			mViewHolder.time.setText(R.string.not_start);
+		}
+		
 		return view;
 	}// [m] getView
 
@@ -204,8 +217,10 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	private void expand(int position) {
 		mViewHolder.expandButton.setImageResource(R.drawable.ic_action_collapse);
 		mViewHolder.expandLayout.setVisibility(View.VISIBLE);
+		
+		boolean hasToStart = mSession.getStartTimestamp() == 0;
 
-		if (position == FIRST_POS && mSession.isActive()) { // TODO get is active from session
+		if (position == FIRST_POS && (mSession.isActive() || hasToStart)) { // TODO get is active from session
 												// position == 0
 			mViewHolder.executeLayout.setVisibility(View.VISIBLE);
 			mViewHolder.playPause.setOnClickListener(null); // TODO listener
@@ -244,6 +259,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		private ImageButton stop;
 		private TextView date;
 		private TextView time;
+		private TextView at;
 		private TextView duration;
 		private TextView falls;
 	}// {c} ViewHolder

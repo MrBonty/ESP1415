@@ -51,7 +51,10 @@ public class Session {
 	 */
 	public Session(String name, long timeStamp) {
 		this.name = name;
-		startDate.setTimeInMillis(timeStamp);
+		if(timeStamp > 0){
+			startDate = Calendar.getInstance();
+			startDate.setTimeInMillis(timeStamp);
+		}
 		this.startTimeStamp = timeStamp;
 		setDuration(startTimeStamp);
 	}//[c] Session
@@ -80,13 +83,16 @@ public class Session {
 	 * [m]
 	 * Method that return the date of the session
 	 * 
-	 * @return the string of the date
+	 * @return the string of the date if startTimeStamp> 0, else ""
 	 */
 	public String getStartDate() {
-		return startDate.get(Calendar.DAY_OF_MONTH) + "/"
+		if(startTimeStamp > 0){
+			return startDate.get(Calendar.DAY_OF_MONTH) + "/"
 				+ (startDate.get(Calendar.MONTH) + 1) + "/"
 				+ startDate.get(Calendar.YEAR);
-
+		}
+		
+		return "";
 	}//[m] getDate
 	
 	public long getStartTimestamp() {
@@ -292,13 +298,16 @@ public class Session {
 	 * [m]
 	 * Method to get the start time as string
 	 * 
-	 * @return start time as hh:mm:ss
+	 * @return start time as hh:mm:ss if startTimeStamp > 0, else ""
 	 */
 	public String getStartTimeToString(){
+		if(startTimeStamp > 0){
 		String tmp = startDate.get(Calendar.HOUR)
 				+ ":" + startDate.get(Calendar.MINUTE)
 				+ ":" + startDate.get(Calendar.SECOND);
 		return tmp;
+		}
+		return "";
 	}
 	
 	public void setFallEvents(ArrayList<Fall> items){

@@ -5,20 +5,21 @@ import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
-
 import java.util.ArrayList;
-
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -34,11 +35,21 @@ public class MainActivity extends ActionBarActivity {
 	
 	public static final int NEW_SESSION_POSITION = 0;
 
+	
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
+		
+		//for a problem to test account gmail
+		//for extra function of rapid mail send
+		
+		if(Build.VERSION.SDK_INT > 8){
+			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+			StrictMode.setThreadPolicy(policy); 
+		}
 		
 		Configuration conf = getResources().getConfiguration();
 		mContext = getApplication();
@@ -147,11 +158,23 @@ public class MainActivity extends ActionBarActivity {
         
         if(mDialog != null && mDialog.isShowing()){
         	outState.putString(SAVE_ADD_DIALOG, mDialog.getStringToSave());
+        	mDialog.dismiss();
 		}
     }
 
 	private void openAdd(){
-		if(mMed.getDataSession().get(0).isActive()){
+		if(mMed.getDataSession().get(0).getStartTimestamp() == 0){
+			
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+			builder.setMessage(R.string.dialog_message_tostart)
+			       .setTitle(R.string.dialog_title);
+			
+
+			AlertDialog dialog = builder.create();
+			
+			dialog.show();
+		}else if(mMed.getDataSession().get(0).isActive()){
 			
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 

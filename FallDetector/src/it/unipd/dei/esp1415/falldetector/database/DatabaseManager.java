@@ -2,7 +2,9 @@ package it.unipd.dei.esp1415.falldetector.database;
 
 import java.util.ArrayList;
 
+import it.unipd.dei.esp1415.falldetector.utility.AccelData;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
+import it.unipd.dei.esp1415.falldetector.utility.MailAddress;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.content.ContentValues;
 import android.content.Context;
@@ -69,7 +71,7 @@ public class DatabaseManager {
 	 * @return the id of the fall event, or ON_OPEN_ERROR if an error is occurred on open the database,
 	 * or INSERT_ERROR if an error is occurred during the insertion.
 	 */
-	public long insertAFall(Fall fall){ //TODO Fall Obj
+	public long insertAFall(Fall fall){
 		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_FE_DATE, fall.getTimeStampFallEvent());
 		values.put(DatabaseTable.COLUMN_FE_IS_NOTIFIED, fall.isNotifiedAsInteger());
@@ -78,6 +80,42 @@ public class DatabaseManager {
 		
 		return insertInDatabase(DatabaseTable.FALL_EVENTS_TABLE, values);
 	}//[m] insertAFall
+	
+	/**
+	 * [m]
+	 * Method to insert a MailAddress into the database
+	 * 
+	 * @param address to insert in the database
+	 * @return the id of the MailAddress, or ON_OPEN_ERROR if an error is occurred on open the database,
+	 * or INSERT_ERROR if an error is occurred during the insertion.
+	 */
+	public long insertAMailAddress(MailAddress address){
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_ML_ADDRESS, address.getAddress());
+		values.put(DatabaseTable.COLUMN_ML_NAME, address.getName());
+		values.put(DatabaseTable.COLUMN_ML_SURNAME, address.getSurname());
+		
+		return insertInDatabase(DatabaseTable.MAIL_TABLE, values);
+	}//[m] insertAMailAddress
+	
+	/**
+	 * [m]
+	 * Method to insert a Accelerometer Data into the database
+	 * 
+	 * @param data to insert in the database
+	 * @return the id of the AccelData, or ON_OPEN_ERROR if an error is occurred on open the database,
+	 * or INSERT_ERROR if an error is occurred during the insertion.
+	 */
+	public long insertAnAccelData(AccelData data){
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_AC_TS, data.getTimestamp());
+		values.put(DatabaseTable.COLUMN_AC_X, data.getX());
+		values.put(DatabaseTable.COLUMN_AC_Y, data.getY());
+		values.put(DatabaseTable.COLUMN_AC_Z, data.getZ());
+		values.put(DatabaseTable.COLUMN_AC_FK_FALLS, data.getFallId());
+		
+		return insertInDatabase(DatabaseTable.ACCEL_TABLE, values);
+	}//[m] insertAnAccelData
 	
 	/**
 	 * [m]
@@ -133,7 +171,7 @@ public class DatabaseManager {
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + fallId;
 	
 		return upgradeRow(DatabaseTable.FALL_EVENTS_TABLE, valuesToupgrade, whereClause, null);
-	}//[m] upgradeASession
+	}//[m] upgradeAFall
 	
 	/**
 	 * [m]
@@ -159,7 +197,87 @@ public class DatabaseManager {
 		}//if... else...
 		
 		return upgradeRow(DatabaseTable.FALL_EVENTS_TABLE, values, whereClause, null);
-	}//[m] upgradeASession
+	}//[m] upgradeAFall
+	
+	/**
+	 * [m]
+	 * Method to upgrade a specific part of the Mail Address
+	 * 
+	 * @param addressId the id of the Mail Address
+	 * @param valuesToupgrade an ContentValues of specific data to upgrade, if you want to upgrade all session upgradeAMailAddress(MailAddress address)
+	 * @return the number of rows affected, or ON_OPEN_ERROR if an error occurred on open the database
+	 */
+	public int upgradeAMailAddress(long addressId, ContentValues valuesToupgrade){
+		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + addressId;
+	
+		return upgradeRow(DatabaseTable.MAIL_TABLE, valuesToupgrade, whereClause, null);
+	}//[m] upgradeAMailAddress
+	
+	/**
+	 * [m]
+	 * Method to upgrade all Mail Address values (not ID)
+	 * 
+	 * @param address the address to upgrade
+	 * @return the number of rows affected, or ON_OPEN_ERROR if an error occurred on open the database, 
+	 * or ID_NOT_SET_ERROR if the id of the fall in not set.
+	 */
+	public int upgradeAMailAddress(MailAddress address){
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_ML_ADDRESS, address.getAddress());
+		values.put(DatabaseTable.COLUMN_ML_NAME, address.getName());
+		values.put(DatabaseTable.COLUMN_ML_SURNAME, address.getSurname());
+
+		String whereClause = "";
+		long id = address.getId();
+		if(id > 0){
+			whereClause = DatabaseTable.COLUMN_PK_ID + " = " + id;
+		}else{
+			return ID_NOT_SET_ERROR;
+		}//if... else...
+		
+		return upgradeRow(DatabaseTable.MAIL_TABLE, values, whereClause, null);
+	}//[m] upgradeAMailAddress
+
+	/**
+	 * [m]
+	 * Method to upgrade a specific part of the Accelerometer Data
+	 * 
+	 * @param addressId the id of the AccelData
+	 * @param valuesToupgrade an ContentValues of specific data to upgrade, if you want to upgrade all session upgradeAnAccelData(AccelData data)
+	 * @return the number of rows affected, or ON_OPEN_ERROR if an error occurred on open the database
+	 */
+	public int upgradeAnAccelData(long dataId, ContentValues valuesToupgrade){
+		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + dataId;
+	
+		return upgradeRow(DatabaseTable.ACCEL_TABLE, valuesToupgrade, whereClause, null);
+	}//[m] upgradeAnAccelData
+	
+	/**
+	 * [m]
+	 * Method to upgrade all Accelerometer Data values (not ID)
+	 * 
+	 * @param data the data to upgrade
+	 * @return the number of rows affected, or ON_OPEN_ERROR if an error occurred on open the database, 
+	 * or ID_NOT_SET_ERROR if the id of the fall in not set.
+	 */
+	public int upgradeAnAccelData(AccelData data){
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_AC_TS, data.getTimestamp());
+		values.put(DatabaseTable.COLUMN_AC_X, data.getX());
+		values.put(DatabaseTable.COLUMN_AC_Y, data.getY());
+		values.put(DatabaseTable.COLUMN_AC_Z, data.getZ());
+		values.put(DatabaseTable.COLUMN_AC_FK_FALLS, data.getFallId());
+
+		String whereClause = "";
+		long id = data.getId();
+		if(id > 0){
+			whereClause = DatabaseTable.COLUMN_PK_ID + " = " + id;
+		}else{
+			return ID_NOT_SET_ERROR;
+		}//if... else...
+		
+		return upgradeRow(DatabaseTable.ACCEL_TABLE, values, whereClause, null);
+	}//[m] upgradeAnAccelData
 	
 	/**
 	 * [m]
@@ -244,7 +362,7 @@ public class DatabaseManager {
 		}
 		
 		return tmp;
-	}
+	}//[m] getSessionAsArray
 	
 	
 	/**
@@ -260,7 +378,7 @@ public class DatabaseManager {
 		
 		Cursor tmp = queryDb(DatabaseTable.SESSION_TABLE, DatabaseTable.ALL_COLUMNS_SESSION, selection, orderBy);
 		return tmp;
-	}
+	}//[m] getSessionAsCursor
 	
 	/**
 	 * [m]
@@ -292,7 +410,7 @@ public class DatabaseManager {
 		}
 		
 		return tmp;
-    }
+    }//[m] getFallForSessionAsArray
     
     /**
      * [m]
@@ -309,10 +427,96 @@ public class DatabaseManager {
     	
     	Cursor tmp = queryDb(DatabaseTable.FALL_EVENTS_TABLE, DatabaseTable.ALL_COLUMNS_FALL_EVENTS, selection, orderBy);
     	return tmp;
-    }
+    }//[m] getFallForSessionAsCursor
+
+    /**
+     * [m]
+     * Method to get all mail Address as Array
+     * 
+     * @return a void ArrayList if has no element, or null if occurred an error on open the database.
+     */
+	public ArrayList<MailAddress> getMailAddressAsArray(){
+		ArrayList<MailAddress> tmp = new ArrayList<MailAddress>();
+		Cursor c = getMailAddressAsCursor();
+    	if(c == null){
+			return null;
+		}
+		
+		if(c.moveToFirst()){
+			do{
+				MailAddress toAdd = new MailAddress(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_ML_ADDRESS)));
+				toAdd.setName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_ML_NAME)));
+				toAdd.setSurname(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_ML_SURNAME)));
+				toAdd.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+				
+				tmp.add(toAdd);
+			}while(c.moveToNext());
+			
+		}
+		
+		return tmp;
+	}//[m] getMailAddressAsArray
 	
+    /**
+     * [m]
+     * Method to get all mail Address as Cursor
+     * 
+	 * @return A Cursor object, which is positioned before the first entry, or null if occurred an error on open the database. Note that Cursor are not synchronized, see the documentation for more details.
+     * @see Cursor
+     */
+	public Cursor getMailAddressAsCursor(){
+    	
+    	Cursor tmp = queryDb(DatabaseTable.MAIL_TABLE, DatabaseTable.ALL_COLUMNS_MAIL, null, null);
+    	return tmp;
+    }//[m] getMailAddressAsCursor
 	
+	/**
+	 * [m]
+     * Method to get all Accelerometer Data stored in database as Array List
+     * 
+     * @param sessionId the id of the fall associated
+	 * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort order, which may be unordered.
+	 * @return a void ArrayList if has no element, or null if occurred an error on open the database.
+	 */
+	public ArrayList<AccelData> getAccelDataAsArrayForAFall(long fallId, String orderBy){
+		ArrayList<AccelData> tmp = new ArrayList<AccelData>();
+		Cursor c = getAccelDataAsCursorForAFall(fallId, orderBy);
+    	if(c == null){
+			return null;
+		}
+		
+		if(c.moveToFirst()){
+			do{			
+				AccelData toAdd = new AccelData(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_AC_TS)),
+						c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_AC_FK_FALLS)));
+				toAdd.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+				toAdd.setX(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_AC_X)));
+				toAdd.setY(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_AC_Y)));
+				toAdd.setZ(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_AC_Z)));
+				tmp.add(toAdd);
+				
+			}while(c.moveToNext());
+			
+		}
+		return tmp;
+	}
 	
+	/**
+	 * [m]
+     * Method to get all Accelerometer Data stored in database as Cursor
+     * 
+     * @param sessionId the id of the fall associated
+	 * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort order, which may be unordered.
+	 * @return A Cursor object, which is positioned before the first entry, or null if occurred an error on open the database. Note that Cursor are not synchronized, see the documentation for more details.
+     * @see Cursor 
+	 */
+	public Cursor getAccelDataAsCursorForAFall(long fallId, String orderBy){
+    	
+    	String selection = DatabaseTable.COLUMN_AC_FK_FALLS + " = " + fallId; 
+		
+    	Cursor tmp = queryDb(DatabaseTable.ACCEL_TABLE, DatabaseTable.ALL_COLUMNS_ACCEL, selection, orderBy);
+    	return tmp;
+    }//[m] getMailAddressAsCursor
 	/**
 	 * [m]
 	 * Complex method to query the given table, returning a Cursor over the result set.
@@ -420,7 +624,7 @@ public class DatabaseManager {
 	}
 	
 	
-	// TODO delete methods documetation
+	// TODO delete methods documentation
 	
 	public int deleteASession(long sessionId){
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + sessionId;
@@ -432,6 +636,15 @@ public class DatabaseManager {
 		return deleteFromDb(DatabaseTable.FALL_EVENTS_TABLE, whereClause);
 	}
 	
+	public int deleteAMailAddress(long mailId){
+		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + mailId;
+		return deleteFromDb(DatabaseTable.MAIL_TABLE, whereClause);
+	}
+	
+	public int deleteAnAccelData(long dataId){
+		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + dataId;
+		return deleteFromDb(DatabaseTable.ACCEL_TABLE, whereClause);
+	}
 	
 	/**
 	 * [m]

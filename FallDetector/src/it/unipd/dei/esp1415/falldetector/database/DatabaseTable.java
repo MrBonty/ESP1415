@@ -6,6 +6,8 @@ public class DatabaseTable {
 	
 	public static final String SESSION_TABLE = "Session";
 	public static final String FALL_EVENTS_TABLE = "Fall_Events";
+	public static final String ACCEL_TABLE = "Accel_Data";
+	public static final String MAIL_TABLE = "Mail_Address";
 			
 	//Common names of columns
 	public static final String COLUMN_PK_ID = "_id";
@@ -34,6 +36,25 @@ public class DatabaseTable {
 															COLUMN_FE_IS_NOTIFIED, COLUMN_FE_XML,
 															COLUMN_FE_FK_SESSION};
 	
+	//Accel Data Columns
+	public static final String COLUMN_AC_TS = "accel_timestamp"; //save as integer timestamp
+	public static final String COLUMN_AC_X = "x"; //data on x
+	public static final String COLUMN_AC_Y = "y"; //data on y
+	public static final String COLUMN_AC_Z = "z"; //
+	public static final String COLUMN_AC_FK_FALLS = "fall"; //integer not null that define the foreign key 
+	
+	public static final String[] ALL_COLUMNS_ACCEL = {COLUMN_PK_ID, COLUMN_AC_TS,
+													  COLUMN_AC_X, COLUMN_AC_Y,
+													  COLUMN_AC_Z, COLUMN_AC_FK_FALLS};
+	
+	//Mail columns
+	public static final String COLUMN_ML_NAME = "name";
+	public static final String COLUMN_ML_SURNAME = "surname";
+	public static final String COLUMN_ML_ADDRESS = "address"; 
+	
+	public static final String[] ALL_COLUMNS_MAIL = {COLUMN_PK_ID, COLUMN_ML_NAME,
+												     COLUMN_ML_SURNAME, COLUMN_ML_ADDRESS};
+	
 	//create table
 	private static final String CREATE_SESSION = "CREATE TABLE " + SESSION_TABLE + " ("
 			+ COLUMN_PK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -55,9 +76,27 @@ public class DatabaseTable {
 			+ SESSION_TABLE + "(" + COLUMN_PK_ID + ") " 
 			+ "ON DELETE RESTRICT ON UPDATE CASCADE" + ");" ;
 	
+	private static final String CREATE_ACCEL_DATA = "CREATE TABLE " + ACCEL_TABLE + " ("
+			+ COLUMN_PK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ COLUMN_AC_TS + " INTEGER, "
+			+ COLUMN_AC_X + " REAL, "
+			+ COLUMN_AC_Y + " REAL, "
+			+ COLUMN_AC_Z + " REAL, "
+			+ COLUMN_AC_FK_FALLS + " INTEGER, "
+			+ "FOREIGN KEY(" + COLUMN_AC_FK_FALLS + ") REFERENCES " 
+			+ FALL_EVENTS_TABLE + "(" + COLUMN_PK_ID + ") " 
+			+ "ON DELETE RESTRICT ON UPDATE CASCADE" + ");" ;
+	
+	private static final String CREATE_MAIL = "CREATE TABLE " + MAIL_TABLE + " ("
+			+ COLUMN_PK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+			+ COLUMN_ML_NAME + " TEXT, "
+			+ COLUMN_ML_SURNAME + " TEXT, "
+			+ COLUMN_ML_ADDRESS + " TEXT );" ;
+	
 	//Utility string for db
     public static final String SET_FK_ON = "PRAGMA foreign_keys = ON;";
     public static final String SET_FK_OFF = "PRAGMA foreign_keys = OFF;";
+    
     public static final String SEE_FK_STATUS = "PRAGMA foreign_keys;";
     
 	
@@ -71,6 +110,8 @@ public class DatabaseTable {
 		db.execSQL(SET_FK_ON);	
 		db.execSQL(CREATE_SESSION);
 		db.execSQL(CREATE_FALL_EVENTS);
+		db.execSQL(CREATE_MAIL);
+		db.execSQL(CREATE_ACCEL_DATA);
 	}
     
 	/**
@@ -85,7 +126,12 @@ public class DatabaseTable {
 			int newVersion){
 		
 		switch (oldVersion){
-		
+		case 1:
+			db.execSQL(CREATE_MAIL);
+		case 2:
+			db.execSQL(CREATE_ACCEL_DATA);
+		default:
+			break;
 		}
 	}
  }

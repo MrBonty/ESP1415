@@ -7,9 +7,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 import android.annotation.SuppressLint;
 import android.util.Base64;
+
 import java.util.Calendar;
+
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
@@ -33,12 +36,19 @@ public class MailSender {
 	private static final long DELAY = 500;
 	private static final long DELAY_LONG = 1000;
 	
+	public static final int GMAIL_PORT = 465;
+	public static final String GMAIL_SERVER = "smtp.gmail.com";
+	
 	public MailSender(int port, String server, String user, String password, boolean toBase64){
 		this.port = port;
 		this.server = server;
 		if(toBase64){
 			this.user = Base64.encodeToString(user.getBytes(), Base64.DEFAULT);
 			this.password = Base64.encodeToString(password.getBytes(), Base64.DEFAULT);
+			
+			char c = 10;
+			user = user.replaceAll(c+"", "");
+			password = password.replaceAll(c+"", "");
 		}else {
 			this.user = user;
 			this.password = password;
@@ -79,27 +89,31 @@ public class MailSender {
 
 				smtp("EHLO smtp.gmail.com\r\n");
 				Thread.sleep(DELAY);
-				//TODO verify response and smtp
 				System.out.println(response);
 
 				smtp("AUTH LOGIN\r\n");
 				Thread.sleep(DELAY);
-				//TODO verify response and smtp
 				System.out.println(response);
 
 				smtp(user+"\r\n");
 				Thread.sleep(DELAY);
-				//TODO verify response and smtp
 				System.out.println(response);
 
 				smtp(password+"\r\n");
 				Thread.sleep(DELAY);
-				//TODO verify response and smtp
+				char[] controll= response.toCharArray();
+				
 				System.out.println(response);
+				
+				for(int i = 0; i<controll.length-2 ; i++){
+					if((controll[i] == '2') && (controll[i+1] == '3') && (controll[i+2] == '5')){ // Look for value 235 ->Connection accepted
+						return true;
+					}
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			return true;
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

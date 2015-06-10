@@ -1,14 +1,7 @@
 package it.unipd.dei.esp1415.falldetector.xmlutil;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -20,12 +13,12 @@ import org.w3c.dom.NodeList;
  */
 public class XmlReader {
 
+	//TODO
 	private XmlFile mFile;
 	private Document mDoc;
 	
 	
 	private boolean isReady = false;
-	private boolean hasElement= false;
 	private Element mainNode;
 	
 
@@ -33,49 +26,15 @@ public class XmlReader {
 	
 	protected XmlReader(XmlFile file){
 		mFile = file;
-		InputStream in = mFile.getFileInputStream();
 		
-		if(mFile.hasDocSet()){
+		if(mFile.hasDoc()){
 			mDoc = mFile.getDoc();
-				
-			mDoc.getDocumentElement().normalize();
-			mainNode = (Element) mDoc.getFirstChild();
+			
+			mainNode = mFile.mainNode;
 
-			hasElement = true;
-		
 			isReady = true;
-			
-			
-		}else{
-			try {
-				DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-
-				if(in.available()>0 ){	
-					mDoc = docBuilder.parse(in);
-					mDoc.getDocumentElement().normalize();
-					mainNode = (Element) mDoc.getFirstChild();
-
-					hasElement = true;
-				}else{
-
-					hasElement = false;
-				}
-
-				mFile.setDoc(mDoc);
-				isReady = true;
-
-			} catch (ParserConfigurationException e) {
-				isReady = false;
-				e.printStackTrace();
-			} catch (SAXException e) {
-				isReady = false;
-				e.printStackTrace();
-			} catch (IOException e) {
-				isReady = false;
-				e.printStackTrace();
-			}
-		
 		}
+
 	}
 	
 	/**
@@ -95,7 +54,10 @@ public class XmlReader {
 	 * @return true if the document has element, false otherwise
 	 */
 	public boolean hasElement(){
-		return hasElement;
+		if((mainNode = mFile.mainNode) != null){
+			return mainNode.getChildNodes().getLength()>0;
+		}
+		return false;
 	}
 	
 	/**

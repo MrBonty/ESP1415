@@ -1,53 +1,99 @@
 package it.unipd.dei.esp1415.falldetector;
 
-
+import it.unipd.dei.esp1415.falldetector.fragment.SettingsMainFragment;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
-
-public class SettingsActivity extends PreferenceActivity {
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 
-	private PreferencesHolder preHolder;
+public class SettingsActivity extends ActionBarActivity {
+
+	private static Fragment mFragment;
+	private static int mCurFrag;
 	
-	@SuppressWarnings("deprecation")
+	private static FragmentTransaction mTransaction;
+	
+	private static final String SAVE_FRAG = "saveFragment";
+	public static final int FRAG_MAIN = 0;
+	public static final int FRAG_SEC = 1;
+	
+	@SuppressLint("Recycle") //for instantiation of FragmentTransaction
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.prefernces);
+		setContentView(R.layout.settings_layout);
 		
-		LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
-        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.drawable.settings_toolbar, root, false);
-        root.addView(bar, 0); // insert at top
-        bar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+		mTransaction = getSupportFragmentManager().beginTransaction();
+		
+		if(savedInstanceState != null){
+			mCurFrag = savedInstanceState.getInt(SAVE_FRAG);
+		}else{
+			mCurFrag = FRAG_MAIN;
+		}
+		
+		changeFragment(mCurFrag);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+	}
+	
+	@Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-		preHolder = new PreferencesHolder();
+        outState.putInt(SAVE_FRAG, mCurFrag);
+		
+    }
 
-		preHolder.ringChk = (CheckBoxPreference) findPreference("key_ring");
-		preHolder.accelSelect = (Preference) findPreference("key_accel");
-		preHolder.freqSelect = (Preference) findPreference("key_frequency");
-		preHolder.mailTypeChk = (CheckBoxPreference) findPreference("key_rapid_mail");
-		preHolder.mailList = (Preference) findPreference("key_mail_add");
-
-		//preHolder.ringChk.setOnPreferenceChangeListener(onPreferenceChangeListener);
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.detail, menu);
+		return true;
 	}
 
-	private class PreferencesHolder{
-		private CheckBoxPreference ringChk;
-		private Preference accelSelect;
-		private Preference freqSelect;
-		private CheckBoxPreference mailTypeChk; 
-		private Preference mailList;
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
+	
+	public static void changeFragment(int frag){
+		switch (frag) {
+		case FRAG_MAIN:
+			
+			//TODO
+			mFragment = new SettingsMainFragment();
+			
+			mCurFrag = frag;
+			mTransaction.replace(R.id.frame_layout, mFragment);
+			mTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+			mTransaction.commit();
+			break;
 
+		case FRAG_SEC:
+			
+			//TODO
+			mFragment = null;
+			
+			mCurFrag = frag;
+			mTransaction.replace(R.id.frame_layout, mFragment);
+			mTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+			mTransaction.commit();
+			break;
+		}
+	}
+	
 }

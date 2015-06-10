@@ -87,11 +87,14 @@ public class ListSessionFragment extends ListFragment {
 	        	return true;
 
 	        case R.id.action_delete:
+	        	String tmp = "";
+	        	String name = mArray.get(pos).getName();
 	        	if(delete(pos)){
-	        		Toast.makeText(mContext, pos + " delete", Toast.LENGTH_SHORT).show();
+	        		tmp = mContext.getResources().getString(R.string.delete) + ": " + name;
 	        	}else {
-
-	        	}	
+	        		tmp = mContext.getResources().getString(R.string.error_advise); 
+	        	}
+	        	Toast.makeText(mContext, tmp, Toast.LENGTH_SHORT).show();
 	        	return true;
 	        default:
 	            return super.onContextItemSelected(item);
@@ -239,6 +242,7 @@ public class ListSessionFragment extends ListFragment {
 		DatabaseManager dbm = new DatabaseManager(mContext);
 		
 		int i = dbm.deleteASession(tmp.getId());
+		System.out.println(i);
 		if(i>0){
 			mArray.remove(pos);
 			mAdapter.notifyDataSetChanged();

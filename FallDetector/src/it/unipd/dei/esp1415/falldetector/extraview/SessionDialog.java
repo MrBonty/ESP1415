@@ -149,7 +149,7 @@ public class SessionDialog extends Dialog{
 							toShow.cancel();
 						}
 						
-						mSession = new Session(name);
+						mSession = new Session(name, 0);
 						mSession.setColorThumbnail(mSessionColor);
 						mSession.setBitmap(mSessionImage);
 						
