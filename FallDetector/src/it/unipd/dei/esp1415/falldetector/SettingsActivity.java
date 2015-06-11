@@ -1,25 +1,25 @@
 package it.unipd.dei.esp1415.falldetector;
 
 import it.unipd.dei.esp1415.falldetector.fragment.SettingsMainFragment;
+import it.unipd.dei.esp1415.falldetector.fragment.SettingsSecFragment;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
-
-
 public class SettingsActivity extends ActionBarActivity {
 
-	private static Fragment mFragment;
 	private static int mCurFrag;
 	
-	private static FragmentTransaction mTransaction;
+	private static FragmentManager mManager;
 	
 	private static final String SAVE_FRAG = "saveFragment";
 	public static final int FRAG_MAIN = 0;
 	public static final int FRAG_SEC = 1;
+	
+	//Constants
+	public static final String DIVISOR_DATA = "&-&-&";
+	
 	
 	@SuppressLint("Recycle") //for instantiation of FragmentTransaction
 	@Override
@@ -27,15 +27,23 @@ public class SettingsActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings_layout);
 		
-		mTransaction = getSupportFragmentManager().beginTransaction();
 		
-		if(savedInstanceState != null){
+		mManager = getSupportFragmentManager();
+		
+        if (findViewById(R.id.frame_layout) != null) {
+
+			changeFragment(FRAG_MAIN);
+
+        }
+        
+        if(savedInstanceState != null){
+
 			mCurFrag = savedInstanceState.getInt(SAVE_FRAG);
-		}else{
-			mCurFrag = FRAG_MAIN;
+			
+			if(mCurFrag == FRAG_SEC){
+				changeFragment(mCurFrag);
+			}
 		}
-		
-		changeFragment(mCurFrag);
 	}
 	
 	@Override
@@ -46,52 +54,30 @@ public class SettingsActivity extends ActionBarActivity {
 	@Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         outState.putInt(SAVE_FRAG, mCurFrag);
 		
     }
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.detail, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
 	
 	public static void changeFragment(int frag){
 		switch (frag) {
 		case FRAG_MAIN:
 			
-			//TODO
-			mFragment = new SettingsMainFragment();
-			
-			mCurFrag = frag;
-			mTransaction.replace(R.id.frame_layout, mFragment);
-			mTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-			mTransaction.commit();
+			mCurFrag = FRAG_MAIN;
+			SettingsMainFragment firstFragment = new SettingsMainFragment();
+			mManager.beginTransaction()
+                    .replace(R.id.frame_layout, firstFragment).commit();
 			break;
 
 		case FRAG_SEC:
+			mCurFrag = FRAG_SEC;
 			
-			//TODO
-			mFragment = null;
+			SettingsSecFragment newFragment = new SettingsSecFragment();
 			
-			mCurFrag = frag;
-			mTransaction.replace(R.id.frame_layout, mFragment);
-			mTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-			mTransaction.commit();
+			FragmentTransaction transaction = mManager.beginTransaction();
+
+			transaction.replace(R.id.frame_layout, newFragment);
+			transaction.addToBackStack(null);
+			transaction.commit();
 			break;
 		}
 	}

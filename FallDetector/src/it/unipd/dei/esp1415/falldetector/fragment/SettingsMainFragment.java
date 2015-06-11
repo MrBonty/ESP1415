@@ -2,27 +2,27 @@ package it.unipd.dei.esp1415.falldetector.fragment;
 
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.SettingsActivity;
-import it.unipd.dei.esp1415.falldetector.mail.MailSender;
-import android.annotation.SuppressLint;
+import it.unipd.dei.esp1415.falldetector.extraview.SignInDialog;
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -45,8 +45,16 @@ public class SettingsMainFragment extends Fragment{
 	private String mailAccount;
 	private String mailDataConvertedBase64;
 	
-	//Constants
-	public static final String DIVISOR_DATA = "&-&-&";
+	private SignInDialog mSignInDialog = null;
+	
+	//TODO APPROPRIETE DIALOG
+	private Dialog mTimeSelectDialog = null;
+	private Dialog mAccelDialog = null;
+	
+	private String savingString;
+	
+	private Context mContext;
+	private Activity mAct;
 	
 	public static final String SAVE_ADVISE_CHK = "isToAdvise";
 	public static final String SAVE_ADVISE_TIME = "adviseTime";
@@ -69,6 +77,15 @@ public class SettingsMainFragment extends Fragment{
 	
 	private static final int STANDARD_TIME = 8*3600*1000; //default time 8:00 am
 	
+
+	public static final String DIVISOR_ON_SAVE_STATE = "&&&";
+	private static final String DIALOG_TYPE = "type_dial";
+	private static final int SIGN_IN = 0;
+	private static final int TIME = 1;
+	private static final int ACCEL = 2;
+	private static final int NO_DIAL = -1;
+	private static final String DIALOG_DATA = "data_dialog";
+	
 	public SettingsMainFragment() {
 		
 	}//[c] void constructor
@@ -78,11 +95,15 @@ public class SettingsMainFragment extends Fragment{
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.settings_main_fragment, container, false);
 		
-		animAlpha = AnimationUtils.loadAnimation(getActivity(),
+		mAct =  getActivity();
+
+		mContext = mAct.getBaseContext();
+		
+		animAlpha = AnimationUtils.loadAnimation(mAct,
 			    R.anim.alpha);
 		
 		//Instantiate preferences and viewHolder
-		preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		preferences = PreferenceManager.getDefaultSharedPreferences(mAct);
 		viewHolder = new ViewHolder();
 		
 		//Get handle to the views
@@ -99,6 +120,21 @@ public class SettingsMainFragment extends Fragment{
 		viewHolder.mailSetLay = (LinearLayout) view.findViewById(R.id.mail_list_set);
 		viewHolder.mailSummary = (TextView) view.findViewById(R.id.mail_summary);
 		
+		return view;
+	}//[m] onCreateView
+
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		
+		int type = NO_DIAL;
+		if(savedInstanceState != null){
+			type = savedInstanceState.getInt(DIALOG_TYPE, NO_DIAL);
+			savingString = savedInstanceState.getString(DIALOG_DATA);
+
+		}
+
 		//Get stored values from preferences
 		adviseChkValue = preferences.getBoolean(SAVE_ADVISE_CHK, false);
 		adviseTime = preferences.getInt(SAVE_ADVISE_TIME, STANDARD_TIME);
@@ -113,6 +149,15 @@ public class SettingsMainFragment extends Fragment{
 		//Initiates views
 		if(mailAccount == null || mailAccount.equals("")){
 			mailChkValue = false;
+		}
+		
+		switch (type) {
+		case SIGN_IN:
+			mailChkValue = true;
+			break;
+		case TIME:
+			adviseChkValue = true;
+			break;
 		}
 		
 		viewHolder.adviseChk.setChecked(adviseChkValue);
@@ -149,15 +194,48 @@ public class SettingsMainFragment extends Fragment{
 		});
 		if(Build.VERSION.SDK_INT <= 8){
 			viewHolder.mailChk.setVisibility(View.GONE);
-			//TODO
+			//TODO check for a better solution (problem with asyngTask and thread)
 			viewHolder.mailSummary.setText("Android version not support it");
 		}else{
 			viewHolder.mailChk.setOnCheckedChangeListener(mailOnChkListener());
 		}
-		return view;
-	}//[m] onCreateView
+		
+		//TODO PROBLEM
 
-
+		
+		switch (type) {
+		case SIGN_IN:
+			createSignInDialog(true);
+			break;
+		case TIME:
+			break;
+		case ACCEL:
+			break;
+		}
+	};
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		
+		if(mSignInDialog != null && mSignInDialog.isShowing()){
+			mSignInDialog.setOnDismissListener(null);
+			outState.putInt(DIALOG_TYPE, SIGN_IN);
+			savingString = mSignInDialog.getSavingString();
+			mSignInDialog.dismiss();
+			mSignInDialog = null;
+			
+		}else if(mTimeSelectDialog != null){
+			outState.putInt(DIALOG_TYPE, TIME);
+		}else if(mAccelDialog != null){
+			outState.putInt(DIALOG_TYPE, ACCEL);
+		}else{
+			outState.putInt(DIALOG_TYPE, NO_DIAL);
+		}
+		
+		outState.putString(DIALOG_DATA, savingString);
+	};
+	
+	
 	@Override
 	public void onPause() {
 		super.onPause();
@@ -173,7 +251,6 @@ public class SettingsMainFragment extends Fragment{
 		editor.putString(SAVE_MAIL_DATABASE64, mailDataConvertedBase64);
 		
 		editor.commit();
-		
 		
 	}//[m] OnPause()
 	
@@ -226,129 +303,17 @@ public class SettingsMainFragment extends Fragment{
 		
 		return new OnCheckedChangeListener() {
 			
-			//TODO save dialog for rotation
-			private Dialog dialog;
-			private ViewHold vh;
-			
-			private static final int START_INFO = 0;
-			private static final int GENERAL_ERROR_INFO = 1;
-			private static final int NOT_GMAIL_INFO = 2;
-			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				mailChkValue = viewHolder.mailChk.isChecked();
 				if(mailChkValue){
-					dialog = new Dialog(getActivity());
-					dialog.setContentView(R.layout.sign_in_layout);
-					dialog.setTitle(R.string.log_in);
-					dialog.setCanceledOnTouchOutside(false);
-					
-					vh= new ViewHold();
-					
-					vh.info = (TextView) dialog.findViewById(R.id.email_info);
-					vh.account = (EditText) dialog.findViewById(R.id.email_addr);
-					vh.password = (EditText) dialog.findViewById(R.id.password_mail);
-					vh.cancel = (Button) dialog.findViewById(R.id.button_cancel);
-					vh.save = (Button) dialog.findViewById(R.id.button_save);
-					
-					vh.cancel.setOnClickListener(new OnClickListener() {
-						
-						@Override
-						public void onClick(View v) {
-							dialog.dismiss();
-							mailChkValue = false;
-							viewHolder.mailChk.setChecked(mailChkValue);
-							mailAccount = null;
-							mailDataConvertedBase64 = null;
-							changeSummary(viewHolder.mailSummary);
-							
-						}// [m] onClick();
-					});
-					
-					vh.save.setOnClickListener(saveListener());
-					
-					if(!dialog.isShowing()){
-						dialog.show();
-					}
-					
-					
+					createSignInDialog(false);
 				}else{
 					mailAccount = null;
 					mailDataConvertedBase64 = null;
 					changeSummary(viewHolder.mailSummary);
 				}
 			}// [m]  onCheckedChanged()
-			
-			private void switchInfo(int toView){
-				String toSet= "";
-				
-				switch (toView){
-				case START_INFO:
-					toSet= getResources().getString(R.string.on_start_sign_in).toString();
-					break;
-					
-				case GENERAL_ERROR_INFO:
-					toSet= getResources().getString(R.string.not_valid_value).toString();
-					break;
-					
-				case NOT_GMAIL_INFO:
-					toSet= getResources().getString(R.string.not_valid_address).toString();
-					break;
-				}
-				
-				vh.info.setText(toSet);
-			}//[m] switchInfo()
-			
-			private OnClickListener saveListener(){
-				return new OnClickListener() {
-					
-					@SuppressLint("DefaultLocale")
-					@Override
-					public void onClick(View v) {
-						
-						
-						String accountVisible= (vh.account.getText().toString()).toLowerCase();
-						String password = vh.password.getText().toString();
-						
-						accountVisible = accountVisible.replaceAll(" ", "");
-
-						
-						String[] controlEmail = accountVisible.split("@");
-						
-						if(controlEmail.length == 2 && controlEmail[1].equals("gmail.com")){
-							String account = Base64.encodeToString(accountVisible.getBytes(), Base64.DEFAULT);
-							password = Base64.encodeToString(password.getBytes(), Base64.DEFAULT);
-							
-							char c = 10;
-							account = account.replaceAll(c+"", "");
-							password = password.replaceAll(c+"", "");
-							
-							if((new MailSender(MailSender.GMAIL_PORT, MailSender.GMAIL_SERVER, account, password, false)).connect()){
-								mailAccount = accountVisible;
-								mailDataConvertedBase64 = account+DIVISOR_DATA+password;
-
-								changeSummary(viewHolder.mailSummary);
-								dialog.dismiss();
-							}else{
-								switchInfo(GENERAL_ERROR_INFO);
-							}
-
-							
-						}else{
-							switchInfo(NOT_GMAIL_INFO);
-						}// if(.... .equals("gmail.com")) else...
-					}// [m] onClick
-					
-				};// return
-			}// [m] saveListener()
-			
-			class ViewHold{
-				private TextView info;
-				private EditText account;
-				private EditText password;
-				private Button save;
-				private Button cancel;
-			}//{c} ViewHold
 		};// return
 	}// [m] mailOnChkListener()
 	
@@ -357,55 +322,55 @@ public class SettingsMainFragment extends Fragment{
 		switch (tx.getId()) {
 		case R.id.advise_summary:
 			if(adviseChkValue){
-				summary = getResources().getString(R.string.time_set_at).toString();
+				summary = mContext.getResources().getString(R.string.time_set_at).toString();
 				summary += fromMillToString(adviseTime);
 			}else{
-				summary = getResources().getString(R.string.no_active_adv).toString();
+				summary = mContext.getResources().getString(R.string.no_active_adv).toString();
 			}
 			break;
 
 		case R.id.accel_summary:
 			switch(accelSelect){
 			case ACCEL_STANDARD:
-				summary = getResources().getString(R.string.standard).toString();
+				summary = mContext.getResources().getString(R.string.standard).toString();
 				break;
 			case ACCEL_LOW:
-				summary = getResources().getString(R.string.low).toString();
-				summary += " " + getResources().getString(R.string.quality).toString();
+				summary = mContext.getResources().getString(R.string.low).toString();
+				summary += " " + mContext.getResources().getString(R.string.quality).toString();
 				break;
 			case ACCEL_MIDDLE:
-				summary = getResources().getString(R.string.middle).toString();
-				summary += " " + getResources().getString(R.string.quality).toString();
+				summary = mContext.getResources().getString(R.string.middle).toString();
+				summary += " " + mContext.getResources().getString(R.string.quality).toString();
 				break;
 			case ACCEL_HIGH:
-				summary = getResources().getString(R.string.high).toString();
-				summary += " " + getResources().getString(R.string.quality).toString();
+				summary = mContext.getResources().getString(R.string.high).toString();
+				summary += " " + mContext.getResources().getString(R.string.quality).toString();
 				break;
 			}//switch on accel_summary
 			
-			summary += " " + getResources().getString(R.string.accelerometer).toString();
+			summary += " " + mContext.getResources().getString(R.string.accelerometer).toString();
 			break;
 			
 		case R.id.freq_summary:
 			switch(frequencyValue){
 			case FREQ_LOW:
-				summary = getResources().getString(R.string.low).toString();
+				summary = mContext.getResources().getString(R.string.low).toString();
 				break;
 			case FREQ_MIDDLE:
-				summary = getResources().getString(R.string.middle).toString();
+				summary = mContext.getResources().getString(R.string.middle).toString();
 				break;
 			case FREQ_HIGH:
-				summary = getResources().getString(R.string.high).toString();
+				summary = mContext.getResources().getString(R.string.high).toString();
 				break;
 			}//switch on freq_summary
 			
-			summary += " " + getResources().getString(R.string.frequency).toString();
+			summary += " " + mContext.getResources().getString(R.string.frequency).toString();
 			break;
 		case R.id.mail_summary:
-			if(mailChkValue){
+			if(mailChkValue && mailAccount != null){
 				summary = mailAccount;
 			}else{
-				summary = getResources().getString(R.string.no_active_mail).toString();
+				summary = mContext.getResources().getString(R.string.no_active_mail).toString();
 			}
 			break;
 		}//switch on textView
@@ -439,4 +404,48 @@ public class SettingsMainFragment extends Fragment{
 		private LinearLayout mailSetLay;
 	}//{c} ViewHolder
 	
+	
+	private void createSignInDialog(boolean toRestore){
+		
+		mSignInDialog = new SignInDialog(mAct);
+		
+		if(toRestore){
+			String[] restoring = savingString.split(DIVISOR_ON_SAVE_STATE);
+			String account = restoring[0];
+			String password = restoring[1];
+			int state = Integer.parseInt(restoring[2]);
+			
+			savingString = null;
+			
+			mSignInDialog.restoreValue(account, password, state);
+		}
+		
+		mSignInDialog.setOnDismissListener(new OnDismissListener() {
+			
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				
+				if(mSignInDialog.hasData()){
+					
+					mailAccount = mSignInDialog.getAccount();
+					mailDataConvertedBase64 = mSignInDialog.getData();
+
+					changeSummary(viewHolder.mailSummary);
+				}else{
+					mailChkValue = false;
+					viewHolder.mailChk.setChecked(mailChkValue);
+					mailAccount = null;
+					mailDataConvertedBase64 = null;
+					changeSummary(viewHolder.mailSummary);
+					
+				}
+			
+				mSignInDialog = null;
+			}
+		});
+		
+		if(!mSignInDialog.isShowing()){
+			mSignInDialog.show();
+		}
+	}
 }

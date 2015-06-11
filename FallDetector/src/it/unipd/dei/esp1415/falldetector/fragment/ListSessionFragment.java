@@ -244,7 +244,6 @@ public class ListSessionFragment extends ListFragment {
 		DatabaseManager dbm = new DatabaseManager(mContext);
 		
 		int i = dbm.deleteASession(tmp.getId());
-		System.out.println(i);
 		if(i>0){
 			mArray.remove(pos);
 			mAdapter.notifyDataSetChanged();

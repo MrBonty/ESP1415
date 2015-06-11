@@ -89,4 +89,15 @@
 	<string name="error_advise">An Error Occurred</string>
 	
 	<string name="dialog_message_tostart">A new Session is yet crated and waits to start</string>
+	
+	<string name="add_mail">Add Mail Address:</string>
+	<string name="name_edit">Name\u2026</string>
+	<string name="surname_edit">Surname\u2026</string>
+	<string name="address_edit">Address\u2026</string>
+	
+	<string name="address_edit_info_start">Create a new contact for emergency</string>
+	<string name="address_edit_info_add">Ad a name or a surname</string>
+	<string name="address_edit_info_no">No valid mail address</string>
+	
+	<string name="add_new_mail">New mail address added</string>
 </resources>

@@ -20,7 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/advise_tag"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <View
@@ -50,7 +50,7 @@
                         android:layout_weight="0.85"
                         android:text="@string/ring_tag"
                         android:textColor="@android:color/black"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
 
                     <CheckBox
                         android:id="@+id/advise_checkbox"
@@ -85,7 +85,7 @@
                             android:layout_gravity="center_vertical"
                             android:text="@string/time_tag"
                             android:textColor="@android:color/black"
-                            android:textSize="16sp" />
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/advise_summary"
@@ -94,7 +94,7 @@
                             android:layout_gravity="center_vertical"
                             android:text="@string/default_tag"
                             android:textColor="@android:color/darker_gray"
-                            android:textSize="14sp" />
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                     <View
@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="@string/accel_set_tag"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <View
@@ -152,7 +152,7 @@
                             android:layout_gravity="center_vertical"
                             android:text="@string/accel_tag"
                             android:textColor="@android:color/black"
-                            android:textSize="16sp" />
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/accel_summary"
@@ -161,7 +161,7 @@
                             android:layout_gravity="center_vertical"
                             android:text="@string/default_tag"
                             android:textColor="@android:color/darker_gray"
-                            android:textSize="14sp" />
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                     <View
@@ -196,7 +196,7 @@
                             android:layout_gravity="center_vertical"
                             android:text="@string/frequency_tag"
                             android:textColor="@android:color/black"
-                            android:textSize="16sp" />
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/freq_summary"
@@ -205,7 +205,7 @@
                             android:layout_gravity="center_vertical"
                             android:text="@string/default_tag"
                             android:textColor="@android:color/darker_gray"
-                            android:textSize="14sp" />
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                     <View
@@ -226,7 +226,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:text="@string/mail_tag"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <View
@@ -262,7 +262,7 @@
                             android:layout_gravity="center_vertical"
                             android:text="@string/rapid_mail_tag"
                             android:textColor="@android:color/black"
-                            android:textSize="16sp" />
+                            android:textSize="18sp" />
 
                         <TextView
                             android:id="@+id/mail_summary"
@@ -271,7 +271,7 @@
                             android:layout_gravity="center_vertical"
                             android:text="@string/default_tag"
                             android:textColor="@android:color/darker_gray"
-                            android:textSize="14sp" />
+                            android:textSize="16sp" />
                     </LinearLayout>
 
                     <CheckBox
@@ -299,7 +299,7 @@
                         android:layout_gravity="center_vertical"
                         android:text="@string/mail_list_tag"
                         android:textColor="@android:color/black"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

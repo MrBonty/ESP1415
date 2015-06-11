@@ -39,7 +39,7 @@ public class DatabaseManager {
 	 * [m]
 	 * this method close the database
 	 */
-	private void close(){
+	public void close(){
 		mDbHelper.close();
 	}
 	/**
@@ -360,14 +360,14 @@ public class DatabaseManager {
 			}while(c.moveToNext());
 			
 		}
-		
+		close();
 		return tmp;
 	}//[m] getSessionAsArray
 	
 	
 	/**
 	 * [m]
-	 * Method to get all Session stored in database as Cursor
+	 * Method to get all Session stored in database as Cursor after read call close()
 	 * 
 	 * @param selection A filter declaring which rows to return, formatted as an SQL WHERE clause (excluding the WHERE itself). Passing null will return all rows for the given table.
 	 * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort order, which may be unordered.
@@ -377,6 +377,7 @@ public class DatabaseManager {
 	public Cursor getSessionAsCursor(String selection, String orderBy){
 		
 		Cursor tmp = queryDb(DatabaseTable.SESSION_TABLE, DatabaseTable.ALL_COLUMNS_SESSION, selection, orderBy);
+
 		return tmp;
 	}//[m] getSessionAsCursor
 	
@@ -408,13 +409,14 @@ public class DatabaseManager {
 			}while(c.moveToNext());
 			
 		}
-		
+
+		close();
 		return tmp;
     }//[m] getFallForSessionAsArray
     
     /**
      * [m]
-     * Method to get all Fall Event stored in database as Cursor
+     * Method to get all Fall Event stored in database as Cursor after read call close()
      * 
      * @param sessionId the id of the session associated
 	 * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort order, which may be unordered.
@@ -454,12 +456,14 @@ public class DatabaseManager {
 			
 		}
 		
+		close();
+		
 		return tmp;
 	}//[m] getMailAddressAsArray
 	
     /**
      * [m]
-     * Method to get all mail Address as Cursor
+     * Method to get all mail Address as Cursor after read call close()
      * 
 	 * @return A Cursor object, which is positioned before the first entry, or null if occurred an error on open the database. Note that Cursor are not synchronized, see the documentation for more details.
      * @see Cursor
@@ -498,12 +502,14 @@ public class DatabaseManager {
 			}while(c.moveToNext());
 			
 		}
+		
+		close();
 		return tmp;
 	}
 	
 	/**
 	 * [m]
-     * Method to get all Accelerometer Data stored in database as Cursor
+     * Method to get all Accelerometer Data stored in database as Cursor after read call close()
      * 
      * @param sessionId the id of the fall associated
 	 * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort order, which may be unordered.
@@ -519,7 +525,7 @@ public class DatabaseManager {
     }//[m] getMailAddressAsCursor
 	/**
 	 * [m]
-	 * Complex method to query the given table, returning a Cursor over the result set.
+	 * Complex method to query the given table, returning a Cursor over the result set. After read call close()
 	 * 
 	 * @param distinct true if you want each row to be unique, false otherwise.
 	 * @param table The table name to compile the query against.
@@ -543,12 +549,12 @@ public class DatabaseManager {
 		
 		Cursor tmp = mDb.query(distinct, table, columns, selection, selectionArgs, groupBy, having, orderBy, limit);
 		
-		close();
+		//close();
 		return tmp;
 	}
 	/**
 	 * [m]
-	 * Intermediary method to query the given table, returning a Cursor over the result set.
+	 * Intermediary method to query the given table, returning a Cursor over the result set. After read call close()
 	 * 
 	 * @param table The table name to compile the query against.
 	 * @param columns A list of which columns to return. Passing null will return all columns, which is discouraged to prevent reading data from storage that isn't going to be used.
@@ -570,13 +576,13 @@ public class DatabaseManager {
 		
 		Cursor tmp = mDb.query(table, columns, selection, selectionArgs, groupBy, having, orderBy);
 		
-		close();
+		//close();
 		return tmp;
 	}
 	
 	/**
 	 * [m]
-	 * Simplest method to query the given table, returning a Cursor over the result set.
+	 * Simplest method to query the given table, returning a Cursor over the result set. After read call close()
 	 * 
 	 * @param table The table name to compile the query against.
 	 * @param columns A list of which columns to return. Passing null will return all columns, which is discouraged to prevent reading data from storage that isn't going to be used.
@@ -594,13 +600,13 @@ public class DatabaseManager {
 		
 		Cursor tmp = mDb.query(table, columns, selection, null, null, null, null);
 		
-		close();
+		//close();
 		return tmp;
 	}
 	
 	/**
 	 * [m]
-	 * Intermediary method to query the given table, returning a Cursor over the result set.
+	 * Intermediary method to query the given table, returning a Cursor over the result set. After read call close()
 	 * 
 	 * @param table The table name to compile the query against.
 	 * @param columns A list of which columns to return. Passing null will return all columns, which is discouraged to prevent reading data from storage that isn't going to be used.
@@ -619,7 +625,7 @@ public class DatabaseManager {
 		
 		Cursor tmp = mDb.query(table, columns, selection, null, null, null, orderBy);
 		
-		close();
+		//close();
 		return tmp;
 	}
 	
