@@ -54,7 +54,7 @@ public class XmlReader {
 	 * @return true if the document has element, false otherwise
 	 */
 	public boolean hasElement(){
-		if(mainNode != null){
+		if((mainNode = mFile.mainNode) != null){
 			return mainNode.getChildNodes().getLength()>0;
 		}
 		return false;

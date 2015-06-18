@@ -10,11 +10,7 @@ import android.view.View;
 
 /**
  * ChartView class extends View for displaying a simple chart
- * from accelerometer data
- * 
- * @author Jiajie Xu
- *
- */
+ * from accelerometer data */
 public class ChartView extends View{
 
 	/**

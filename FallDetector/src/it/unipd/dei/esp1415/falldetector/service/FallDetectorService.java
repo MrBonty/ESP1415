@@ -1,16 +1,7 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
-import it.unipd.dei.esp1415.falldetector.xmlutil.XmlEditor;
-import it.unipd.dei.esp1415.falldetector.xmlutil.XmlFile;
-import it.unipd.dei.esp1415.falldetector.xmlutil.XmlReader;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import org.w3c.dom.Element;
 
 import android.app.Service;
 import android.content.Context;
@@ -20,49 +11,63 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
+//import it.unipd.dei.esp1415.falldetector.xmlutil.XmlReader;
 
 public class FallDetectorService extends Service {
 	
-	private XmlFile file;
-	private XmlEditor edit;
-	private Element mainNode;
-	private XmlReader read;
+//	private XmlFile file;
+//	private XmlEditor edit;
+//	private Element mainNode;
+	//private XmlReader read;
+	
+	public static final String XYZ_DATA = "XYZ_DATA";
+	public static final String XYZ_RESULT = "XYZ_RESULT";
 	
 	// TODO sensor
 	private SensorManager sensorManager;
 	
 	// TODO accelerometer data
-	private double x;
-	private double y;
-	private double z;
+	private float[] xyz;
 	
-	private int count;
+	private LocalBroadcastManager broadcaster;
 	
-	private Calendar currentTime;
+	private Intent broadcastIntent;
 	
-	private String[] attrKey = {"TimeStamp","X","Y","Z","Read"};
-	private String[] attrVal = {null, null, null, null, null};
+//	private String[] attrKey = {"TimeStamp","X","Y","Z","Read"};
+//	private String[] attrVal = {null, null, null, null, null};
+	
+	public FallDetectorService(){
+		xyz = new float[3];
+	}
 	
 	public void onCreate() {
 		super.onCreate();
 		
-		// Instantiate xml file, editor, reader 
-		// TODO GET NAME OF FILE FROM SESSION....
-		file = new XmlFile("ServiceAccData", this.getApplicationContext());
-		edit = file.edit();
-		read = file.read();
-		
 		// TODO Delete toast message
 		Toast.makeText(this, "Service Created", Toast.LENGTH_SHORT).show();
+		
+		broadcaster = LocalBroadcastManager.getInstance(this);
+		
+		// Initialize the sensor manager
+		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		
+		
+		// Instantiate xml file, editor, reader 
+		// TODO GET NAME OF FILE FROM SESSION....
+//		file = new XmlFile("ServiceAccData", this.getApplicationContext());
+//		edit = file.edit();
+		//read = file.read();
 
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		// Initialize the sensor manager
-		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		
+		// TODO delete Toast message
+		Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show();
 		
 		// Get default accelerometer sensor
 		Sensor accelerometer = sensorManager
@@ -72,59 +77,24 @@ public class FallDetectorService extends Service {
 		sensorManager.registerListener(sensorEventListener, accelerometer,
 				SensorManager.SENSOR_DELAY_FASTEST);
 		
-		Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show();
-		
-		count = 0;
+		// TODO
+		broadcastIntent = new Intent(FallDetectorService.XYZ_RESULT);
 		
 		// UpdateGUI throw thread every 100milliseconds
 		Timer updateTimer = new Timer("AccelerometerTimer");
 		updateTimer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				if(edit.isReady()){
-					mainNode = edit.getMainNode();
-					
-					// If main node doesn't exists
-					if(mainNode == null){
-						edit.addMainNode("root", null, null, false);
-						mainNode = edit.getMainNode();
-					}
-					
-					currentTime = Calendar.getInstance(TimeZone.getDefault());
-					attrVal[0] = /*currentTime.getTime().toString();*/ Long.toString(System.currentTimeMillis());
-					attrVal[1] = Double.toString(x);
-					attrVal[2] = Double.toString(y);
-					attrVal[3] = Double.toString(z);
-					attrVal[4] = Integer.toString(0);
-					
-					edit.addNode("data", attrKey, attrVal, true);
+				if(xyz != null){
+					Log.i("xyz_data",xyz[0]+"");
+					Log.i("xyz_data",xyz[1]+"");
+					Log.i("xyz_data",xyz[2]+"");
+					broadcastIntent.putExtra(FallDetectorService.XYZ_DATA, xyz);
+					broadcaster.sendBroadcast(broadcastIntent);
 				}
-				
-				if(read.isReady() && read.hasElement()){
-					mainNode = read.getMainNode();
-					
-					ArrayList<Element> tp = read.getInternalNodes(mainNode);
-					
-					Log.w("count",Integer.toString(count));
-					Element tmp = tp.get(count);
-					
-					Log.w("TimeStamp",tmp.getAttribute("TimeStamp"));
-					Log.w("X",tmp.getAttribute("X"));
-					Log.w("Y",tmp.getAttribute("Y"));
-					Log.w("Z",tmp.getAttribute("Z"));
-					Log.w("read",tmp.getAttribute("Read"));
-					
-					count++;
-				}else{
-					
-				}
-				
-//				if(count > 10){
-//					stopSelf();
-//				}
 			}
 		}, 0, 100);
 		
-		return START_STICKY;
+		return Service.START_STICKY;
 	}
 	
 	@Override
@@ -132,7 +102,7 @@ public class FallDetectorService extends Service {
 		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_SHORT).show();
 		sensorManager.unregisterListener(sensorEventListener);
 		
-		file.close();
+//		file.close();
 		super.onDestroy();
 	}
 	
@@ -142,6 +112,10 @@ public class FallDetectorService extends Service {
 		return null;
 	}
 	
+	
+	/**
+	 * Used for gathering accelerometer data
+	 */
 	private final SensorEventListener sensorEventListener = new SensorEventListener() {
 
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -152,9 +126,7 @@ public class FallDetectorService extends Service {
 
 			// Ensure mutually exclusive access to the sensor.
 			synchronized (this) {
-				x = event.values[0];
-				y = event.values[1];
-				z = event.values[2];
+				xyz = event.values;
 			}
 		}
 	};

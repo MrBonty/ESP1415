@@ -12,16 +12,13 @@ import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -79,23 +76,21 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	private ChartView chartYAxis;
 	private ChartView chartZAxis;
 
-	// Uses for drawing chart
-	private Paint paint;
-
-	// Sensor manager which manages accelerometer sensor
-	private SensorManager sensorManager;
-
 	// Text view for displaying acceleromter data
 	private TextView txtvAccDataX;
 	private TextView txtvAccDataY;
 	private TextView txtvAccDataZ;
 
 	// Accelerometer data
-	private double x;
-	private double y;
-	private double z;
+	private float x;
+	private float y;
+	private float z;
 
+	private Intent serviceIntent;
+	
 	private ImageView thmb;
+	
+	private BroadcastReceiver broadReceiver;
 
 	public CurrentSessionActivity() {
 
@@ -110,33 +105,13 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 		duration = 0l;
 
-		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		paint.setColor(Color.WHITE);
-
-		x = 0.0d;
-		y = 0.0d;
-		z = 0.0d;
+		x = 0.0f;
+		y = 0.0f;
+		z = 0.0f;
+		
+		serviceIntent = null;
+		
 	}
-
-	/**
-	 * Used for gathering accelerometer data
-	 */
-	private final SensorEventListener sensorEventListener = new SensorEventListener() {
-
-		public void onAccuracyChanged(Sensor sensor, int accuracy) {
-		}
-
-		// Store the data from the accelerometer
-		public void onSensorChanged(SensorEvent event) {
-
-			// Ensure mutually exclusive access to the sensor.
-			synchronized (this) {
-				x = event.values[0];
-				y = event.values[1];
-				z = event.values[2];
-			}
-		}
-	};
 
 	/**
 	 * Updates accelerometer text view and chart using thread
@@ -146,19 +121,19 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			public void run() {
 
 				// Update chart X axis data and text
-				chartXAxis.setChartHeightData((float) x);
+				chartXAxis.setChartHeightData(x);
 				chartXAxis.invalidate();
 				txtvAccDataX.setText("X: " + x);
 				txtvAccDataX.invalidate();
 
 				// Update chart Y axis data and text
-				chartYAxis.setChartHeightData((float) y);
+				chartYAxis.setChartHeightData(y);
 				chartYAxis.invalidate();
 				txtvAccDataY.setText("Y: " + y);
 				txtvAccDataY.invalidate();
 
 				// Update chart Z axis data and text
-				chartZAxis.setChartHeightData((float) z);
+				chartZAxis.setChartHeightData(z);
 				chartZAxis.invalidate();
 				txtvAccDataZ.setText("Z: " + z);
 				txtvAccDataZ.invalidate();
@@ -171,17 +146,24 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.current_session_interface);
 
+		broadReceiver = new BroadcastReceiver() {
+	        @Override
+	        public void onReceive(Context context, Intent intent) {
+	            float[] xyz = intent.getFloatArrayExtra(FallDetectorService.XYZ_DATA);
+	            x = xyz[0];
+	            y = xyz[1];
+	            z = xyz[2];
+	        }
+		};
+		
 		mMed = new Mediator();
 		mCurrent = mMed.getDataSession().get(ListSessionFragment.FIRST_ITEM);
-
+		
 		thmb = (ImageView) findViewById(R.id.current_thumbnail);
 		thmb.setImageBitmap(mCurrent.getBitmap());
 
 		// Initialize txtvStartTime view
 		txtvStartTime = (TextView) findViewById(R.id.session_start_time);
-
-		// Initialize the sensor manager
-		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
 		// Initialize the chronometer
 		chroDuration = (Chronometer) findViewById(R.id.session_duration);
@@ -205,14 +187,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		arrayAdapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, falls);
 		lstvFalls.setAdapter(arrayAdapter);
-
-		// Get default accelerometer sensor
-		Sensor accelerometer = sensorManager
-				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-		// Attach sensorListener to our accelerometer sensor
-		sensorManager.registerListener(sensorEventListener, accelerometer,
-				SensorManager.SENSOR_DELAY_FASTEST);
 
 		// Shows the acceleration axises data in a graphic way
 		chartXAxis = (ChartView) findViewById(R.id.chart_x_axis);
@@ -244,6 +218,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 								.setImageResource(R.drawable.pause_button_default);
 
 						isSessionPaused = false;
+						
+						startService(serviceIntent);
 					}
 					// The session has already started and is not paused
 					else {
@@ -259,26 +235,27 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 						// Swtich flag
 						isSessionPaused = true;
+						
+						// Stop service after button press
+						stopService(serviceIntent);
 
 					}
 				}
 				// First time starting the session
+				// TODO save to the DB
 				else {
 
 					// Get the current time
 					sessionStartTime = Calendar.getInstance(TimeZone
 							.getDefault());
-
-					// TODO save to the DB
+					
 					// Set the current time to the text view field
 					txtvStartTime
 							.setText(sessionStartTime.getTime().toString());
 					
 					// Start service 
-					//TODO GET JUST STARTED SERVICE NOT START A NEW ONE
-					
-					Intent i = new Intent(getApplicationContext(), FallDetectorService.class);
-					startService(i);
+					serviceIntent = new Intent(getApplicationContext(), FallDetectorService.class);
+					startService(serviceIntent);
 
 					// Start the chronometer
 					chroDuration.setBase(SystemClock.elapsedRealtime());
@@ -313,25 +290,29 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		Timer updateTimer = new Timer("AccelerometerTimer");
 		updateTimer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
-				if (isSessionStarted && !isSessionPaused)
+				if (isSessionStarted && !isSessionPaused){
 					updateGUI();
+				}
 			}
 		}, 0, 100);
 
 	}
 
 	@Override
+	protected void onStart() {
+	    super.onStart();
+	    LocalBroadcastManager.getInstance(this).registerReceiver((broadReceiver), 
+	        new IntentFilter(FallDetectorService.XYZ_RESULT)
+	    );
+	}
+	
+	@Override
 	protected void onResume() {
 		super.onResume();
-		Sensor accelerometer = sensorManager
-				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		sensorManager.registerListener(sensorEventListener, accelerometer,
-				SensorManager.SENSOR_DELAY_FASTEST);
 	};
 
 	@Override
 	protected void onPause() {
-		sensorManager.unregisterListener(sensorEventListener);
 		super.onPause();
 	};
 
