@@ -20,6 +20,26 @@ public class Mediator {
 	private static boolean mIsLand = false;
 	private static boolean mIsLarge = false;
 	
+	// Aggiunte da Xu
+	private static boolean isSessionStarted = false;
+	private static boolean isSessionPaused = true;
+	
+	public boolean isSessionStarted() {
+		return isSessionStarted;
+	}
+
+	public void setSessionStarted(boolean isSessionStarted) {
+		Mediator.isSessionStarted = isSessionStarted;
+	}
+
+	public boolean isSessionPaused() {
+		return isSessionPaused;
+	}
+
+	public void setSessionPaused(boolean isSessionPaused) {
+		Mediator.isSessionPaused = isSessionPaused;
+	}
+	
 	private static DetailSessionFragment mDetailSessionFragment;
 	
 	/**
