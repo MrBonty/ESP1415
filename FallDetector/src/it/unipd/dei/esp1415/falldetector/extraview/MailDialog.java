@@ -43,6 +43,8 @@ public class MailDialog extends Dialog{
 		mToMod = position != SettingsSecFragment.NEW_MAIL;
 		mPos = position;
 		
+		mArray = array;
+		
 		isRestored = false;
 		mName = null;
 		mSurname = null;
@@ -107,7 +109,7 @@ public class MailDialog extends Dialog{
 				if(mName.length() > 0 || mSurname.length() > 0){
 					String[] toControl = mAddress.split("@");
 					
-					if(toControl.length == 2 && (toControl[1].split(".")).length >= 2){
+					if(toControl.length == 2 && toControl[1].indexOf('.') != (-1)){
 						DatabaseManager db = new DatabaseManager(mContext);
 						if(mToMod){
 							MailAddress tmp = mArray.get(mPos);
@@ -124,9 +126,11 @@ public class MailDialog extends Dialog{
 								db.upgradeAMailAddress(tmp);
 							
 								Toast.makeText(mContext, R.string.modify_made, Toast.LENGTH_SHORT).show();
+								dismiss();
 							}else{
 								
 								Toast.makeText(mContext, R.string.modify_no_made, Toast.LENGTH_SHORT).show();
+								dismiss();
 							}
 						}else{
 							MailAddress tmp = new MailAddress(mAddress);
@@ -138,6 +142,7 @@ public class MailDialog extends Dialog{
 							mArray.add(tmp);
 							
 							Toast.makeText(mContext, R.string.add_new_mail, Toast.LENGTH_SHORT).show();
+							dismiss();
 						}
 					}else{
 						mState = NO_VALID_MAIL_INFO;

@@ -35,21 +35,20 @@ public class ListMailAdapter extends ArrayAdapter<MailAddress>{
 		
 		MailAddress toView = mArray.get(position);
 		mViewHolder = new ViewHolder();
+	
+		convertView = mInflater.inflate(R.layout.mail_list_row, parent, false);
 		
-		if(convertView == null){
-			convertView = mInflater.inflate(R.layout.mail_list_row, parent, false);
-		
-			mViewHolder.nameSurname = (TextView) convertView.findViewById(R.id.name_surname);
-			mViewHolder.address = (TextView) convertView.findViewById(R.id.mail_address);
-		}
+		mViewHolder.nameSurname = (TextView) convertView.findViewById(R.id.name_surname);
+		mViewHolder.address = (TextView) convertView.findViewById(R.id.mail_address);
+
 		
 		String nameSurname = toView.getName();
 		nameSurname = (nameSurname != null && nameSurname.length() > 0) ? 
 				nameSurname + " " + toView.getSurname() : nameSurname + toView.getSurname();
-				
+	
 		mViewHolder.nameSurname.setText(nameSurname);
 		mViewHolder.address.setText(toView.getAddress());
-		
+	
 		return convertView;
 	}
 	

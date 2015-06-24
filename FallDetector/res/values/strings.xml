@@ -100,4 +100,6 @@
 	<string name="address_edit_info_no">No valid mail address</string>
 	
 	<string name="add_new_mail">New mail address added</string>
+	
+	<string name="select_freq">Select frequency:</string>
 </resources>

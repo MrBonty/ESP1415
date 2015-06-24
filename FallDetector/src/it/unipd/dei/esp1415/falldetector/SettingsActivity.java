@@ -3,6 +3,7 @@ package it.unipd.dei.esp1415.falldetector;
 import it.unipd.dei.esp1415.falldetector.fragment.SettingsMainFragment;
 import it.unipd.dei.esp1415.falldetector.fragment.SettingsSecFragment;
 import android.annotation.SuppressLint;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -26,7 +27,6 @@ public class SettingsActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.settings_layout);
-		
 		
 		mManager = getSupportFragmentManager();
 		
@@ -59,11 +59,24 @@ public class SettingsActivity extends ActionBarActivity {
     }
 	
 	public static void changeFragment(int frag){
+		Fragment tmp = null;
+		
 		switch (frag) {
 		case FRAG_MAIN:
 			
 			mCurFrag = FRAG_MAIN;
-			SettingsMainFragment firstFragment = new SettingsMainFragment();
+
+			SettingsMainFragment firstFragment = null;
+					
+			tmp = mManager.findFragmentById(R.id.frame_layout);
+			
+			if(tmp != null && tmp instanceof SettingsMainFragment){
+				firstFragment = (SettingsMainFragment) tmp;
+			}
+			
+			if(firstFragment == null){
+				firstFragment = new SettingsMainFragment();
+			}
 			mManager.beginTransaction()
                     .replace(R.id.frame_layout, firstFragment).commit();
 			break;
@@ -71,7 +84,18 @@ public class SettingsActivity extends ActionBarActivity {
 		case FRAG_SEC:
 			mCurFrag = FRAG_SEC;
 			
-			SettingsSecFragment newFragment = new SettingsSecFragment();
+			SettingsSecFragment newFragment = null;
+			
+			tmp = mManager.findFragmentById(R.id.frame_layout);
+			
+			if(tmp != null && tmp instanceof SettingsSecFragment){
+				newFragment = (SettingsSecFragment) tmp;
+			}
+			
+			if(newFragment == null){
+				newFragment = new SettingsSecFragment();
+			}
+			
 			
 			FragmentTransaction transaction = mManager.beginTransaction();
 
@@ -81,5 +105,4 @@ public class SettingsActivity extends ActionBarActivity {
 			break;
 		}
 	}
-	
 }

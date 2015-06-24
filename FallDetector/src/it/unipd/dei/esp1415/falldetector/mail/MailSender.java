@@ -59,7 +59,8 @@ public class MailSender {
 	public boolean connect(){
 		try {
 			
-			socket = (SSLSocket)((SSLSocketFactory)SSLSocketFactory.getDefault()).createSocket(server, port);
+			socket = (SSLSocket)((SSLSocketFactory)
+					SSLSocketFactory.getDefault()).createSocket(server, port);
 			
 			in = socket.getInputStream();
 			InputStreamReader isr = new InputStreamReader(in);
