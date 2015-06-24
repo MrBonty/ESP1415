@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,15 +45,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	 */
 	private TextView txtvStartTime;
 
-	/**
-	 * Indicates whether this session starts
-	 */
-	private boolean isSessionStarted;
-
-	/**
-	 * Indicates whether this session pauses
-	 */
-	private boolean isSessionPaused;
 
 	/**
 	 * Display the duration of the session
@@ -87,14 +79,10 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	private ImageView thmb;
 	
 	private BroadcastReceiver broadcastDataReceiver;
-	private BroadcastReceiver broadcastArrayReceiver;
 
 	public CurrentSessionActivity() {
 
 		// Initialize variables
-
-		isSessionStarted = false;
-		isSessionPaused = true;
 
 		txtvStartTime = null;
 		ibtnPlayPause = null;
@@ -120,6 +108,11 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	            y = intent.getFloatExtra(FallDetectorService.Y_AXIS_NEW_DATA, 0.0f);
 	            z = intent.getFloatExtra(FallDetectorService.Z_AXIS_NEW_DATA, 0.0f);
 	            
+	            Log.w("x: ", x+"");
+	            Log.w("y: ", y+"");
+	            Log.w("z: ", z+"");
+	            Log.w("size: ", xChart.getSize()+"");
+	            
 				// Update chart X axis data and text
 				xChart.addNewData(x);
 				xChart.invalidate();
@@ -140,28 +133,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	        }
 		};
 		
-		broadcastArrayReceiver = new BroadcastReceiver() {
-	        @Override
-	        public void onReceive(Context context, Intent intent) {
-            	xChart.setChartData(
-            			intent.getFloatArrayExtra(FallDetectorService.X_AXIS_ARRAY_DATA),
-            			intent.getIntExtra(FallDetectorService.SIZE_DATA, 0));
-            	xChart.invalidate();
-            	yChart.setChartData(
-            			intent.getFloatArrayExtra(FallDetectorService.Y_AXIS_ARRAY_DATA),
-            			intent.getIntExtra(FallDetectorService.SIZE_DATA, 0));
-            	yChart.invalidate();
-            	zChart.setChartData(
-            			intent.getFloatArrayExtra(FallDetectorService.Z_AXIS_ARRAY_DATA),
-            			intent.getIntExtra(FallDetectorService.SIZE_DATA, 0));
-            	zChart.invalidate();	
-	        }
-		};
-		
 		mMed = new Mediator();
-		
-		isSessionStarted = mMed.isSessionStarted();
-		isSessionPaused = mMed.isSessionPaused();
 		
 		mCurrent = mMed.getDataSession().get(ListSessionFragment.FIRST_ITEM);
 		
@@ -176,6 +148,10 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 		// Initialize the play-pause button view
 		ibtnPlayPause = (ImageButton) findViewById(R.id.play_button);
+		if(mMed.isSessionStarted() && (!mMed.isSessionPaused()))
+			ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
+		else
+			ibtnPlayPause.setImageResource(R.drawable.play_button_default);
 
 		// TODO end the session and add to UI2
 		final ImageButton ibtnEnd = (ImageButton) findViewById(R.id.end_button);
@@ -196,9 +172,14 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 		// Shows the acceleration axises data in a graphic way
 		xChart = (ChartView) findViewById(R.id.chart_x_axis);
+		xChart.setChartData(mMed.getX_array(), mMed.getSize());
+		
 		yChart = (ChartView) findViewById(R.id.chart_y_axis);
+		yChart.setChartData(mMed.getY_array(), mMed.getSize());
+		
 		zChart = (ChartView) findViewById(R.id.chart_z_axis);
-
+		zChart.setChartData(mMed.getZ_array(), mMed.getSize());
+		
 		// Displays acceleration value in each axis
 		txtvAccDataX = (TextView) findViewById(R.id.acc_data_x);
 		txtvAccDataY = (TextView) findViewById(R.id.acc_data_y);
@@ -210,9 +191,9 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			@Override
 			public void onClick(View v) {
 
-				if (isSessionStarted) {
+				if (mMed.isSessionStarted()) {
 					// (Paused) The session has already started and it's paused
-					if (isSessionPaused)
+					if (mMed.isSessionPaused())
 						sessionResume();						
 					// (Running) the session has already started and is not paused
 					else
@@ -239,17 +220,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 						Toast.LENGTH_LONG).show();
 			}
 		});
-
-//		// UpdateGUI throw thread every 100milliseconds
-//		Timer updateTimer = new Timer("AccelerometerTimer");
-//		updateTimer.scheduleAtFixedRate(new TimerTask() {
-//			public void run() {
-//				if (isSessionStarted && !isSessionPaused){
-//					updateGUI();
-//				}
-//			}
-//		}, 0, 100);
-
 	}
 
 	private void sessionStart(){
@@ -270,14 +240,16 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				.setImageResource(R.drawable.pause_button_default);
 		
 		// Session starts
-		isSessionStarted = true;
-		isSessionPaused = false;
+		mMed.setSessionStarted(true);
+		mMed.setSessionPaused(false);
+		
+		xChart.setChartData(mMed.getX_array(), mMed.getSize());
+		yChart.setChartData(mMed.getY_array(), mMed.getSize());
+		zChart.setChartData(mMed.getZ_array(), mMed.getSize());
 		
 		// Start service 
 		Intent serviceIntent = new Intent(getApplicationContext(), FallDetectorService.class);
-		serviceIntent.putExtra(FallDetectorService.ACTIVITY_ACTIVE, true);
 		startService(serviceIntent);
-		
 	}
 	
 	private void sessionPause(){
@@ -292,7 +264,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				.setImageResource(R.drawable.play_button_default);
 
 		// Flags need to be set before the intent!!
-		isSessionPaused = true;
+		mMed.setSessionPaused(true);
 		
 		// Stop service after button press
 		Intent serviceIntent = new Intent(getApplicationContext(), FallDetectorService.class);
@@ -312,10 +284,9 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		
 		
 		// Flags need to be set before the intent!!
-		isSessionPaused = false;
+		mMed.setSessionPaused(false);
 		
 		Intent serviceIntent = new Intent(getApplicationContext(), FallDetectorService.class);
-		serviceIntent.putExtra(FallDetectorService.ACTIVITY_ACTIVE, true);
 		startService(serviceIntent);
 
 	}
@@ -325,21 +296,26 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	    super.onStart();
 	    LocalBroadcastManager.getInstance(this).registerReceiver((broadcastDataReceiver), 
 	    		new IntentFilter(FallDetectorService.XYZ_DATA));
-	    
-	    LocalBroadcastManager.getInstance(this).registerReceiver((broadcastArrayReceiver), 
-	    		new IntentFilter(FallDetectorService.XYZ_ARRAY));
 	}
 	
 	@Override
 	protected void onResume() {
+		xChart.setChartData(mMed.getX_array(), mMed.getSize());
+		yChart.setChartData(mMed.getY_array(), mMed.getSize());
+		zChart.setChartData(mMed.getZ_array(), mMed.getSize());
 		super.onResume();
 	};
 
 	@Override
 	protected void onPause() {
-		isSessionPaused = true;
 		super.onPause();
 	};
+	
+	@Override
+	protected void onStop() {
+	    LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastDataReceiver);
+	    super.onStop();
+	}
 
 	@Override
 	protected void onSaveInstanceState(Bundle savedInstanceState) {
@@ -349,15 +325,9 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		savedInstanceState.putString("sessionStartTime", txtvStartTime
 				.getText().toString());
 
-		// Saves whether this session starts
-		savedInstanceState.putBoolean("isSessionStarted", isSessionStarted);
-
-		// Saves whether this session pauses
-		savedInstanceState.putBoolean("isSessionPaused", isSessionPaused);
-
 		// Saves play-pause button status and chronometer
-		if (isSessionStarted) {
-			if (isSessionPaused) {
+		if (mMed.isSessionStarted()) {
+			if (mMed.isSessionPaused()) {
 				savedInstanceState.putLong("duration", duration);
 				savedInstanceState.putInt("ibtnPlayPause",
 						R.drawable.play_button_default);
@@ -373,13 +343,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			savedInstanceState.putLong("duration", 0l);
 		}
 
-		// Saves chart axes data
-		savedInstanceState.putFloatArray("xChart", xChart.getChartData());
-		savedInstanceState.putFloatArray("yChart", yChart.getChartData());
-		savedInstanceState.putFloatArray("zChart", zChart.getChartData());
-		savedInstanceState.putInt("xSize", xChart.getSize());
-		savedInstanceState.putInt("ySize", yChart.getSize());
-		savedInstanceState.putInt("zSize", zChart.getSize());
 	};
 
 	@Override
@@ -388,12 +351,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 		// Restore session start time
 		txtvStartTime.setText(savedInstanceState.getString("sessionStartTime"));
-
-		// Restore session start flag
-		isSessionStarted = savedInstanceState.getBoolean("isSessionStarted");
-
-		// Set session paused everytime runtime changes occur
-		isSessionPaused = savedInstanceState.getBoolean("isSessionPaused");
 
 		// Set play-pause button to play
 		ibtnPlayPause.setImageResource(savedInstanceState
@@ -405,21 +362,14 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		// Restore chronometer data
 		chroDuration.setBase(SystemClock.elapsedRealtime() - duration);
 
-		if (isSessionStarted && !isSessionPaused)
+		if (mMed.isSessionStarted() && !mMed.isSessionPaused())
 			chroDuration.start();
 		else
 			chroDuration.stop();
-
-		// Restore chart's axes data
-		xChart.setChartData(
-				savedInstanceState.getFloatArray("xChart"),
-				savedInstanceState.getInt("xSize"));
-		yChart.setChartData(
-				savedInstanceState.getFloatArray("yChart"),
-				savedInstanceState.getInt("ySize"));
-		zChart.setChartData(
-				savedInstanceState.getFloatArray("zChart"),
-				savedInstanceState.getInt("zSize"));
+		
+		xChart.setChartData(mMed.getX_array(), mMed.getSize());
+		yChart.setChartData(mMed.getY_array(), mMed.getSize());
+		zChart.setChartData(mMed.getZ_array(), mMed.getSize());
 	};
 
 	@Override

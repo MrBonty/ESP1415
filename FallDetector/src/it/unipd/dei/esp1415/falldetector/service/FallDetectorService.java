@@ -1,8 +1,6 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
+import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +11,6 @@ import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 public class FallDetectorService extends Service {
 	
@@ -21,67 +18,42 @@ public class FallDetectorService extends Service {
 	public static final String Y_AXIS_NEW_DATA = "Y_AXIS_NEW_DATA";
 	public static final String Z_AXIS_NEW_DATA = "Z_AXIS_NEW_DATA";
 	
-	public static final String X_AXIS_ARRAY_DATA = "X_AXIS_ARRAY_DATA";
-	public static final String Y_AXIS_ARRAY_DATA = "Y_AXIS_ARRAY_DATA";
-	public static final String Z_AXIS_ARRAY_DATA = "Z_AXIS_ARRAY_DATA";
-	
-	public static final String SIZE_DATA = "SIZE_DATA";
-	
 	public static final String XYZ_DATA = "XYZ_DATA";
-	public static final String XYZ_ARRAY = "XYZ_ARRAY";
+
+	private Mediator mMed;
 	
-	public static final String ACTIVITY_ACTIVE = "SERVICE_ACTIVE";
-	
-	private boolean isActivityActive;
-	
-	// TODO sensor
 	private SensorManager sensorManager;
 	
 	private LocalBroadcastManager broadcaster;
 	
 	private Intent broadcastDataIntent;
-	private Intent broadcastArrayIntent;
-	
-	private float xyz[];
-	
-	private float[] x_data;
-	private float[] y_data;
-	private float[] z_data;
-	
-	int size;
-	
-	public FallDetectorService(){
-		
-		xyz = new float[3];
-		
-		x_data = new float[1000000];
-		y_data = new float[1000000];
-		z_data = new float[1000000];
-		size = 0;
-		
-		isActivityActive = false;
-	}
-	
+
 	public void onCreate() {
 		super.onCreate();
 		
-		// TODO Delete toast message
-		Toast.makeText(this, "Service Created", Toast.LENGTH_SHORT).show();
+		// Initialize the sensor manager
+		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		
+		// Get default accelerometer sensor
+		Sensor accelerometer = sensorManager
+				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+		// Attach sensorListener to our accelerometer sensor/ every 100000 microseconds = 100milliseconds
+		sensorManager.registerListener(sensorEventListener, accelerometer, 100000);
+		
+		broadcaster = LocalBroadcastManager.getInstance(this);
+		broadcastDataIntent = new Intent(FallDetectorService.XYZ_DATA);
+		
+		mMed = new Mediator();
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		
-		isActivityActive = intent.getBooleanExtra(FallDetectorService.ACTIVITY_ACTIVE, false);
-		if(isActivityActive)
-			start();
 		return Service.START_STICKY;
 	}
 	
 	@Override
 	public void onDestroy() {
-		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_SHORT).show();
-		isActivityActive = false;
 		sensorManager.unregisterListener(sensorEventListener);
 		super.onDestroy();
 	}
@@ -92,66 +64,6 @@ public class FallDetectorService extends Service {
 		return null;
 	}
 	
-	private void start(){
-		
-		Log.i("Started","I'm in!");
-		
-		// Initialize the sensor manager
-		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		
-		// TODO delete Toast message
-		Toast.makeText(this, "Service Started", Toast.LENGTH_SHORT).show();
-		
-		// Get default accelerometer sensor
-		Sensor accelerometer = sensorManager
-				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-		// Attach sensorListener to our accelerometer sensor
-		sensorManager.registerListener(sensorEventListener, accelerometer,
-				SensorManager.SENSOR_DELAY_FASTEST);
-		
-		// TODO	Know how this work
-		broadcaster = LocalBroadcastManager.getInstance(this);
-		
-		broadcastArrayIntent = new Intent(FallDetectorService.XYZ_ARRAY);
-		broadcastArrayIntent.putExtra(FallDetectorService.X_AXIS_ARRAY_DATA, x_data);
-		broadcastArrayIntent.putExtra(FallDetectorService.Y_AXIS_ARRAY_DATA, y_data);
-		broadcastArrayIntent.putExtra(FallDetectorService.Z_AXIS_ARRAY_DATA, z_data);
-		broadcastArrayIntent.putExtra(FallDetectorService.SIZE_DATA, size);
-		
-		broadcastDataIntent = new Intent(FallDetectorService.XYZ_DATA);
-		
-		// UpdateGUI throw thread every 100milliseconds
-		Timer updateTimer = new Timer("AccelerometerTimer");
-		updateTimer.scheduleAtFixedRate(new TimerTask() {
-			public void run() {
-				x_data[size] = xyz[0];
-				y_data[size] = xyz[1];
-				z_data[size] = xyz[2];
-				size++;
-				if(isActivityActive){
-					Log.w("size: ", size+"");
-					Log.e("xyz[0]: ", xyz[0]+"");
-					Log.e("xyz[1]: ", xyz[1]+"");
-					Log.e("xyz[2]: ", xyz[2]+"");
-					
-					broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_NEW_DATA, x_data[size-1]);
-					broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_NEW_DATA, y_data[size-1]);
-					broadcastDataIntent.putExtra(FallDetectorService.Z_AXIS_NEW_DATA, z_data[size-1]);
-					broadcaster.sendBroadcast(broadcastDataIntent);
-				}else
-				{
-					cancel();
-				}
-					
-			}
-		}, 0, 100);	//updateTimer
-	}	// start
-	
-	
-	/**
-	 * Used for gathering accelerometer data
-	 */
 	private final SensorEventListener sensorEventListener = new SensorEventListener() {
 
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -162,7 +74,20 @@ public class FallDetectorService extends Service {
 
 			// Ensure mutually exclusive access to the sensor.
 			synchronized (this) {
-				xyz = event.values;
+				Log.i("event.values[0]: ", event.values[0] + "");
+				Log.i("event.values[1]: ", event.values[1] + "");
+				Log.i("event.values[2]: ", event.values[2] + "");
+				Log.i("size: ", mMed.getSize() + "");
+				
+				mMed.setX_data(event.values[0]);
+				mMed.setY_data(event.values[1]);
+				mMed.setZ_data(event.values[2]);
+				mMed.incrementSize();
+				
+				broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_NEW_DATA, event.values[0]);
+				broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_NEW_DATA, event.values[1]);
+				broadcastDataIntent.putExtra(FallDetectorService.Z_AXIS_NEW_DATA, event.values[2]);
+				broadcaster.sendBroadcast(broadcastDataIntent);
 			}
 		}
 	};
