@@ -185,6 +185,7 @@ public class ListSessionFragment extends ListFragment {
         
         if(mDialog != null && mDialog.isShowing()){
         	outState.putString(SAVE_MODIFY_DIALOG, mDialog.getStringToSave());
+        	mDialog.dismiss();
 		}
     }
 	

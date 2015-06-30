@@ -94,12 +94,13 @@ public class SessionDialog extends Dialog{
 			
 			if(colorSet){
 				mSessionImage = ColorUtil.recolorIconBicolor(mSessionColor, mThumb);
-				mSession.setColorThumbnail(mSessionColor);
-				mSession.setBitmap(mSessionImage);
+				
 			}else{
 				if((mSessionImage = mSession.getBitmap()) == null) {
 					mSessionImage = ColorUtil.recolorIconBicolor((mSessionColor = mSession.getColorThumbnail()), mThumb);
 					mSession.setBitmap(mSessionImage);
+				}else{
+					mSessionColor = mSession.getColorThumbnail();
 				}
 			}
 		}
