@@ -18,6 +18,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.view.View;
 
+/**
+ * Implementation of a dialog for add or modify a session
+ */
 public class SessionDialog extends Dialog{
 
 	private Context mContext;
@@ -35,10 +38,17 @@ public class SessionDialog extends Dialog{
 	
 	private boolean mIsModColor = false;
 	
-	public final static String DIVISOR = "&&";
+	public final static String SAVE_NAME_SESSION = "name";
+	public final static String SAVE_COLOR = "color";
+	public final static String SAVE_POS = "position";
 	
-	/**[c]
-	 * @param context 
+	/**
+	 * [c]
+	 * Constructor for add/modify dialog for a session
+	 * 
+	 * @param context application context
+	 * @param position the position for the session, set to 0 if is a new one
+	 * @param isNew set to true if is a new session, false otherwise 
 	 */
 	public SessionDialog(Context context, int position, boolean isNew) {
 		super(context);
@@ -55,7 +65,22 @@ public class SessionDialog extends Dialog{
 		
 		
 		mPos = position;
-	}
+	}// [c] SessionDialog
+	
+	/**
+	 * [c]	 
+	 * Constructor for add/modify dialog for a session
+	 * 
+	 * @param context application context
+	 * @param isNew set to true if is a new session, false otherwise
+	 */
+	public SessionDialog(Context context, boolean isNew) {
+		super(context);
+		mContext = context;
+		mIsNew = isNew;
+		
+		mThumb = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.thumbnail);
+	}// [c] SessionDialog()
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -74,25 +99,43 @@ public class SessionDialog extends Dialog{
 		mViewHolder.cancel = (Button) findViewById(R.id.button_cancel);
 		mViewHolder.save = (Button) findViewById(R.id.button_save);
 		
+		mViewHolder.image.setOnClickListener(changeImageListener());
+		mViewHolder.cancel.setOnClickListener(cancelListener());
+		mViewHolder.save.setOnClickListener(saveListener());
+	}// [m] onCreate()
+	
+	@Override
+	public void show() {
+		super.show();
+		
 		if(mIsNew){
+			
+			// control if the color for the image is set
 			if(!colorSet){
 				mSessionColor = ColorUtil.imageColorSelector();
 				colorSet = true;
 			}
 			
+			// control if the name for the session is set
 			if(!(mSessionName == null || mSessionName.length() <= 0)){
 				mViewHolder.name.setText(mSessionName);
 			}
+			
 			mSessionImage = ColorUtil.recolorIconBicolor(mSessionColor, mThumb);
+			
 		}else{
 			
+			// control if the name for the session is set
 			if(mSessionName == null || mSessionName.length() <= 0){
 				mSessionName = mSession.getName();
 			}
+			
 			mViewHolder.name.setText(mSessionName);
 			mViewHolder.name.setSelection(mSessionName.length());
 			
+			// control if the color for the image is set
 			if(colorSet){
+				
 				mSessionImage = ColorUtil.recolorIconBicolor(mSessionColor, mThumb);
 				
 			}else{
@@ -103,15 +146,18 @@ public class SessionDialog extends Dialog{
 					mSessionColor = mSession.getColorThumbnail();
 				}
 			}
-		}
+			
+		}// if(mIsNew).... else ...
 
 		mViewHolder.image.setImageBitmap(mSessionImage);
 		
-		mViewHolder.image.setOnClickListener(changeImageListener());
-		mViewHolder.cancel.setOnClickListener(cancelListener());
-		mViewHolder.save.setOnClickListener(saveListener());
-	}
+	}// [m] show()
 	
+	/**[m]
+	 * Method to create lister for change image
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private android.view.View.OnClickListener changeImageListener() {
 		
 		return new android.view.View.OnClickListener() {
@@ -123,20 +169,30 @@ public class SessionDialog extends Dialog{
 
 				mViewHolder.image.setImageBitmap(mSessionImage);
 				mIsModColor= true;
-			}
+			}// [m] onClick()
 		};
-	}
+	}// [m] changeImageListener()  
 	
+	/**[m]
+	 * Method to create lister for cancel button
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private android.view.View.OnClickListener cancelListener(){
 		return new android.view.View.OnClickListener(){
 			
 			@Override
 			public void onClick(View v) {
 				dismiss();
-			}
+			}// [m] onClick()
 		};
-	}
+	}// [m] cancelListener()
 	
+	/**[m]
+	 * Method to create lister for save button, it control all params
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private android.view.View.OnClickListener saveListener() {
 		return new android.view.View.OnClickListener(){
 			
@@ -151,7 +207,7 @@ public class SessionDialog extends Dialog{
 					if(mIsNew){
 						if(toShow != null && toShow.getView().getWindowVisibility() == View.VISIBLE){
 							toShow.cancel();
-						}
+						} // close all toast if is visible
 						
 						mSession = new Session(name, 0);
 						mSession.setColorThumbnail(mSessionColor);
@@ -162,10 +218,14 @@ public class SessionDialog extends Dialog{
 						(new Mediator()).getDataSession().add(mPos, mSession);
 						
 						toShow = Toast.makeText(mContext, R.string.add_session, Toast.LENGTH_SHORT);
+						
 					}else{
+						
 						if(toShow != null && toShow.getView().getWindowVisibility() == View.VISIBLE){
 							toShow.cancel();
-						}
+						} // close all toast if is visible
+						
+						// control if a modification is made
 						if((!(name.equals(mSession.getName()))) || mIsModColor){
 							mSession.setName(name);
 
@@ -187,31 +247,63 @@ public class SessionDialog extends Dialog{
 						}else{
 							toShow = Toast.makeText(mContext, R.string.modify_no_made, Toast.LENGTH_SHORT);
 						}
-					}
+						
+					}// if(mIsNew).... else ...
 					toShow.show();
 					dismiss();
+					
 				}else{
 					toShow = Toast.makeText(mContext, R.string.no_value, Toast.LENGTH_SHORT);
 					toShow.show();
-				}
+					
+				}// if(name.length > 0 ) ... else...
 			}
 		};
-	}
+	}//[m] saveListener()
 	
-	public String getStringToSave(){
-		return mPos + DIVISOR + mViewHolder.name.getText().toString()+ DIVISOR + mSessionColor;
-	}
 	
-	public void restoreValue(String name, int color){
-		mSessionName = name;
-		mSessionColor = color;
-		colorSet = true;
-	}
+    @Override
+    public Bundle onSaveInstanceState() {
+    	final Bundle state = super.onSaveInstanceState();
+    	
+    	state.putInt(SAVE_POS, mPos);
+    	state.putString(SAVE_NAME_SESSION, mViewHolder.name.getText().toString());
+    	state.putInt(SAVE_COLOR, mSessionColor);
+    	
+    	return state;
+    }// [m] onSaveInstanceState()
+    
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    	colorSet = true;
+    	
+    	mPos = savedInstanceState.getInt(SAVE_POS);
+    	mSessionName = savedInstanceState.getString(SAVE_NAME_SESSION);
+    	mSessionColor = savedInstanceState.getInt(SAVE_COLOR);
+    	
+    	if(!mIsNew){
+    		mSession = (new Mediator()).getDataSession().get(mPos);
+    	}
+    	
+    	super.onRestoreInstanceState(savedInstanceState);
+    }// [m] onRestoreInstanceState()
 	 
+    /**
+     * private internal class to hold the view 
+     */
 	private class ViewHolder{
 		private EditText name;
 		private Button cancel;
 		private Button save;
 		private ImageView image;
-	}
+	}// {c} ViewHolder
+	
+	/**[m]
+	 * Method to see if is a dialog for a new session
+	 * 
+	 * @return true if is a dialog for a new session, false otherwise
+	 */
+	public boolean isNew(){
+		return mIsNew;
+	}// [m] isNew()
 }

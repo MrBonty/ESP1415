@@ -57,6 +57,7 @@ public class SettingsMainFragment extends Fragment{
 	private Context mContext;
 	private Activity mAct;
 
+	// Constants
 	public static final String SAVE_ADVISE_CHK = "isToAdvise";
 	public static final String SAVE_ADVISE_TIME = "adviseTime";
 
@@ -106,7 +107,7 @@ public class SettingsMainFragment extends Fragment{
 		viewHolder.mailSummary = (TextView) view.findViewById(R.id.mail_summary);
 
 		return view;
-	}//[m] onCreateView
+	}//[m] onCreateView()
 
 
 	@Override
@@ -187,8 +188,6 @@ public class SettingsMainFragment extends Fragment{
 			viewHolder.mailChk.setOnCheckedChangeListener(mailOnChkListener());
 		}
 
-		//TODO PROBLEM ON ROTATION
-
 
 		switch (type) {
 		case SIGN_IN:
@@ -203,7 +202,7 @@ public class SettingsMainFragment extends Fragment{
 			}
 			break;
 		}
-	};
+	}//[m] onActivityCreated()
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -234,7 +233,8 @@ public class SettingsMainFragment extends Fragment{
 		}
 
 		outState.putString(DIALOG_DATA, savingString);
-	};
+		
+	}//[m] onSaveInstanceState()
 
 
 	@Override
@@ -255,8 +255,11 @@ public class SettingsMainFragment extends Fragment{
 
 	}//[m] OnPause()
 
-
-
+	/**[m]
+	 * Method to create lister for time view
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private OnClickListener timeDialogListener(){
 		return new OnClickListener() {
 
@@ -270,7 +273,12 @@ public class SettingsMainFragment extends Fragment{
 
 		};
 	}// [m] timeDialogListener()
-
+	
+	/**[m]
+	 * Method to create lister for frequency view
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private OnClickListener accelDialogListener(){
 		return new OnClickListener() {
 
@@ -283,6 +291,11 @@ public class SettingsMainFragment extends Fragment{
 		};
 	}// [m] accelDialogListener()
 
+	/**[m]
+	 * Method to create lister for mail view
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private OnClickListener mailListener(){
 		return new OnClickListener() {
 
@@ -295,7 +308,12 @@ public class SettingsMainFragment extends Fragment{
 	}//[m] mailListener()
 
 
-
+	/**
+	 * [m]
+	 * Method to get a OnCheckedChangeListener for mail checkbox
+	 * 
+	 * @return the {@link OnCheckedChangeListener}
+	 */
 	private OnCheckedChangeListener mailOnChkListener() {
 
 		return new OnCheckedChangeListener() {
@@ -314,6 +332,12 @@ public class SettingsMainFragment extends Fragment{
 		};// return
 	}// [m] mailOnChkListener()
 
+	/**
+	 * [m]
+	 * Method to change test to summary obj
+	 * 
+	 * @param tx the text view to change
+	 */
 	private void changeSummary(TextView tx){
 		String summary = "";
 		switch (tx.getId()) {
@@ -353,6 +377,9 @@ public class SettingsMainFragment extends Fragment{
 		tx.setText(summary);
 	}// [m] changeSummary()
 
+	/**
+	 * private inner class for hold the view
+	 */
 	private class ViewHolder{
 
 		private CheckBox adviseChk;
@@ -367,7 +394,12 @@ public class SettingsMainFragment extends Fragment{
 		private LinearLayout mailSetLay;
 	}//{c} ViewHolder
 
-
+	/**
+	 * [m]
+	 * Method to create the dialog for get and test sign-in data
+	 * 
+	 * @param toRestore set to true if the dialog has to restore
+	 */
 	private void createSignInDialog(boolean toRestore){
 
 		mSignInDialog = new SignInDialog(mAct);
@@ -383,6 +415,7 @@ public class SettingsMainFragment extends Fragment{
 			mSignInDialog.restoreValue(account, password, state);
 		}
 
+		// set of OnDismissListener fo the dialog
 		mSignInDialog.setOnDismissListener(new OnDismissListener() {
 
 			@Override
@@ -404,15 +437,24 @@ public class SettingsMainFragment extends Fragment{
 				}
 
 				mSignInDialog = null;
-			}
+			}//[m] onDismiss
 		});
 
 		if(!mSignInDialog.isShowing()){
 			mSignInDialog.show();
 		}
-	}
+	}//[m] createSignInDialog()
 
+	/**
+	 * [m]
+	 * Method for create a time-picker dialog 
+	 * 
+	 * @param restore set to true if the dialog has to restore
+	 * @param savedIstanceState the bundle to restore the dialog, set null if restore is false
+	 */
 	private void createTimeDialog(boolean restore, Bundle savedIstanceState){
+		
+		// creation of the callback for dialog
 		OnTimeSetListener callBack = new OnTimeSetListener() {
 			
 			@Override
@@ -423,8 +465,9 @@ public class SettingsMainFragment extends Fragment{
 				changeSummary(viewHolder.adviseSummary);
 				
 				mTimeSelectDialog = null;
-			}
+			}//[m] onTimeSet()
 		}; 
+		
 		mTimeSelectDialog = new TimePickerDialog(mAct, callBack, adviseHourOfDay, adviseMinutes, true);
 		mTimeSelectDialog.show();
 		
@@ -432,20 +475,39 @@ public class SettingsMainFragment extends Fragment{
 			mTimeSelectDialog.onRestoreInstanceState(savedIstanceState);
 		}
 		
-	}
+	}//[m] createTimeDialog()
 	
+	/**
+	 * [m]
+	 * Method to make a string from hour and minute
+	 * 
+	 * @return a string as hh:mm
+	 */
 	private String getTimeString(){
 		return adviseHourOfDay + ":" + ((adviseMinutes < 10) ? "0" : "") + adviseMinutes ;
-	} 
+	}//[m] getTimeString()
 	
+	/**
+	 * [m]
+	 * Method to split time in minute and hour from hh:mm
+	 * 
+	 * @param time to split
+	 */
 	private void splitTime(String time){
 		String[] tmp = time.split(":");
 		
 		adviseHourOfDay = Integer.parseInt(tmp[0]);
 		adviseMinutes = Integer.parseInt(tmp[1]);
 		
-	}
+	}//[m] splitTime()
 	
+	/**
+	 * [m]
+	 * Method to create a dialog for set the frequency
+	 * 
+	 * @param restore set to true if the dialog has to restore
+	 * @param restoreValue the value 
+	 */
 	private void createFreqDialog(boolean restore, int restoreValue){
 		mAccelDialog = new FreqDialog(mAct, frequencyValue);
 		
@@ -466,18 +528,6 @@ public class SettingsMainFragment extends Fragment{
 		});
 		
 		mAccelDialog.show();
-	}
+	}//[m] createFreqDialog()
 	
-	/*
-	 
-	private String fromMillToString(int time){
-		time = (time / 1000)/60;
-		int h = time/60;
-		int m = time%60;
-
-		String minute = (m<10)? "0"+m : m+"" ;
-
-		return h + ":" + minute;
-	}//[m]
-	 */
 }

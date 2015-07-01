@@ -20,6 +20,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+/**
+ * Array Adapter of Session
+ */
 public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 	private ArrayList<Session> mArray;
@@ -32,6 +35,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	
 	private Session mSession;
 	
+	//constants
 	private static final int COLLAPSED = 0;
 	private static final int TO_COLLAPSE = 1;
 	private static final int TO_EXPAND = 2;

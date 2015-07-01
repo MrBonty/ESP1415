@@ -2,6 +2,9 @@ package it.unipd.dei.esp1415.falldetector.database;
 
 import android.database.sqlite.SQLiteDatabase;
 
+/** 
+ * Helper class for define database tables, columns, .... 
+ */
 public class DatabaseTable {
 	
 	public static final String SESSION_TABLE = "Session";
@@ -40,7 +43,7 @@ public class DatabaseTable {
 	public static final String COLUMN_AC_TS = "accel_timestamp"; //save as integer timestamp
 	public static final String COLUMN_AC_X = "x"; //data on x
 	public static final String COLUMN_AC_Y = "y"; //data on y
-	public static final String COLUMN_AC_Z = "z"; //
+	public static final String COLUMN_AC_Z = "z"; //data on z
 	public static final String COLUMN_AC_FK_FALLS = "fall"; //integer not null that define the foreign key 
 	
 	public static final String[] ALL_COLUMNS_ACCEL = {COLUMN_PK_ID, COLUMN_AC_TS,
@@ -48,9 +51,9 @@ public class DatabaseTable {
 													  COLUMN_AC_Z, COLUMN_AC_FK_FALLS};
 	
 	//Mail columns
-	public static final String COLUMN_ML_NAME = "name";
-	public static final String COLUMN_ML_SURNAME = "surname";
-	public static final String COLUMN_ML_ADDRESS = "address"; 
+	public static final String COLUMN_ML_NAME = "name"; //save as Text
+	public static final String COLUMN_ML_SURNAME = "surname"; //save as Text
+	public static final String COLUMN_ML_ADDRESS = "address"; //save as Text
 	
 	public static final String[] ALL_COLUMNS_MAIL = {COLUMN_PK_ID, COLUMN_ML_NAME,
 												     COLUMN_ML_SURNAME, COLUMN_ML_ADDRESS};
@@ -112,7 +115,7 @@ public class DatabaseTable {
 		db.execSQL(CREATE_FALL_EVENTS);
 		db.execSQL(CREATE_MAIL);
 		db.execSQL(CREATE_ACCEL_DATA);
-	}
+	}//[m] onCreate()
     
 	/**
 	 * [m]
@@ -125,6 +128,8 @@ public class DatabaseTable {
 	public static void onUpgrade(SQLiteDatabase db, int oldVersion, 
 			int newVersion){
 		
+		//switch case that start from oldVersion and after execute
+		//on cascade all modification for the database
 		switch (oldVersion){
 		case 1:
 			db.execSQL(CREATE_MAIL);
@@ -133,5 +138,5 @@ public class DatabaseTable {
 		default:
 			break;
 		}
-	}
+	}// [m] onUpgrade()
  }

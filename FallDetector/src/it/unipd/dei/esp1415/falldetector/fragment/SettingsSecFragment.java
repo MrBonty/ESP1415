@@ -26,6 +26,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+/**
+ * Implementation of a fragment for the second page of the settings: list of mail address
+ */
 public class SettingsSecFragment extends Fragment{
 	
 	
@@ -50,15 +53,20 @@ public class SettingsSecFragment extends Fragment{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		//creation of the fragment
+		
 		mContext= getActivity();
 		
 		DatabaseManager dm = new DatabaseManager(getActivity());
 		mArray = dm.getMailAddressAsArray();
-	};
+	} // [m] onCreate()
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
+		//set the view of the fragment
 		
 		View view = inflater.inflate(R.layout.settings_sec_fragment, container, false);
 
@@ -69,11 +77,13 @@ public class SettingsSecFragment extends Fragment{
 		mList.setAdapter(mAdapter);
 				
 		return view;
-	}
+	}// [m] onCreateView()
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		
+		//fill the view
 		
 		mList.setOnItemClickListener(onListItemClick());
 		mAdd.setOnClickListener(addListerListener());
@@ -87,7 +97,7 @@ public class SettingsSecFragment extends Fragment{
 				createDialog(true);
 			}
 		}
-	};
+	}// [m] onActivityCreated
 	
 	@Override
 	public void onPause() {
@@ -97,7 +107,7 @@ public class SettingsSecFragment extends Fragment{
 			mDialog.setOnDismissListener(null);
 			mDialog.dismiss();
 		}
-	};
+	}// [m] onPause()
 	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
@@ -106,8 +116,13 @@ public class SettingsSecFragment extends Fragment{
 			outState.putString(SAVING_DATA_TO_RESTORE, mSavingString);
 			outState.putInt(SAVING_POS_TO_RESTORE, mSavingPos);
 		}
-	};
+	}// [m] onSaveInstanceState()
 	
+	/**[m]
+	 * Method to create lister for add button
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private OnClickListener addListerListener(){
 		return new OnClickListener() {
 			
@@ -115,10 +130,15 @@ public class SettingsSecFragment extends Fragment{
 			public void onClick(View v) {
 				mSavingPos = NEW_MAIL;
 				createDialog(false);
-			}
+			}// [m] onClick
 		};
-	}
+	}// [m] addListerListener()
 	
+	/**[m]
+	 * Method to create lister for item of list view
+	 * 
+	 * @return the {@link OnItemClickListener}
+	 */
 	private OnItemClickListener onListItemClick(){
 		return new OnItemClickListener() {
 
@@ -130,10 +150,13 @@ public class SettingsSecFragment extends Fragment{
 
 				pos = position;
 				showPopup(view);
-			}
+			}// [m] onItemClick()
 
-
-
+			/**[m]
+			 * Method to create the pop up menu for the item
+			 * 
+			 * @param v the view where open the menu
+			 */
 			private void showPopup(View v) {
 				PopupMenu popup = new PopupMenu(mContext, v);
 
@@ -143,6 +166,11 @@ public class SettingsSecFragment extends Fragment{
 				popup.show();
 			}
 
+			/**[m]
+			 * Method to create lister for click on menu
+			 * 
+			 * @return the {@link OnMenuItemClickListener}
+			 */
 			private OnMenuItemClickListener menuClickEvent(){
 				return new OnMenuItemClickListener() {
 
@@ -171,14 +199,20 @@ public class SettingsSecFragment extends Fragment{
 				        default:
 				            return false;
 						}
-					}
+					}//[m] onMenuItemClick()
 				};
-			}
+			}//[m] menuClickEvent()
 			
+			/**[m]
+			 * Method to modify an item of the list view
+			 */
 			private void modify(){
 				createDialog(false);
-			}
+			}//[m] modify()
 		
+			/**[m]
+			 * Method to modify an item of the list view
+			 */
 			private boolean delete(){
 				DatabaseManager dm = new DatabaseManager(mContext);
 				int i = dm.deleteAMailAddress(mArray.get(pos).getId());
@@ -190,10 +224,15 @@ public class SettingsSecFragment extends Fragment{
 				}
 				
 				return false;
-			}
+			}//[m] delete()
 		};
-	}
+	}// [m] onListItemClick()
 
+	/**[m]
+	 * Method to create the dialog to add or modify the mail address
+	 * 
+	 * @param restore true if the dialog has to be restored
+	 */
 	private void createDialog(boolean restore){
 		mDialog = new MailDialog(mContext, mArray, mSavingPos);
 		
@@ -205,6 +244,7 @@ public class SettingsSecFragment extends Fragment{
 					
 		}
 		
+		// set of dismiss lister for dialog
 		mDialog.setOnDismissListener(new OnDismissListener() {
 			
 			@Override
@@ -215,9 +255,10 @@ public class SettingsSecFragment extends Fragment{
 				}
 				
 				mDialog = null;
-			}
+			}//[m] onDismiss()
 		});
 		
 		mDialog.show();
-	}
+		
+	}// [m] createDialog()
 }

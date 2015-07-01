@@ -12,6 +12,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+/**
+ * Class for work on database, it contain both generic and specific methods
+ */
 public class DatabaseManager {
 	
 	private DatabaseHelper mDbHelper;
@@ -20,6 +23,8 @@ public class DatabaseManager {
 	public static final int INSERT_ERROR = -1;
 	public static final int ON_OPEN_ERROR = -2;
 	public static final int ID_NOT_SET_ERROR = -3;
+	
+	public static final int DELETION_COMPLETE = 1; // 
 	
 	public DatabaseManager(Context context){
 		mDbHelper = new DatabaseHelper(context);
@@ -33,7 +38,7 @@ public class DatabaseManager {
 	 */
 	private void open() throws SQLException {
 		mDb = mDbHelper.getWritableDatabase();
-	}
+	}//[m] open()
 	
 	/**
 	 * [m]
@@ -41,7 +46,8 @@ public class DatabaseManager {
 	 */
 	public void close(){
 		mDbHelper.close();
-	}
+	}// [m] close()
+	
 	/**
 	 * [m]
 	 * Method to insert a Session into the database
@@ -61,7 +67,7 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_SS_XML, session.getXmlFileName());
 				
 		return insertInDatabase(DatabaseTable.SESSION_TABLE, values); 
-	}//[m] insertASession
+	}//[m] insertASession()
 	
 	/**
 	 * [m]
@@ -79,7 +85,7 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_FE_FK_SESSION, fall.getSessionId());
 		
 		return insertInDatabase(DatabaseTable.FALL_EVENTS_TABLE, values);
-	}//[m] insertAFall
+	}//[m] insertAFall()
 	
 	/**
 	 * [m]
@@ -96,7 +102,7 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_ML_SURNAME, address.getSurname());
 		
 		return insertInDatabase(DatabaseTable.MAIL_TABLE, values);
-	}//[m] insertAMailAddress
+	}//[m] insertAMailAddress()
 	
 	/**
 	 * [m]
@@ -115,7 +121,7 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_AC_FK_FALLS, data.getFallId());
 		
 		return insertInDatabase(DatabaseTable.ACCEL_TABLE, values);
-	}//[m] insertAnAccelData
+	}//[m] insertAnAccelData()
 	
 	/**
 	 * [m]
@@ -129,7 +135,7 @@ public class DatabaseManager {
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + sessionId;
 	
 		return upgradeRow(DatabaseTable.SESSION_TABLE, valuesToupgrade, whereClause, null);
-	}//[m] upgradeASession
+	}//[m] upgradeASession()
 	
 	/**
 	 * [m]
@@ -157,7 +163,7 @@ public class DatabaseManager {
 		}//if... else...
 		
 		return upgradeRow(DatabaseTable.SESSION_TABLE, values, whereClause, null);
-	}//[m] upgradeASession
+	}//[m] upgradeASession()
 	
 	/**
 	 * [m]
@@ -171,7 +177,7 @@ public class DatabaseManager {
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + fallId;
 	
 		return upgradeRow(DatabaseTable.FALL_EVENTS_TABLE, valuesToupgrade, whereClause, null);
-	}//[m] upgradeAFall
+	}//[m] upgradeAFall()
 	
 	/**
 	 * [m]
@@ -197,7 +203,7 @@ public class DatabaseManager {
 		}//if... else...
 		
 		return upgradeRow(DatabaseTable.FALL_EVENTS_TABLE, values, whereClause, null);
-	}//[m] upgradeAFall
+	}//[m] upgradeAFall()
 	
 	/**
 	 * [m]
@@ -211,7 +217,7 @@ public class DatabaseManager {
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + addressId;
 	
 		return upgradeRow(DatabaseTable.MAIL_TABLE, valuesToupgrade, whereClause, null);
-	}//[m] upgradeAMailAddress
+	}//[m] upgradeAMailAddress()
 	
 	/**
 	 * [m]
@@ -236,7 +242,7 @@ public class DatabaseManager {
 		}//if... else...
 		
 		return upgradeRow(DatabaseTable.MAIL_TABLE, values, whereClause, null);
-	}//[m] upgradeAMailAddress
+	}//[m] upgradeAMailAddress()
 
 	/**
 	 * [m]
@@ -250,7 +256,7 @@ public class DatabaseManager {
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + dataId;
 	
 		return upgradeRow(DatabaseTable.ACCEL_TABLE, valuesToupgrade, whereClause, null);
-	}//[m] upgradeAnAccelData
+	}//[m] upgradeAnAccelData()
 	
 	/**
 	 * [m]
@@ -277,7 +283,7 @@ public class DatabaseManager {
 		}//if... else...
 		
 		return upgradeRow(DatabaseTable.ACCEL_TABLE, values, whereClause, null);
-	}//[m] upgradeAnAccelData
+	}//[m] upgradeAnAccelData()
 	
 	/**
 	 * [m]
@@ -300,7 +306,7 @@ public class DatabaseManager {
 		
 		close();
 		return id;
-	}//[m] insertInDatabase
+	}//[m] insertInDatabase()
 	
 	/**
 	 * [m]
@@ -325,7 +331,7 @@ public class DatabaseManager {
 		close();
 		
 		return tmp;
-	}//[m] upgradeRow
+	}//[m] upgradeRow()
 	
 	/**
 	 * [m]
@@ -362,7 +368,7 @@ public class DatabaseManager {
 		}
 		close();
 		return tmp;
-	}//[m] getSessionAsArray
+	}//[m] getSessionAsArray()
 	
 	
 	/**
@@ -379,7 +385,7 @@ public class DatabaseManager {
 		Cursor tmp = queryDb(DatabaseTable.SESSION_TABLE, DatabaseTable.ALL_COLUMNS_SESSION, selection, orderBy);
 
 		return tmp;
-	}//[m] getSessionAsCursor
+	}//[m] getSessionAsCursor()
 	
 	/**
 	 * [m]
@@ -412,7 +418,7 @@ public class DatabaseManager {
 
 		close();
 		return tmp;
-    }//[m] getFallForSessionAsArray
+    }//[m] getFallForSessionAsArray()
     
     /**
      * [m]
@@ -429,7 +435,7 @@ public class DatabaseManager {
     	
     	Cursor tmp = queryDb(DatabaseTable.FALL_EVENTS_TABLE, DatabaseTable.ALL_COLUMNS_FALL_EVENTS, selection, orderBy);
     	return tmp;
-    }//[m] getFallForSessionAsCursor
+    }//[m] getFallForSessionAsCursor()
 
     /**
      * [m]
@@ -459,7 +465,7 @@ public class DatabaseManager {
 		close();
 		
 		return tmp;
-	}//[m] getMailAddressAsArray
+	}//[m] getMailAddressAsArray()
 	
     /**
      * [m]
@@ -472,7 +478,7 @@ public class DatabaseManager {
     	
     	Cursor tmp = queryDb(DatabaseTable.MAIL_TABLE, DatabaseTable.ALL_COLUMNS_MAIL, null, null);
     	return tmp;
-    }//[m] getMailAddressAsCursor
+    }//[m] getMailAddressAsCursor()
 	
 	/**
 	 * [m]
@@ -505,7 +511,7 @@ public class DatabaseManager {
 		
 		close();
 		return tmp;
-	}
+	}// [m] getAccelDataAsArrayForAFall()
 	
 	/**
 	 * [m]
@@ -522,7 +528,8 @@ public class DatabaseManager {
 		
     	Cursor tmp = queryDb(DatabaseTable.ACCEL_TABLE, DatabaseTable.ALL_COLUMNS_ACCEL, selection, orderBy);
     	return tmp;
-    }//[m] getMailAddressAsCursor
+    }//[m] getMailAddressAsCursor()
+	
 	/**
 	 * [m]
 	 * Complex method to query the given table, returning a Cursor over the result set. After read call close()
@@ -551,7 +558,8 @@ public class DatabaseManager {
 		
 		//close();
 		return tmp;
-	}
+	}// [m] queryDb()
+	
 	/**
 	 * [m]
 	 * Intermediary method to query the given table, returning a Cursor over the result set. After read call close()
@@ -578,7 +586,7 @@ public class DatabaseManager {
 		
 		//close();
 		return tmp;
-	}
+	}// [m] queryDb()
 	
 	/**
 	 * [m]
@@ -602,7 +610,7 @@ public class DatabaseManager {
 		
 		//close();
 		return tmp;
-	}
+	}// [m] queryDb()
 	
 	/**
 	 * [m]
@@ -627,30 +635,55 @@ public class DatabaseManager {
 		
 		//close();
 		return tmp;
-	}
+	}// [m] queryDb()
 	
-	
-	// TODO delete methods documentation
-	
+	/**
+	 * [m]
+	 * Method to delete a session 
+	 * 
+	 * @param sessionId the id of the session to delete
+	 * @return DELETION_COMPLETE if is all good or ON_OPEN_ERROR if db not open. 
+	 */
 	public int deleteASession(long sessionId){
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + sessionId;
 		return deleteFromDb(DatabaseTable.SESSION_TABLE, whereClause);
-	}
+	}// [m] deleteASession()
 	
+	/**
+	 * [m]
+	 * Method to delete a fall event 
+	 * 
+	 * @param fallId the id of the fall event to delete
+	 * @return DELETION_COMPLETE if is all good or ON_OPEN_ERROR if db not open. 
+	 */
 	public int deleteAFall(long fallId){
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + fallId;
 		return deleteFromDb(DatabaseTable.FALL_EVENTS_TABLE, whereClause);
-	}
+	}// [m] deleteAFall()
 	
+	/**
+	 * [m]
+	 * Method to delete a Mail Address
+	 * 
+	 * @param mailId the id of the Mail Address to delete
+	 * @return DELETION_COMPLETE if is all good or ON_OPEN_ERROR if db not open. 
+	 */
 	public int deleteAMailAddress(long mailId){
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + mailId;
 		return deleteFromDb(DatabaseTable.MAIL_TABLE, whereClause);
-	}
+	}// [m] deleteAMailAddress()
 	
+	/**
+	 * [m]
+	 * Method to delete a AccelData
+	 * 
+	 * @param mailId the id of the AccelData to delete
+	 * @return DELETION_COMPLETE if is all good or ON_OPEN_ERROR if db not open. 
+	 */
 	public int deleteAnAccelData(long dataId){
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + dataId;
 		return deleteFromDb(DatabaseTable.ACCEL_TABLE, whereClause);
-	}
+	}// [m] deleteAnAccelData()
 	
 	/**
 	 * [m]
@@ -670,5 +703,5 @@ public class DatabaseManager {
 		int row = mDb.delete(tableNam, whereClause, null);
 	    close();
 		return row;
-	}
+	}// [m] deleteFromDb
 }

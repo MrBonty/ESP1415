@@ -39,7 +39,7 @@ public class Session {
 		startDate = Calendar.getInstance();
 		startTimeStamp = startDate.getTimeInMillis();
 		setDuration(startTimeStamp);
-	}//[c] Session
+	}//[c] Session()
 
 	/**
 	 * [c] Create a Session object
@@ -57,7 +57,7 @@ public class Session {
 		}
 		this.startTimeStamp = timeStamp;
 		setDuration(startTimeStamp);
-	}//[c] Session
+	}//[c] Session()
 	
 	/**
 	 * [m]
@@ -67,7 +67,7 @@ public class Session {
 	 */
 	public void setName(String name){
 		this.name = name;
-	}//[m] setName
+	}//[m] setName()
 	
 	/**
 	 * [m]
@@ -77,7 +77,7 @@ public class Session {
 	 */
 	public String getName(){
 		return name;
-	}//[m] getName
+	}//[m] getName()
 
 	/**
 	 * [m]
@@ -93,11 +93,11 @@ public class Session {
 		}
 		
 		return "";
-	}//[m] getDate
+	}//[m] getDate()
 	
 	public long getStartTimestamp() {
 		return startTimeStamp;
-	}//[m] getStartTimestamp
+	}//[m] getStartTimestamp()
 	
 	/**
 	 * [m]
@@ -107,7 +107,7 @@ public class Session {
 	 */
 	public void setId(long id){
 		this.id = id;
-	}//[m] setId
+	}//[m] setId()
 	
 	/**
 	 * [m]
@@ -117,7 +117,7 @@ public class Session {
 	 */
 	public long getId(){
 		return id;		
-	}//[m] getId
+	}//[m] getId()
 	
 	/**
 	 * [m]
@@ -127,7 +127,7 @@ public class Session {
 	 */
 	public void setColorThumbnail(int color){
 		colorThumbnail = color;
-	}
+	}//[m] setColorThumbnail()
 	
 	/**
 	 * [m]
@@ -137,7 +137,7 @@ public class Session {
 	 */
 	public int getColorThumbnail(){
 		return colorThumbnail;
-	}
+	}//[m] getColorThumbnail()
 	
 	/**
 	 * [m]
@@ -147,7 +147,7 @@ public class Session {
 	 */
 	public void setFallsNum(int number){
 		falls = number;
-	}
+	}//[m] setFallsNum()
 	
 	/**
 	 * [m]
@@ -157,7 +157,7 @@ public class Session {
 	 */
 	public int getFallsNum(){
 		return falls;
-	}
+	}// [m] getFallsNum()
 	
 	/**
 	 * [m]
@@ -166,7 +166,7 @@ public class Session {
 	public void setDuration(){
 		endTimeStamp = Calendar.getInstance().getTimeInMillis();
 		duration = endTimeStamp - startTimeStamp;
-	}
+	}//[m] setDuration()
 	
 	/**
 	 * [m]
@@ -177,7 +177,7 @@ public class Session {
 	public void setDuration(long timeStamp){
 		endTimeStamp = timeStamp;
 		duration = endTimeStamp - startTimeStamp;
-	}
+	}//[m] setDuration()
 	
 	/**
 	 * [m]
@@ -187,7 +187,7 @@ public class Session {
 	 */
 	public long getDuration(){
 		return duration;
-	}
+	}//[m] getDuration()
 	
 	/**
 	 * [m]
@@ -199,7 +199,7 @@ public class Session {
 	 */
 	public boolean isActive(){
 		return isActive;
-	}
+	}//[m] isActive() 
 	
 	/**
 	 * [m]
@@ -214,7 +214,7 @@ public class Session {
 			return TRUE;
 		}
 		return FALSE; 
-	}
+	}// [m] isActiveAsInteger()
 	
 	/**
 	 * [m]
@@ -227,7 +227,7 @@ public class Session {
 	public void setToActive(int value){
 		if(value == FALSE) isActive = false;
 		else isActive = true;
-	}
+	}// [m] setToActive()
 	
 	/**
 	 * [m]
@@ -239,7 +239,7 @@ public class Session {
 	 */
 	public void setToActive(boolean value){
 		isActive = value;
-	}
+	}// [m] setToActive()
 	
 	/**
 	 * [m]
@@ -249,7 +249,7 @@ public class Session {
 	 */
 	public String getXmlFileName(){
 		return xmlFile;
-	}
+	}//[m] getXmlFileName()
 	
 	/**
 	 * [m]
@@ -259,7 +259,8 @@ public class Session {
 	 */
 	public void setXmlFileName(String xml){
 		xmlFile = xml;
-	}
+	}// [m] setXmlFileName()
+	
 	/**
 	 * [m]
 	 * Method to set name of file xml as hhmmssmmmddmmaaaa
@@ -272,7 +273,7 @@ public class Session {
 				+ startDate.get(Calendar.DAY_OF_MONTH)
 				+ (startDate.get(Calendar.MONTH) + 1)
 				+ startDate.get(Calendar.YEAR);
-	}
+	}// [m] generateXmlName()
 	
 	/**
 	 * [m]
@@ -282,7 +283,7 @@ public class Session {
 	 */
 	public void setBitmap(Bitmap bitmapIcon){
 		this.bitmapIcon = bitmapIcon;
-	}
+	}//[m] setBitmap()
 	
 	/**
 	 * [m]
@@ -292,7 +293,7 @@ public class Session {
 	 */
 	public Bitmap getBitmap(){
 		return bitmapIcon;
-	}
+	}//[m] getBitmap()
 	
 	/**
 	 * [m]
@@ -308,7 +309,7 @@ public class Session {
 		return tmp;
 		}
 		return "";
-	}
+	}//[m] getStartTimeToString()
 	
 	public void setFallEvents(ArrayList<Fall> items){
 		fallsEvent = items;
@@ -360,7 +361,7 @@ public class Session {
 		    tmp = h+ ":"+ m;
 		}
 		return tmp;
-	}
+	}//[m] getDurationString()
 	
 	
 }

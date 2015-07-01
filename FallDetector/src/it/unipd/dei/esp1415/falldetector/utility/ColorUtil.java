@@ -19,6 +19,7 @@ public class ColorUtil {
 	private final static int LAYER_TH = 6; 
 	private final static int SQUARE_NUM_FOR_ROOT = 3; //total size of thumbnail is 90 (acepted value 1, 2, 3, 5, 6, 9, 15,..., 90)
 	private final static int SQUARE_NUM = SQUARE_NUM_FOR_ROOT *SQUARE_NUM_FOR_ROOT;
+	
 	/**
 	 * [m]
 	 * This method calculate the color of the image for a new session
@@ -38,8 +39,7 @@ public class ColorUtil {
 		color = (((aa | rr) | gg) | bb);
 		
 		return color;
-	}
-	
+	}// [m] imageColorSelector()
 
 	/**
 	 * [m]
@@ -117,6 +117,6 @@ public class ColorUtil {
 		}
 		
 		return image;
-	}
+	}// [m] recolorIconBicolor()
 	
 }

@@ -15,6 +15,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * Implementation of a dialog for get mail address
+ * 
+ */
 public class MailDialog extends Dialog{
 
 	private Context mContext;
@@ -35,6 +39,14 @@ public class MailDialog extends Dialog{
 	private final static int ADD_NAME_INFO = 1;
 	private final static int NO_VALID_MAIL_INFO = 2;
 	
+	/**
+	 * [c]
+	 * Constructor for Dialog
+	 * 
+	 * @param context for create dialog
+	 * @param array of mailAddress for get data
+	 * @param position the position
+	 */
 	public MailDialog(Context context, ArrayList<MailAddress> array, int position) {
 		super(context);
 
@@ -49,7 +61,7 @@ public class MailDialog extends Dialog{
 		mName = null;
 		mSurname = null;
 		mAddress = null;
-	}
+	}//[c] MailDialog()
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -95,8 +107,13 @@ public class MailDialog extends Dialog{
 		viewHolder.cancel.setOnClickListener(cancelListener());
 		viewHolder.save.setOnClickListener(saveListener());
 
-	}
+	}//[m] onCreate()
 
+	/**[m]
+	 * Method to create lister for save button, it control all params
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private android.view.View.OnClickListener saveListener() {
 
 		return new View.OnClickListener() {
@@ -155,10 +172,15 @@ public class MailDialog extends Dialog{
 					mSurname = null;
 					mAddress = null;
 				}	
-			}
+			}//[m] onClick()
 		};
-	}
+	}//[m] saveListener()
 
+	/**[m]
+	 * Method to create lister for cancel button
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private android.view.View.OnClickListener cancelListener() {
 		
 		return new View.OnClickListener() {
@@ -166,10 +188,14 @@ public class MailDialog extends Dialog{
 			@Override
 			public void onClick(View v) {
 				dismiss();
-			}
+			}//[m] onClick()
 		};
-	}
+	}//[m] cancelListener() 
 	
+	/**
+	 * [m]
+	 * Method change advise on insert
+	 */
 	private void changeInfo(){
 		switch (mState) {
 		case START_INFO:
@@ -184,6 +210,10 @@ public class MailDialog extends Dialog{
 		}
 	}
 
+	/**
+	 * private inner class to hold the view
+	 *
+	 */
 	private class ViewHolder{
 		private TextView info;
 		private EditText name;
@@ -191,8 +221,17 @@ public class MailDialog extends Dialog{
 		private EditText address;
 		private Button save;
 		private Button cancel;
-	}
+	}//{c} ViewHolder
 	
+	/**
+	 * [m]
+	 * Method to restore the data on dialog
+	 * 
+	 * @param name 
+	 * @param surname
+	 * @param address
+	 * @param state
+	 */
 	public void restoreValue(String name, String surname, String address, int state){
 		isRestored = true;
 		mName = name;
@@ -201,6 +240,12 @@ public class MailDialog extends Dialog{
 		mState = state;
 	}
 	
+	/**
+	 * [m]
+	 * Method to get data to save
+	 * 
+	 * @return a formatted string with data
+	 */
 	public String getSavingString(){
 		String name = viewHolder.name.getText().toString();
 		String surname = viewHolder.surname.getText().toString(); 
@@ -209,5 +254,5 @@ public class MailDialog extends Dialog{
 		return name + SettingsSecFragment.DIVISOR + surname + 
 				SettingsSecFragment.DIVISOR + address + 
 				SettingsSecFragment.DIVISOR + mState;
-	}
-}
+	}//[m] getSavingString()
+}//{c} MailDialog

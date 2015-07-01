@@ -30,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
 
 	private SessionDialog mDialog;
 	
+	//Constants
 	public static final int SCREENLAYOUT_SIZE_XLARGE = 0x04; //For compatibility with API 8 same value of Configuration.SCREENLAYOUT_SIZE_XLARGE
 	public static final String SAVE_ADD_DIALOG = "addDialog";
 	
@@ -44,8 +45,8 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main);
 		
 		//for a problem to test account gmail
-		//for extra function of rapid mail send
-		
+		//for extra function of rapid mail send 
+
 		if(Build.VERSION.SDK_INT > 8){
 			StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 			StrictMode.setThreadPolicy(policy); 
@@ -103,36 +104,18 @@ public class MainActivity extends ActionBarActivity {
 		
 		transaction.commit();
 		
-		if(savedInstanceState != null){
-			String restore = savedInstanceState.getString(SAVE_ADD_DIALOG);
-			if(restore != null && (!(restore.equals("")))){
-				
-				String[] splitted = restore.split(SessionDialog.DIVISOR);
-
-				int pos = Integer.parseInt(splitted[0]);
-				int color = Integer.parseInt(splitted[2]);
-				
-				mDialog = new SessionDialog(this, pos, true);
-				mDialog.restoreValue(splitted[1], color);
-				mDialog.show();
-				mDialog.setOnDismissListener(new OnDismissListener() {
-					
-					@Override
-					public void onDismiss(DialogInterface dialog) {
-						ListSessionFragment.mAdapter.notifyDataSetChanged();
-						mDialog = null;
-					}
-				});
-			}
+		if(savedInstanceState != null && savedInstanceState.getBoolean(SAVE_ADD_DIALOG)){
+			
+			createAddDialog(true, savedInstanceState);
 		}
-	}
+	}//[m] onCreate()
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
-	}
+	}//[m] onCreateOptionsMenu()
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -150,18 +133,25 @@ public class MainActivity extends ActionBarActivity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
+	}// [m] onOptionsItemSelected()
 	
 	@Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         
-        if(mDialog != null && mDialog.isShowing()){
-        	outState.putString(SAVE_ADD_DIALOG, mDialog.getStringToSave());
+        if(mDialog != null && mDialog.isShowing() && mDialog.isNew()){
+        	outState.putAll(mDialog.onSaveInstanceState());
+        	mDialog.setOnDismissListener(null);
         	mDialog.dismiss();
+        	
+        	outState.putBoolean(SAVE_ADD_DIALOG, true);
 		}
-    }
+    }//[m] onSaveInstanceState()
 
+	/**
+	 * [m]
+	 * Method use for open add dialog or an advise
+	 */
 	private void openAdd(){
 		if(mMed.getDataSession().get(0).getStartTimestamp() == 0){
 			
@@ -186,18 +176,40 @@ public class MainActivity extends ActionBarActivity {
 			dialog.show();
 			
 		}else{
-			mDialog = new SessionDialog(this, NEW_SESSION_POSITION, true);
-			mDialog.show();
-			mDialog.setOnDismissListener(new OnDismissListener() {
-				
-				@Override
-				public void onDismiss(DialogInterface dialog) {
-					ListSessionFragment.mAdapter.notifyDataSetChanged();
-					mDialog = null;
-					
-					//TODO intent to start the new session;
-				}
-			});
+			createAddDialog(false, null);
+			
 		}
-	}
+	}//[m] openAdd()
+	
+	/**
+	 * [m]
+	 * Method to create a Dialog for add or modify a session
+	 * 
+	 * @param restore pass true if the dialog has to restored, false otherwise
+	 * @param data the bundle for restoring dialog, pass null if restore is set to false 
+	 */
+	private void createAddDialog(boolean restore, Bundle data){
+
+		if(restore && data != null){
+			mDialog = new SessionDialog(this, true);
+			mDialog.onRestoreInstanceState(data);
+			
+		}else{
+			mDialog = new SessionDialog(this, NEW_SESSION_POSITION, true);
+		}
+		
+		mDialog.show();
+		
+		// set of dismiss listener for the dialog
+		mDialog.setOnDismissListener(new OnDismissListener() {
+			
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				ListSessionFragment.mAdapter.notifyDataSetChanged();
+				mDialog = null;
+				
+				//TODO intent to start the new session;
+			}//[m] onDismiss()
+		});
+	}//[m] createAddDialog()
 }

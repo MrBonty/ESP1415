@@ -8,6 +8,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
+
+/**
+ * Activity for the settings of the application
+ */
 public class SettingsActivity extends ActionBarActivity {
 
 	private static int mCurFrag;
@@ -44,20 +48,26 @@ public class SettingsActivity extends ActionBarActivity {
 				changeFragment(mCurFrag);
 			}
 		}
-	}
+	}//[m] onCreate()
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-	}
+	}//[m] onResume()
 	
 	@Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SAVE_FRAG, mCurFrag);
 		
-    }
+    }//[m] onSaveInstanceState()
 	
+	/**
+	 * [m]
+	 * Methods use for change fragment
+	 * 
+	 * @param frag the value of the fragment to set, use FRAG_MAIN or FRAG_SEC
+	 */
 	public static void changeFragment(int frag){
 		Fragment tmp = null;
 		
@@ -68,12 +78,15 @@ public class SettingsActivity extends ActionBarActivity {
 
 			SettingsMainFragment firstFragment = null;
 					
+			// get fragment on screen 
 			tmp = mManager.findFragmentById(R.id.frame_layout);
 			
+			//control if the fragment on screen is the right one
 			if(tmp != null && tmp instanceof SettingsMainFragment){
 				firstFragment = (SettingsMainFragment) tmp;
 			}
 			
+			// if is not setted
 			if(firstFragment == null){
 				firstFragment = new SettingsMainFragment();
 			}
@@ -103,6 +116,6 @@ public class SettingsActivity extends ActionBarActivity {
 			transaction.addToBackStack(null);
 			transaction.commit();
 			break;
-		}
-	}
+		}// switch(frag) ... case...
+	}//[m] changeFragment()
 }

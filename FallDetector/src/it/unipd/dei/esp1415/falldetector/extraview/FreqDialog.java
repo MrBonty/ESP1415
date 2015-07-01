@@ -9,6 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 
+/**
+ * Dialog for set frequency
+ * 
+ */
 public class FreqDialog extends Dialog{
 
 	private int mState;
@@ -17,12 +21,19 @@ public class FreqDialog extends Dialog{
 	
 	private boolean hasSave;
 	
+	/**
+	 * [c]
+	 * Constructor for dialog
+	 * 
+	 * @param context
+	 * @param state set using FREQ_LOW, FREQ_MIDDLE, FREQ_HIGH from SettingsMainFragment
+	 */
 	public FreqDialog(Context context, int state) {
 		super(context);
 		mState = state;
 		
 		hasSave = false;
-	}
+	}//[c]  FreqDialog()
 
 	
 	@Override
@@ -57,16 +68,26 @@ public class FreqDialog extends Dialog{
 			viewHolder.high.setChecked(true);
 			break;
 		}
-	}
+	}//[m] onCreate()
 	
+	/**
+	 * private inner class to hold the view
+	 *
+	 */
 	private class ViewHolder{
 		private RadioButton low;
 		private RadioButton middle;
 		private RadioButton high;
 		private Button save;
 		private Button cancel;
-	}
+	}//{c} ViewHolder
 	
+	/**
+	 * [m]
+	 * Method to create lister for group of radio buttons
+	 * 
+	 * @return the {@link View.OnClickListener}
+	 */
 	private View.OnClickListener radioOnClick(){
 		return new View.OnClickListener() {
 			
@@ -94,10 +115,15 @@ public class FreqDialog extends Dialog{
 						break;
 					}
 				}
-			}
+			}// [m] onClick()
 		};
-	}
+	}//[m] radioOnClick()
 	
+	/**[m]
+	 * Method to create lister for both save and cancel button 
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private android.view.View.OnClickListener cancelListener() {
 		
 		return new View.OnClickListener() {
@@ -115,15 +141,33 @@ public class FreqDialog extends Dialog{
 		};
 	}
 	
+	/**
+	 * [m]
+	 * Method to check if he data has saved
+	 * 
+	 * @return true if the data has save
+	 */
 	public boolean hasSaved(){
 		return hasSave;
-	}
-	
+	}//[m] hasSaved()
+
+	/**
+	 * [m]
+	 * Method to get the state saved
+	 * 
+	 * @return the state
+	 */
 	public int getState(){
 		return mState;
-	}
+	}//[m] getState()
 	
+	/**
+	 * [m]
+	 * Method to restore the data on dialog
+	 * 
+	 * @param state
+	 */
 	public void restoreValue(int state){
 		mState = state;
-	}
-}
+	}//[m] restoreValue()
+}//{c} FreqDialog

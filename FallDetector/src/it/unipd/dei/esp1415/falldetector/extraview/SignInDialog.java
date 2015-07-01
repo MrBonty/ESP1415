@@ -14,6 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+/**
+ * Implementation of a dialog for Sign-in
+ * 
+ */
 public class SignInDialog extends Dialog{
 
 	private Context mContext;
@@ -32,7 +36,12 @@ public class SignInDialog extends Dialog{
 	private static final int GENERAL_ERROR_INFO = 1;
 	private static final int NOT_GMAIL_INFO = 2;
 	
-	
+	/**
+	 * [c]
+	 * Constructor for the dialog
+	 * 
+	 * @param context
+	 */
 	public SignInDialog(Context context) {
 		super(context);
 		mContext = context;
@@ -43,7 +52,7 @@ public class SignInDialog extends Dialog{
 		
 		mIsRestored = false;
 		lastState = START_INFO;
-	}
+	}//[c] SignInDialog
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -91,8 +100,12 @@ public class SignInDialog extends Dialog{
 			mData = null;
 			mIsRestored = false;
 		}
-	}
+	}//[m] onCreate()
 	
+	/**
+	 * private inner class to hold the view
+	 *
+	 */
 	class ViewHolder{
 		private TextView info;
 		private EditText account;
@@ -101,7 +114,11 @@ public class SignInDialog extends Dialog{
 		private Button cancel;
 	}//{c} ViewHold
 
-	
+	/**[m]
+	 * Method to create lister for save button, it control all params
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
 	private View.OnClickListener saveListener(){
 		return new View.OnClickListener() {
 			
@@ -143,7 +160,12 @@ public class SignInDialog extends Dialog{
 		};// return
 	}// [m] saveListener()
 	
-	
+	/**
+	 * [m]
+	 * Method change advise on insert
+	 * 
+	 * @param toView the value of the advise to view
+	 */
 	private void switchInfo(int toView){
 		String toSet= "";
 		lastState = toView;
@@ -165,28 +187,54 @@ public class SignInDialog extends Dialog{
 		vh.info.setText(toSet);
 	}//[m] switchInfo()
 	
+	/**
+	 * [m]
+	 * @return true if the data is set on save 
+	 */
 	public boolean hasData(){
 		return hasData;
-	}
+	}//[m] hasData()
 	
+	/**
+	 * [m]
+	 * @return the account 
+	 */
 	public String getAccount(){
 		return mAccount;
-	}
+	}//[m] getAccount()
 	
+	/**
+	 * [m]
+	 * @return a base64 string with a divisor
+	 */
 	public String getData(){
 		return mData;
-	}
+	}//[m] getData()
 
+	/**
+	 * [m]
+	 * Method to get data to save
+	 * 
+	 * @return a formatted string with data
+	 */
 	public String getSavingString(){
 		return vh.account.getText().toString() + SettingsMainFragment.DIVISOR_ON_SAVE_STATE 
 				+ vh.password.getText().toString() + SettingsMainFragment.DIVISOR_ON_SAVE_STATE 
 				+ lastState; 
-	}
+	}//[m] getSavingString()
 	
+	/**
+	 * [m]
+	 * Method to restore the data on dialog
+	 * 
+	 * @param account
+	 * @param password
+	 * @param state
+	 */
 	public void restoreValue(String account, String password, int state){
 		mAccount = account;
 		mPassword = password;
 		lastState = state;
 		mIsRestored = true;
-	}
+	}//[m] restoreValue() 
 }

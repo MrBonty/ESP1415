@@ -99,7 +99,7 @@ public class ListSessionFragment extends ListFragment {
 	        default:
 	            return super.onContextItemSelected(item);
 	    }
-	}
+	}//[m] onContextItemSelected()
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
@@ -115,14 +115,7 @@ public class ListSessionFragment extends ListFragment {
 		
 		mAdapter = new ListSessionAdapter(mContext, mArray,
 				mDualPanel);
-		
-		/*
-		if (!mod.hasCurretnPosSessionSet()) {
-			// Restore last state for checked position.
-			//mCurCheckPosition = savedInstanceState.getInt(Moderator.SAVE_CURRENT_CHOICE, START_FRAG_POS);
-			mod.resetCurretnPosSession();
-		}*/
-		
+	
 		mCurCheckPosition = mMed.getCurretnPosSession();
 		Log.i("POSITION","Current pos= " + mCurCheckPosition);
 
@@ -148,27 +141,8 @@ public class ListSessionFragment extends ListFragment {
 		
 		setListAdapter(mAdapter);
 		
-		if(savedInstanceState != null){
-			String restore = savedInstanceState.getString(SAVE_MODIFY_DIALOG);
-			if(restore != null && (!(restore.equals("")))){
-				
-				String[] splitted = restore.split(SessionDialog.DIVISOR);
-
-				int pos = Integer.parseInt(splitted[0]);
-				int color = Integer.parseInt(splitted[2]);
-				
-				mDialog = new SessionDialog(mMed.getMain(), pos, false);
-				mDialog.restoreValue(splitted[1], color);
-				mDialog.show();
-				mDialog.setOnDismissListener(new OnDismissListener() {
-					
-					@Override
-					public void onDismiss(DialogInterface dialog) {
-						mAdapter.notifyDataSetChanged();
-						mDialog = null;
-					}
-				});
-			}
+		if(savedInstanceState != null && savedInstanceState.getBoolean(SAVE_MODIFY_DIALOG)){
+			createModifyDialog(true, savedInstanceState, -1);
 		}
 	}// [m] onActivityCreated
 
@@ -183,11 +157,14 @@ public class ListSessionFragment extends ListFragment {
         	mMed.resetIsCalledFromBack();
         }
         
-        if(mDialog != null && mDialog.isShowing()){
-        	outState.putString(SAVE_MODIFY_DIALOG, mDialog.getStringToSave());
+        if(mDialog != null && mDialog.isShowing()&& !mDialog.isNew()){
+        	outState.putAll(mDialog.onSaveInstanceState());
+        	mDialog.setOnDismissListener(null);
         	mDialog.dismiss();
+        	
+        	outState.putBoolean(SAVE_MODIFY_DIALOG, true);
 		}
-    }
+    }//[m] onSaveInstanceState() 
 	
 	/**
 	 * [m]
@@ -240,6 +217,13 @@ public class ListSessionFragment extends ListFragment {
 
 	}//[m] showDetail
 	
+	/**
+	 * [m]
+	 * Method to delete a session
+	 * 
+	 * @param pos the position of the session to delete on the list view
+	 * @return
+	 */
 	private boolean delete(int pos){
 		Session tmp= mArray.get(pos);
 		DatabaseManager dbm = new DatabaseManager(mContext);
@@ -252,21 +236,48 @@ public class ListSessionFragment extends ListFragment {
 		}
 		
 		return false;
-	}
+	}//[m] delete()
 	
+	/**
+	 * [m]
+	 * Method to modify a session
+	 * 
+	 * @param pos the position of the session to modify on the list view
+	 * @return
+	 */
 	private void modify(int pos){
+		createModifyDialog(false, null, pos);
+	}//[m] modify()
+
+	/**
+	 * [m]
+	 * Method to create a dialog to modify a session
+	 * 
+	 * @param restore set to true if dialog has to be restored, false otherwise
+	 * @param data the bundle for restoring dialog, or null if restore is set to false 
+	 * @param pos the position of the session to modify
+	 */
+	private void createModifyDialog(boolean restore, Bundle data, int pos){
+
+		if(restore && data != null){
+			mDialog = new SessionDialog(mMed.getMain(), false);
+			mDialog.onRestoreInstanceState(data);
+			
+		}else{
+			mDialog = new SessionDialog(mMed.getMain(), pos, false);
+		}
 		
-		mDialog = new SessionDialog(mMed.getMain(), pos, false);
 		mDialog.show();
+		
+		// set of OnDismissListener for dialog
 		mDialog.setOnDismissListener(new OnDismissListener() {
 			
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				mAdapter.notifyDataSetChanged();
 				mDialog = null;
-			}
+			}//[m] onDismiss()
 		});
 		
-	}
-
+	}//[m] createModifyDialog()
 }

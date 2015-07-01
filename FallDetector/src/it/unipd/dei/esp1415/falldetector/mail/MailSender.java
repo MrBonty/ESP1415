@@ -16,6 +16,9 @@ import java.util.Calendar;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
+/**
+ * Implementation of SMTP protocol for GMAIL for sending mail obj
+ */
 public class MailSender {
 
 	private int port;
@@ -53,21 +56,26 @@ public class MailSender {
 			this.user = user;
 			this.password = password;
 		}
-	}
+	}//[c] MailSender()
 
-	
+	/**
+	 * [m]
+	 * Method to connect to mail server of gmail, remember to close the connection
+	 * 
+	 * @return true if has connected, false otherwise
+	 */
 	public boolean connect(){
 		try {
-			
+
 			socket = (SSLSocket)((SSLSocketFactory)
 					SSLSocketFactory.getDefault()).createSocket(server, port);
-			
+
 			in = socket.getInputStream();
 			InputStreamReader isr = new InputStreamReader(in);
 			br = new BufferedReader(isr);
-			
+
 			out = new DataOutputStream(socket.getOutputStream());
-			
+
 			reader = new Thread(new Runnable(){
 				public void run(){
 					try{
@@ -79,49 +87,51 @@ public class MailSender {
 						e.printStackTrace();
 					}
 				}
-	        });
-			
+			});
+
 			reader.start();
-			
-			try {
-				
-				Thread.sleep(DELAY);
-				System.out.println(response);
 
-				smtp("EHLO smtp.gmail.com\r\n");
-				Thread.sleep(DELAY);
-				System.out.println(response);
+			Thread.sleep(DELAY);
+			System.out.println(response);
 
-				smtp("AUTH LOGIN\r\n");
-				Thread.sleep(DELAY);
-				System.out.println(response);
+			smtp("EHLO smtp.gmail.com\r\n");
+			Thread.sleep(DELAY);
+			System.out.println(response);
 
-				smtp(user+"\r\n");
-				Thread.sleep(DELAY);
-				System.out.println(response);
+			smtp("AUTH LOGIN\r\n");
+			Thread.sleep(DELAY);
+			System.out.println(response);
 
-				smtp(password+"\r\n");
-				Thread.sleep(DELAY);
-				char[] controll= response.toCharArray();
-				
-				System.out.println(response);
-				
-				for(int i = 0; i<controll.length-2 ; i++){
-					if((controll[i] == '2') && (controll[i+1] == '3') && (controll[i+2] == '5')){ // Look for value 235 ->Connection accepted
-						return true;
-					}
+			smtp(user+"\r\n");
+			Thread.sleep(DELAY);
+			System.out.println(response);
+
+			smtp(password+"\r\n");
+			Thread.sleep(DELAY);
+			char[] controll= response.toCharArray();
+
+			System.out.println(response);
+
+			for(int i = 0; i<controll.length-2 ; i++){
+				if((controll[i] == '2') && (controll[i+1] == '3') && (controll[i+2] == '5')){ // Look for value 235 ->Connection accepted
+					return true;
 				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
-			
-		} catch (IOException e) {
+
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
         
 		return false;
-	}
+	}//[m] connect()
 	
+	/**
+	 * [m]
+	 * Method to close connection
+	 */
 	public void close(){
 		try {		
 			smtp("QUIT\r\n");
@@ -137,11 +147,17 @@ public class MailSender {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * [m]
+	 * Method to send the mail
+	 * 
+	 * @param mail to send
+	 * @return true if mail is sent, false otherwise
+	 */
 	@SuppressLint("SimpleDateFormat")
 	public boolean send(Mail mail){	
 		
@@ -218,8 +234,15 @@ public class MailSender {
 			e.printStackTrace();
 		}
 		return false;
-	}
+	}//[m] send()
 	
+	/**
+	 * [m]
+	 * method use to send command
+	 * 
+	 * @param command
+	 * @return return true if is sent, false otherwise 
+	 */
 	private boolean smtp(String command) {
 		try {
 			out.writeBytes(command);
@@ -228,28 +251,5 @@ public class MailSender {
 			e.printStackTrace();
 		}
 		return false;
-	}
-	
-	
-	/*
-	private void read(){
-		response = "";
-		int n;
-		
-		byte[] b = new byte[1024];
-		
-		try {
-			while ((n = in.available())> 0){
-				
-				for(int i = 0; i<n; i++){
-					byte c= (byte) br.read();
-					b[i] = c;
-				}
-				response += new String(b, 0, n);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	*/
+	}// [m] smtp()
 }
