@@ -13,6 +13,9 @@
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -38,6 +41,7 @@
             android:name=".CurrentSessionActivity"
             android:label="@string/title_active_session" >
         </activity>
+
         
         <activity
             android:name=".FallDetailActivity"
@@ -53,6 +57,12 @@
         <service android:enabled="true"
             android:name=".FallDetectorService"
         />
+
+
+        <service
+            android:name="it.unipd.dei.esp1415.falldetector.service.FallDetectorService"
+            android:enabled="true" />
+
     </application>
 
 </manifest>

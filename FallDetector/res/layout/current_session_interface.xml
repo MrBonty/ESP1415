@@ -183,12 +183,28 @@
         
     	</LinearLayout>
 	    
+		<TextView
+		    android:id="@+id/fall_title"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginTop="15dp"
+		    android:gravity="center|bottom"
+		    android:singleLine="true"
+		    android:text="@string/fall_title"
+		    android:textSize="20sp"
+		    android:textStyle="bold" />
+
 	</LinearLayout>
-    
-    <ListView android:id="@+id/session_falls"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-    />
+	
+	<LinearLayout android:orientation="vertical"
+	    android:layout_width="match_parent"
+	    android:layout_height="0dp"
+	    android:layout_weight="1">
+			
+	    <ListView android:id="@+id/session_falls"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	    />
+	</LinearLayout>
     
 </LinearLayout>

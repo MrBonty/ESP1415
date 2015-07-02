@@ -1,6 +1,5 @@
 package it.unipd.dei.esp1415.falldetector.utility;
 
-import java.util.ArrayList;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -10,13 +9,11 @@ import android.view.View;
 
 /**
  * ChartView class extends View for displaying a simple chart
- * from accelerometer data
- * 
- * @author Jiajie Xu
- *
- */
+ * of data */
 public class ChartView extends View{
 
+	private static final int MAX_DATA = 1000000;		// 1 million data per chart, about a total of 10MB
+	
 	/**
 	 * Provides how to draw the graph
 	 */
@@ -24,25 +21,24 @@ public class ChartView extends View{
 	
 	
 	/**
-	 * Device's screen width
+	 *	The widht of the view
 	 */
-	private int widht;
+	private int viewWidht;
 	
 	
 	/**
-	 * Device's screen height
+	 * The height of the view
 	 */
-	private int height;
+	private int viewHeight;
 	
 	
 	/**
-	 * An array list which saves the data from the acceleromoter
+	 * Chart data, the chart view read data from here and display it.
 	 */
-	private ArrayList<Float> chartHeightData;
-	
+	private float[] chartData;
 	
 	/**
-	 * Number of data stored from accelerometer
+	 * Number of data stored
 	 */
 	private int size;
 
@@ -63,84 +59,79 @@ public class ChartView extends View{
 		paint.setAlpha(255);
 		
 		// Get the screen size
-		widht = this.getWidth();
-		height = this.getHeight();
+		viewWidht = this.getWidth();
+		viewHeight = this.getHeight();
 		
-		// And istantiate the array list
-		chartHeightData = new ArrayList<Float>();
+		// And istantiate the array
+		chartData = new float[MAX_DATA];
+		
 		size = 0;
 	}
 	
 	
 	/**
-	 * Returns array list containing the accelerometer data
-	 * @return ArrayList
+	 * Returns array containing data
+	 * @return float[]
 	 */
-	public ArrayList<Float> getChartHeightData(){
-		return chartHeightData;
+	public float[] getChartData(){
+		return chartData;
 	};
 	
+	
 	/**
-	 * Returns the number of elements
+	 * Returns the number of element
 	 * @return int
 	 */
-	public int getChartDataSize(){
+	public int getSize(){
 		return size;
 	}
 	
 	/**
-	 * Returns a float array containing the accelerometer data
-	 * @return float[]
-	 */
-	public float[] getArrayFloat(){
-		
-		float[] arrayFloat = new float[size];
-		int i = 0;
-		
-		for(Float data : chartHeightData)
-			arrayFloat[i++] = (data != null) ? data:0 ;
-		
-		return arrayFloat;
-	}
-	/**
 	 * Set the data to be display
 	 * 
-	 * @param arrayList Contains data to displays
+	 * @param array
 	 */
-	public void setChartHeightData(float[] array){
-		
-		this.size = array.length;
-		
-		for (float data : array) {
-			chartHeightData.add(Float.valueOf(data));
-		}
+	public void setChartData(float[] array, int size){
+		chartData = array;
+		this.size = size;
 	};
 	
 	/**
-	 * Add new element to display in the chart
+	 * Add new data to displays in chart
 	 * @param data New data to display
 	 */
-	public void setChartHeightData(float data){
-		chartHeightData.add(size, (Float) (((float)height / 2) - data));
+	public void addNewData(float data){
+		chartData[size] = data;
 		size++;
 	}
 	
-	public int getWidht(){
-		return this.widht;
+	/**
+	 * Get the view widht
+	 * @return	int
+	 */
+	public int getViewWidht(){
+		return this.viewWidht;
 	}
 	
-	@Override
+	/**
+	 * Get the view height
+	 * @return	int
+	 */
+	public int getViewHeight(){
+		return this.viewHeight;
+	}
+	
 	public void onDraw(Canvas canvas) {
-		if(size < widht){
-			for(int j = 0; j < ((size % widht) - 1); j++){
-				canvas.drawLine((float) j, (float) chartHeightData.get(size - (j + 2)),
-						(float) (j + 1), (float) chartHeightData.get(size - (j + 1)), paint);
+		if(size < viewWidht){
+			for(int j = 0; j < ((size % viewWidht) - 1); j++){
+				canvas.drawLine((float) j, chartData[size - (j + 2)] + (viewHeight / 2),
+						(float) (j + 1), chartData[size - (j + 1)] + (viewHeight / 2), paint);
 			}
 		}
 		else{
-			for(int j = 0; j < (widht - 1); j++){
-				canvas.drawLine((float) j, (float) chartHeightData.get(size - (j + 2)),
-						(float) (j + 1), (float) chartHeightData.get(size - (j + 1)), paint);
+			for(int j = 0; j < (viewWidht - 1); j++){
+				canvas.drawLine((float) j, chartData[size - (j + 2)] + (viewHeight / 2),
+						(float) (j + 1), chartData[size - (j + 1)] + (viewHeight / 2), paint);
 			}
 		}
 	}
@@ -148,7 +139,7 @@ public class ChartView extends View{
 	@Override
     public void onSizeChanged (int w, int h, int oldw, int oldh){
         super.onSizeChanged(w, h, oldw, oldh);
-        this.widht = w;
-        this.height= h;
+        this.viewWidht = w;
+        this.viewHeight= h;
     }
 }
