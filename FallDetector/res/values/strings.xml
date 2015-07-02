@@ -4,6 +4,7 @@
     <string name="app_name">Fall Detector</string>
     <string name="title_activity_detail">Detail Activity</string>
     <string name="title_active_session">Active Session</string>
+    <string name="title_activity_fall">Fall Activity</string>
     <string name="title_settings">Settings</string>
     
     <string name="hello_world">Hello world!</string>
@@ -100,6 +101,7 @@
 	<string name="address_edit_info_no">No valid mail address</string>
 	
 	<string name="add_new_mail">New mail address added</string>
+
 	
 	<string name="select_freq">Select frequency:</string>
 	
@@ -111,4 +113,10 @@
 	<string name="wifi_but">GO TO WIFI</string>
 	<string name="wifi_sum">Wifi is disable, activate it only for a domestic use</string>
 	<string name="con_dial_but">Active Nothing (the application don\'t work for sending message and get location)</string>
+
+	<string name="dialog_modify_name">Modify Session Name</string>
+	
+	<string name="latitude">Latitude</string>
+	<string name="longitude">Latitude</string>
+
 </resources>

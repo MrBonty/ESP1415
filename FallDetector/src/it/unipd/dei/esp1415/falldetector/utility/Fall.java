@@ -16,8 +16,11 @@ public class Fall {
 	public Fall(long timeStamp, long sessionId){
 		timeStampFallEvent = timeStamp;
 		this.sessionId = sessionId;
+
 		dateEvent = Calendar.getInstance();
 		dateEvent.setTimeInMillis(timeStamp);
+
+		isNotified = false;
 	}
 	
 	/**

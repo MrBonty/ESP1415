@@ -1,7 +1,11 @@
 package it.unipd.dei.esp1415.falldetector;
 
+import java.util.ArrayList;
+
 import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
+import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
+import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -19,10 +23,11 @@ public class DetailActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		Configuration conf = getResources().getConfiguration();
+		Configuration conf = getResources().getConfiguration(); //take the configuration of the device
 		
 		mMed = new Mediator();
 		
+		//check if the device is a tablet in landscape
 		mIsDual = mMed.isLarge() && mMed.isLand(conf.orientation == Configuration.ORIENTATION_LANDSCAPE);
 		
 		if (mIsDual ) {
@@ -31,6 +36,26 @@ public class DetailActivity extends ActionBarActivity {
 		}
 		
 		setContentView(R.layout.activity_detail);
+		
+		//FOR TEST
+		ArrayList<Session> mSessions = mMed.getDataSession();
+		if(mSessions != null){
+			if(mSessions.size() > 0){
+				Fall first = new Fall(1L,1);
+				Fall second = new Fall(2L,1);
+				Fall third = new Fall(1L,2);
+				
+				ArrayList<Fall> items = new ArrayList<Fall>();
+				ArrayList<Fall> item = new ArrayList<Fall>();
+				items.add(first);
+				items.add(second);
+				item.add(third);
+				
+				mSessions.get(1).setFallEvents(items);
+				mSessions.get(2).setFallEvents(item);
+			}
+		}
+		//END TEST
 		
 		Fragment detailSession = new DetailSessionFragment();
 		
