@@ -95,6 +95,9 @@ public class FallDetailActivity extends ActionBarActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	/**
+	 * private inner class to hold the view
+	 */
 	private class ViewHolder{
 		private LinearLayout lt;
 		private TextView sessionDate;
@@ -103,5 +106,5 @@ public class FallDetailActivity extends ActionBarActivity {
 		private ImageView sessionImage;
 		private TextView sessionLatitude;
 		private TextView sessionSended;
-	}
+	}//{c} ViewHolder
 }

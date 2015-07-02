@@ -202,7 +202,14 @@ public class DetailSessionFragment extends Fragment {
 		}
     }
 	
-	//create an AlertDialog to modify the name of the session
+	/**
+	 * [m]
+	 * Method to create an AlertDialog to modify the name of the session
+	 * 
+	 * @param titleId The title of the AlertDialog
+	 * @param text The name of the session for the EditText input
+	 * @param ok The object EditOk  that implements the action of press the button "ok" in the AlertDialog
+	 */
     public void editTextDialog(int titleId, String text, final EditOk ok) {
         LayoutInflater myInflater = (LayoutInflater) act.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View layout = myInflater.inflate(R.layout.edittext_dialog, (ViewGroup) act.findViewById(R.id.layout_root));
@@ -244,6 +251,9 @@ public class DetailSessionFragment extends Fragment {
 		});
     }
 	
+    /**
+	 * private inner class to hold the view
+	 */
 	private class ViewHolder{
 		private LinearLayout lt;
 		private TextView sessionName;
@@ -254,7 +264,10 @@ public class DetailSessionFragment extends Fragment {
 		private ListView sessionFalls;
 	}
 	
-	//abstract class for define method ok(String result) that implements the action of press the button "ok" in the AlertDialog
+	/**
+	 * private abstract class to define method ok(String result) 
+	 * that implements the action of press the button "ok" in the AlertDialog
+	 */
     private abstract class EditOk {
         abstract public void ok(String result);
     }
