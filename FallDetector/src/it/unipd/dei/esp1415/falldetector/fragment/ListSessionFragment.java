@@ -174,8 +174,8 @@ public class ListSessionFragment extends ListFragment {
 
 	@Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.i("SAVE", "save of " + mCurCheckPosition);
+        super.onSaveInstanceState(outState);        
+        Log.i("SAVE11"+(mDialog==null), "save of " + mCurCheckPosition);
         //outState.putInt(SAVE_CURRENT_CHOICE, mCurCheckPosition);
         if(!mMed.isCalledFromBack()){
             mMed.setCurretnPosSession(mCurCheckPosition);
@@ -184,6 +184,7 @@ public class ListSessionFragment extends ListFragment {
         }
         
         if(mDialog != null && mDialog.isShowing()){
+            Log.i("SAVE2", "save of " + mCurCheckPosition);
         	outState.putString(SAVE_MODIFY_DIALOG, mDialog.getStringToSave());
 		}
     }

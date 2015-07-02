@@ -1,5 +1,7 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:id="@+id/detail_layout"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/detail_layout"
+    android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,12 +9,81 @@ android:id="@+id/detail_layout"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:weightSum="3"
     tools:context="it.unipd.dei.esp1415.falldetector.DetailActivity$PlaceholderFragment" >
 
     <TextView
         android:id="@+id/detailFrag_session_name"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:gravity="center"
+        android:singleLine="true"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="@string/hello_world"/>
+    
+    
+    <LinearLayout android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        
+	    <ImageView 
+	        android:id="@+id/current_thumbnail"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_margin="5dp"
+	        android:src="@drawable/paint"
+	        android:contentDescription="@string/thumbnail"
+	    />
+	    
+	    <LinearLayout android:orientation="vertical"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content">
+	        
+	        <TextView
+	        	android:id="@+id/date"
+	        	android:layout_width="match_parent"
+	        	android:layout_height="wrap_content"
+	        	android:gravity="center"
+	        	android:singleLine="true"
+	        	android:textStyle="italic|bold"
+	        	android:text="@string/date"
+	        />
+	        
+	        <TextView
+	            android:id="@+id/session_start_time"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center"
+	            android:singleLine="true"
+	            android:text="@string/not_started"
+	        />
+	        
+	        <TextView
+	            android:id="@+id/duration"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center"
+	            android:singleLine="true"
+	            android:textStyle="italic|bold"
+	            android:text="@string/duration"
+	        />
+	        
+	        <TextView
+	            android:id="@+id/session_duration"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center"
+	        />
+	    </LinearLayout>	<!-- current session data -->
+	    
+    </LinearLayout>	<!-- session information label -->
+    
+    <ListView android:id="@+id/session_falls"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+    />
 
-</RelativeLayout>
+</LinearLayout>
