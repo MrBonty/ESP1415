@@ -1,11 +1,15 @@
 package it.unipd.dei.esp1415.falldetector;
 
+import it.unipd.dei.esp1415.falldetector.extraview.ConnectionDialog;
 import it.unipd.dei.esp1415.falldetector.extraview.SessionDialog;
 import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
+import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
+
 import java.util.ArrayList;
+
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -109,6 +113,16 @@ public class MainActivity extends ActionBarActivity {
 			createAddDialog(true, savedInstanceState);
 		}
 	}//[m] onCreate()
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		
+		if(!(mMed.isLocationControlled() && mMed.isConnectionControlled())){
+			createConnectivityDialog();
+		}
+	}//[m] onResume()
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -212,4 +226,26 @@ public class MainActivity extends ActionBarActivity {
 			}//[m] onDismiss()
 		});
 	}//[m] createAddDialog()
+	
+	/**
+	 * [m]
+	 * @param isWifiOn
+	 * @param isMobileOn
+	 * @param isMobileAvailable
+	 * @param isLocationOn
+	 */
+	private void createConnectivityDialog(){
+
+		ConnectivityStatus conStat = new ConnectivityStatus(mContext);
+		
+		boolean isLocationOn = conStat.hasLocationON();
+		boolean isWifiOn = conStat.hasWifiConnectionON();
+		boolean isMobileOn = conStat.hasMobileConnectionON();
+		boolean isMobileAvailable = conStat.isMobileConnectionAvailable();
+		
+		if(!isLocationOn || (isMobileAvailable && !isMobileOn) || !isWifiOn){
+			ConnectionDialog dialog = new ConnectionDialog(this, isWifiOn, isMobileOn, isMobileAvailable, isLocationOn);
+			dialog.show();
+		}
+	}//[m] createConnectivityDialog()
 }

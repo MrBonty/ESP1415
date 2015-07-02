@@ -20,6 +20,10 @@ public class Mediator {
 	private static boolean mIsLand = false;
 	private static boolean mIsLarge = false;
 	
+	private static boolean mIsWifiControlled = false;
+	private static boolean mIsMobileControlled = false;
+	private static boolean mIsLocationControlled = false;
+	
 	private static DetailSessionFragment mDetailSessionFragment;
 	
 	/**
@@ -149,5 +153,21 @@ public class Mediator {
 	}
 	public DetailSessionFragment getDetatilFrag(){
 		return mDetailSessionFragment;
+	}
+	
+	public boolean isLocationControlled(){
+		return mIsLocationControlled;
+	}
+	public void isLocationControlled(boolean isLocationControlled){
+		mIsLocationControlled = isLocationControlled;
+	}
+	
+	public void isConnectionControlled(boolean isWifiControlled, boolean isMobileControlled){
+		mIsWifiControlled = isWifiControlled;
+		mIsMobileControlled = isMobileControlled;
+	}
+	
+	public boolean isConnectionControlled(){
+		return mIsMobileControlled && mIsWifiControlled;
 	}
 }

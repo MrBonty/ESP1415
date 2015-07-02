@@ -102,4 +102,13 @@
 	<string name="add_new_mail">New mail address added</string>
 	
 	<string name="select_freq">Select frequency:</string>
+	
+	<string name="con_dial_title">Activate this service/s for complete functionality of the application</string>
+	<string name="location_but">GO TO LOCATION</string>
+	<string name="location_sum">Location is disable, activate it for position function</string>
+	<string name="mobile_but">GO TO MOBILE</string>
+	<string name="mobile_sum">Mobile is disable, activate it for sending function</string>
+	<string name="wifi_but">GO TO WIFI</string>
+	<string name="wifi_sum">Wifi is disable, activate it only for a domestic use</string>
+	<string name="con_dial_but">Active Nothing (the application don\'t work for sending message and get location)</string>
 </resources>
