@@ -34,7 +34,7 @@ public class MainActivity extends ActionBarActivity {
 
 	private SessionDialog mDialog;
 	
-	//Constants
+	// Constants
 	public static final int SCREENLAYOUT_SIZE_XLARGE = 0x04; //For compatibility with API 8 same value of Configuration.SCREENLAYOUT_SIZE_XLARGE
 	public static final String SAVE_ADD_DIALOG = "addDialog";
 	
