@@ -72,7 +72,7 @@ public class SettingsMainFragment extends Fragment{
 	public static final int FREQ_MIDDLE = 7; 
 	public static final int FREQ_HIGH = 9; 
 
-	private static final String STANDARD_TIME = "8:00"; //default time 8:00 am
+	public static final String STANDARD_TIME = "8:00"; //default time 8:00 am
 
 	public static final String DIVISOR_ON_SAVE_STATE = "&&&";
 	private static final String DIALOG_TYPE = "type_dial";

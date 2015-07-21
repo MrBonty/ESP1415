@@ -26,6 +26,9 @@ public class DatabaseManager {
 	
 	public static final int DELETION_COMPLETE = 1; // 
 	
+	public static final String ASC = "ASC";
+	public static final String DESC = "DESC";
+	
 	public DatabaseManager(Context context){
 		mDbHelper = new DatabaseHelper(context);
 	}

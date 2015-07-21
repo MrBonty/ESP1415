@@ -1,5 +1,7 @@
 package it.unipd.dei.esp1415.falldetector;
 
+import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
+import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.extraview.ConnectionDialog;
 import it.unipd.dei.esp1415.falldetector.extraview.SessionDialog;
 import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
@@ -68,7 +70,12 @@ public class MainActivity extends ActionBarActivity {
 		mMed.isLarge(xlarge || large);
 		
 		if(!mMed.hasDataSession()){
+			
+			DatabaseManager db = new DatabaseManager(mContext);
+			mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
 
+			/*
+			
 			//TODO REMOVE ARRAY FOR TEST
 			ArrayList<Session> tmp = new ArrayList<Session>();
 			tmp.add(new Session("a"));
@@ -97,6 +104,8 @@ public class MainActivity extends ActionBarActivity {
 
 			mMed.setDataSession(tmp);
 			//TODO END REMOVE ARRAY FOR TEST
+			
+			*/
 		}
 		
 		FragmentManager manager = getSupportFragmentManager();
