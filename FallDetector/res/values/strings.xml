@@ -118,6 +118,9 @@
 	<string name="dialog_modify_name">Modify Session Name</string>
 	
 	<string name="latitude">Latitude</string>
-	<string name="longitude">Latitude</string>
+	<string name="longitude">Longitude</string>
+	
+	<string name="alarm_title">Start a new Session!!</string>
+	<string name="alarm_info">Click here!!</string>
 
 </resources>

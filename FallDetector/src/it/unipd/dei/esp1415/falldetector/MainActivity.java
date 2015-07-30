@@ -1,22 +1,23 @@
 package it.unipd.dei.esp1415.falldetector;
 
+import java.util.List;
+
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.extraview.ConnectionDialog;
 import it.unipd.dei.esp1415.falldetector.extraview.SessionDialog;
 import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
+import it.unipd.dei.esp1415.falldetector.service.AlarmService;
 import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
-import it.unipd.dei.esp1415.falldetector.utility.Session;
-import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
-
-import java.util.ArrayList;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -120,6 +121,26 @@ public class MainActivity extends ActionBarActivity {
 		if(savedInstanceState != null && savedInstanceState.getBoolean(SAVE_ADD_DIALOG)){
 			
 			createAddDialog(true, savedInstanceState);
+		}
+		
+		Intent intent = getIntent();
+		if(intent != null){
+			boolean newSession  = intent.getBooleanExtra(AlarmService.NEW_TASK, false);
+			if(newSession){
+				openAdd();
+				
+				ActivityManager actMan = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+				List<RunningServiceInfo> list = actMan.getRunningServices(Integer.MAX_VALUE);
+				for(RunningServiceInfo info : list){
+					if(info.service.getClassName().equals("it.unipd.dei.esp1415.falldetector.service.AlarmService")){
+						Intent intnt = new Intent(this, AlarmService.class);
+						
+						stopService(intnt);
+						break;
+					}
+				}
+			}
+			
 		}
 	}//[m] onCreate()
 	

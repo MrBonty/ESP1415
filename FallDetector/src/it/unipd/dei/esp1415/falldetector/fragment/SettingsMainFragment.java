@@ -4,6 +4,8 @@ import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.SettingsActivity;
 import it.unipd.dei.esp1415.falldetector.extraview.FreqDialog;
 import it.unipd.dei.esp1415.falldetector.extraview.SignInDialog;
+import it.unipd.dei.esp1415.falldetector.service.AlarmServiceHelper;
+
 import android.app.Activity;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
@@ -56,6 +58,8 @@ public class SettingsMainFragment extends Fragment{
 
 	private Context mContext;
 	private Activity mAct;
+	
+	private boolean isAdiviseChanged = false;
 
 	// Constants
 	public static final String SAVE_ADVISE_CHK = "isToAdvise";
@@ -169,6 +173,8 @@ public class SettingsMainFragment extends Fragment{
 		viewHolder.adviseChk.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				isAdiviseChanged = true;
+				
 				adviseChkValue = viewHolder.adviseChk.isChecked();
 				if(adviseChkValue){
 					viewHolder.timeSetLay.setBackgroundColor(Color.TRANSPARENT);
@@ -253,6 +259,15 @@ public class SettingsMainFragment extends Fragment{
 		editor.putString(SAVE_MAIL_DATABASE64, mailDataConvertedBase64);
 		editor.commit();
 
+		if(isAdiviseChanged){
+			
+			if(adviseChkValue){
+				AlarmServiceHelper.setAlarm(mContext);
+			} else {
+				AlarmServiceHelper.deleteAlarm(mContext);
+			}
+				
+		}
 	}//[m] OnPause()
 
 	/**[m]
@@ -459,10 +474,15 @@ public class SettingsMainFragment extends Fragment{
 			
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-				adviseHourOfDay = hourOfDay;
-				adviseMinutes = minute;
 				
-				changeSummary(viewHolder.adviseSummary);
+				if(adviseHourOfDay != hourOfDay || adviseMinutes != minute){
+					isAdiviseChanged = true;
+					
+					adviseHourOfDay = hourOfDay;
+					adviseMinutes = minute;
+					
+					changeSummary(viewHolder.adviseSummary);
+				}
 				
 				mTimeSelectDialog = null;
 			}//[m] onTimeSet()
