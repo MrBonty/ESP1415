@@ -33,7 +33,7 @@ public class AlarmService extends Service{
 		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
 			.setContentTitle(getResources().getString(R.string.alarm_title))
 			.setContentText(getResources().getString(R.string.alarm_info))
-			.setSmallIcon(R.drawable.ic_launcher)
+			.setSmallIcon(R.drawable.ic_notification)
 			.setAutoCancel(true)
 			.setLights(0xffffffff, 200, 200);
 		
