@@ -5,19 +5,22 @@ import it.unipd.dei.esp1415.falldetector.SettingsActivity;
 import it.unipd.dei.esp1415.falldetector.extraview.FreqDialog;
 import it.unipd.dei.esp1415.falldetector.extraview.SignInDialog;
 import it.unipd.dei.esp1415.falldetector.service.AlarmServiceHelper;
-
 import android.app.Activity;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -60,6 +63,7 @@ public class SettingsMainFragment extends Fragment{
 	private Activity mAct;
 	
 	private boolean isAdiviseChanged = false;
+	private boolean isDialogTimeActive = false;
 
 	// Constants
 	public static final String SAVE_ADVISE_CHK = "isToAdvise";
@@ -227,6 +231,7 @@ public class SettingsMainFragment extends Fragment{
 			outState.putInt(DIALOG_TYPE, TIME);
 			mTimeSelectDialog.dismiss();
 			mTimeSelectDialog = null;
+			isDialogTimeActive = true;
 			
 		}else if(mAccelDialog != null && mAccelDialog.isShowing()){
 			mAccelDialog.setOnDismissListener(null);
@@ -259,14 +264,22 @@ public class SettingsMainFragment extends Fragment{
 		editor.putString(SAVE_MAIL_DATABASE64, mailDataConvertedBase64);
 		editor.commit();
 
-		if(isAdiviseChanged){
+		if(isAdiviseChanged && !isDialogTimeActive){
+			LocalBroadcastManager broadcasting = LocalBroadcastManager.getInstance(mContext);
+			AlarmServiceHelper broadcaster = new AlarmServiceHelper();
 			
 			if(adviseChkValue){
-				AlarmServiceHelper.setAlarm(mContext);
+				broadcasting.registerReceiver(broadcaster, new IntentFilter(AlarmServiceHelper.GET_A_NEW_ALARM));
+				Intent i = new Intent(AlarmServiceHelper.GET_A_NEW_ALARM);
+				broadcasting.sendBroadcast(i);
+				Log.i("SEND", "sended");
 			} else {
-				AlarmServiceHelper.deleteAlarm(mContext);
+				broadcasting.registerReceiver(broadcaster, new IntentFilter(AlarmServiceHelper.DELETE_ALARM));
+				Intent i = new Intent(AlarmServiceHelper.DELETE_ALARM);
+				broadcasting.sendBroadcast(i);
 			}
-				
+			
+			broadcasting.unregisterReceiver(broadcaster);
 		}
 	}//[m] OnPause()
 
@@ -468,7 +481,7 @@ public class SettingsMainFragment extends Fragment{
 	 * @param savedIstanceState the bundle to restore the dialog, set null if restore is false
 	 */
 	private void createTimeDialog(boolean restore, Bundle savedIstanceState){
-		
+		isDialogTimeActive = true;
 		// creation of the callback for dialog
 		OnTimeSetListener callBack = new OnTimeSetListener() {
 			
@@ -483,7 +496,7 @@ public class SettingsMainFragment extends Fragment{
 					
 					changeSummary(viewHolder.adviseSummary);
 				}
-				
+				isDialogTimeActive = false;
 				mTimeSelectDialog = null;
 			}//[m] onTimeSet()
 		}; 

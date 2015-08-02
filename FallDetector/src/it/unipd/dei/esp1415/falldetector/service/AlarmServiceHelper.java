@@ -4,7 +4,9 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
 import it.unipd.dei.esp1415.falldetector.fragment.SettingsMainFragment;
+
 import java.util.Calendar;
+
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -14,9 +16,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
+/**
+ *  Receive BOOT_COMPLETED signal by 
+ *
+ */
 public class AlarmServiceHelper extends BroadcastReceiver{
-
 
 	private static int mNotHour = 0; //notification hour
 	private static int mNotMinutes = 0; //notification minutes
@@ -39,13 +45,24 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 	
 	private static final long NOT_NOTIFICATION_VALUE = -1;
 	
+	public static final String GET_A_NEW_ALARM = "android.falldetector.action.GET_A_NEW_ALARM";
+	public static final String DELETE_ALARM = "android.falldetector.action.DELETE_ALARM";
+	
 	@Override
-	public void onReceive(Context context, Intent intent) {
-		setAlarm(context);
+	public void onReceive(Context context, Intent intent){
+		String action = intent.getAction();
+		
+		Log.i("NEW BROAD", action);
+		
+		if(action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(GET_A_NEW_ALARM)){
+			setAlarm(context);
+		}else if(action.equals(DELETE_ALARM)){
+			deleteAlarm(context);
+		}
 	}
 	
 	@SuppressLint("NewApi")
-	public static void setAlarm(Context context){
+	private void setAlarm(Context context){
 		if(localPref == null){
 			localPref = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
 		}
@@ -54,19 +71,44 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		}
 		
 		Editor editor = localPref.edit();
+		
+		//get info from local preferences
 		mIsActive = preferences.getBoolean(SettingsMainFragment.SAVE_ADVISE_CHK, false);
-		mCurrentNotificationDate = Calendar.getInstance();
-		mNextNotificationDate = Calendar.getInstance();
+
 		
 		if(mIsActive){
+			mCurrentNotificationDate = Calendar.getInstance();
+			mNextNotificationDate = Calendar.getInstance();
+			
 			mAlarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 			
 			splitTime(preferences.getString(SettingsMainFragment.SAVE_ADVISE_TIME, SettingsMainFragment.STANDARD_TIME));
 
-			calculateNotificationDate();
+			//
+			long currentNotificationDate = localPref.getLong(CURRENT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
+			long timeSaved = localPref.getLong(NEXT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
+			
+			if(timeSaved != NOT_NOTIFICATION_VALUE && currentNotificationDate != NOT_NOTIFICATION_VALUE){
+				mNextNotificationDate.setTimeInMillis(timeSaved);
+				mCurrentNotificationDate.setTimeInMillis(currentNotificationDate);
+			}
+
+			int hour = mNextNotificationDate.get(Calendar.HOUR_OF_DAY);
+			int minute = mNextNotificationDate.get(Calendar.MINUTE);
+
+			if(timeSaved != NOT_NOTIFICATION_VALUE && hour == mNotHour && minute == mNotMinutes){
+				if(mCurrentNotificationDate.getTimeInMillis() > System.currentTimeMillis()){
+					mNextNotificationDate.add(Calendar.DAY_OF_YEAR, -1);
+				}
+			}else{
+				calculateNotificationDate();
+			}
+			
 			
 			boolean isStart = localPref.getBoolean(IS_STARTED, false);
+			
 			if(isStart){
+				// delete existing  alarm
 				PendingIntent intent = createPendingIntent(context, mCurrentNotificationDate.getTimeInMillis());
 				deleteAlarm(context, intent);
 			}
@@ -74,15 +116,17 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 			mCurrentNotificationDate.setTimeInMillis(mNextNotificationDate.getTimeInMillis());
 			mNextNotificationDate.add(Calendar.DAY_OF_YEAR, 1);
 			
-			
 			if(hasExpired(mCurrentNotificationDate)){
 				context.startService(new Intent(context, AlarmService.class));
+				
+				calculateNotificationDate();
 				
 				mCurrentNotificationDate.setTimeInMillis(mNextNotificationDate.getTimeInMillis());
 				mNextNotificationDate.add(Calendar.DAY_OF_YEAR, 1);
 			}
 			
-			System.out.println(mCurrentNotificationDate.toString());
+			
+			Log.i("ADVISE", mCurrentNotificationDate.toString());
 			
 			PendingIntent intent = createPendingIntent(context, mCurrentNotificationDate.getTimeInMillis());
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
@@ -97,6 +141,14 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 			
 		}else{
 			
+			boolean isStart = localPref.getBoolean(IS_STARTED, false);
+			
+			if(isStart){
+				// delete existing  alarm
+				PendingIntent intent = createPendingIntent(context, mCurrentNotificationDate.getTimeInMillis());
+				deleteAlarm(context, intent);
+			}
+			
 			editor.putBoolean(IS_STARTED,false);
 			editor.putLong(NEXT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
 			editor.putLong(CURRENT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
@@ -110,7 +162,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 	 * @param notificationDate
 	 * @return 
 	 */
-	private static boolean hasExpired(Calendar notificationDate) {
+	private boolean hasExpired(Calendar notificationDate) {
 		Calendar nowDate = Calendar.getInstance();
 		
 		long not = notificationDate.getTimeInMillis();
@@ -120,7 +172,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		return (not - now) < 0;	
 	}
 
-	public static void deleteAlarm(Context context) {
+	private void deleteAlarm(Context context) {
 		
 		
 		if(localPref == null){
@@ -142,9 +194,8 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		editor.commit();
 	}
 	
-	private static void deleteAlarm(Context context, PendingIntent intent){
+	private void deleteAlarm(Context context, PendingIntent intent){
 		mAlarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		
 		mAlarm.cancel(intent);
 	}
  
@@ -175,46 +226,25 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 	}*/
 	
 	private static void calculateNotificationDate(){
-		
-		long currentNotificationDate = localPref.getLong(CURRENT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
-		long timeSaved = localPref.getLong(NEXT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
-		
-		if(timeSaved != NOT_NOTIFICATION_VALUE && currentNotificationDate != NOT_NOTIFICATION_VALUE){
-			mNextNotificationDate.setTimeInMillis(timeSaved);
-			mCurrentNotificationDate.setTimeInMillis(currentNotificationDate);
-		}
+
+		mNextNotificationDate = Calendar.getInstance();
 
 		int hour = mNextNotificationDate.get(Calendar.HOUR_OF_DAY);
 		int minute = mNextNotificationDate.get(Calendar.MINUTE);
 		int second = mNextNotificationDate.get(Calendar.SECOND);
 		int milli = mNextNotificationDate.get(Calendar.MILLISECOND);
 
-		if(timeSaved != NOT_NOTIFICATION_VALUE && hour == mNotHour && minute == mNotMinutes){
-			if(mCurrentNotificationDate.getTimeInMillis() > System.currentTimeMillis()){
-				mNextNotificationDate.add(Calendar.DAY_OF_YEAR, -1);
-			}
-		}else{
-			
-			mNextNotificationDate = Calendar.getInstance();
-			
-			hour = mNextNotificationDate.get(Calendar.HOUR_OF_DAY);
-			minute = mNextNotificationDate.get(Calendar.MINUTE);
-			second = mNextNotificationDate.get(Calendar.SECOND);
-			milli = mNextNotificationDate.get(Calendar.MILLISECOND);
-			
-			System.out.println(mNextNotificationDate.toString());
-			
-			int time = (hour * 3600) + (minute * 60) + second;
-			int notTime = (mNotHour * 3600) + (mNotMinutes *60);
+		int time = (hour * 3600) + (minute * 60) + second;
+		int notTime = (mNotHour * 3600) + (mNotMinutes *60);
 
-			if(time > notTime){
-				mNextNotificationDate.add(Calendar.DATE, 1); //add a day
-			}
-
-			mNextNotificationDate.add(Calendar.HOUR_OF_DAY, (mNotHour - hour));
-			mNextNotificationDate.add(Calendar.MINUTE, (mNotMinutes - minute));
-			mNextNotificationDate.add(Calendar.SECOND, - second);
-			mNextNotificationDate.add(Calendar.MILLISECOND, - milli);
+		if(time > notTime){
+			mNextNotificationDate.add(Calendar.DATE, 1); //add a day
 		}
+
+		mNextNotificationDate.add(Calendar.HOUR_OF_DAY, (mNotHour - hour));
+		mNextNotificationDate.add(Calendar.MINUTE, (mNotMinutes - minute));
+		mNextNotificationDate.add(Calendar.SECOND, - second);
+		mNextNotificationDate.add(Calendar.MILLISECOND, - milli);
+	
 	}
 }

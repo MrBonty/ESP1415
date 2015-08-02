@@ -56,14 +56,19 @@
         <service
             android:name="it.unipd.dei.esp1415.falldetector.service.AlarmService"
             android:enabled="true" />
-        
-        <receiver android:name="it$unipd$dei$esp1415$falldetector$service$FallDetectorService$InnerReceiver" />
-        
+
         <receiver android:name="it.unipd.dei.esp1415.falldetector.service.AlarmServiceHelper" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.falldetector.action.GET_A_NEW_ALARM" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.falldetector.action.DELETE_ALARM" />
+            </intent-filter>
         </receiver>
+        
     </application>
 
 </manifest>
