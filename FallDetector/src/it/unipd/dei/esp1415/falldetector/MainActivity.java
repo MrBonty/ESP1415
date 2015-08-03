@@ -126,16 +126,18 @@ public class MainActivity extends ActionBarActivity {
 		Intent intent = getIntent();
 		if(intent != null){
 			boolean newSession  = intent.getBooleanExtra(AlarmService.NEW_TASK, false);
+			
 			if(newSession){
 				openAdd();
 				
 				ActivityManager actMan = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
 				List<RunningServiceInfo> list = actMan.getRunningServices(Integer.MAX_VALUE);
+				
 				for(RunningServiceInfo info : list){
 					if(info.service.getClassName().equals("it.unipd.dei.esp1415.falldetector.service.AlarmService")){
 						Intent intnt = new Intent(this, AlarmService.class);
-						
 						stopService(intnt);
+						
 						break;
 					}
 				}

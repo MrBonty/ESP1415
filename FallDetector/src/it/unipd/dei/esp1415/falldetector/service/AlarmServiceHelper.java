@@ -24,19 +24,19 @@ import android.util.Log;
  */
 public class AlarmServiceHelper extends BroadcastReceiver{
 
-	private static int mNotHour = 0; //notification hour
-	private static int mNotMinutes = 0; //notification minutes
+	private int mNotHour = 0; //notification hour
+	private int mNotMinutes = 0; //notification minutes
 	//private static long mNotMill = 0; //notification time in milliseconds
 	
-	private static boolean mIsActive = false;
+	private boolean mIsActive = false;
 	
-	private static AlarmManager mAlarm;
+	private AlarmManager mAlarm;
 	
-	private static SharedPreferences preferences;
-	private static SharedPreferences localPref;
+	private SharedPreferences preferences;
+	private SharedPreferences localPref;
 	
-	private static Calendar mNextNotificationDate;
-	private static Calendar mCurrentNotificationDate;
+	private Calendar mNextNotificationDate;
+	private Calendar mCurrentNotificationDate;
 
 	private static final String PREF_FILE_NAME = "AlarmServicePref";
 	private static final String IS_STARTED = "isStarted";
@@ -117,7 +117,10 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 			mNextNotificationDate.add(Calendar.DAY_OF_YEAR, 1);
 			
 			if(hasExpired(mCurrentNotificationDate)){
-				context.startService(new Intent(context, AlarmService.class));
+				Intent intent = new Intent(context, AlarmService.class);
+				intent.putExtra(AlarmService.NOT_CONTROL, true);
+				
+				context.startService(intent);
 				
 				calculateNotificationDate();
 				
@@ -212,7 +215,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 	 * 
 	 * @param time to split
 	 */
-	private static void splitTime(String time){
+	private void splitTime(String time){
 		String[] tmp = time.split(":");
 		
 		mNotHour = Integer.parseInt(tmp[0]);
@@ -225,7 +228,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		return ((long)((hour* 3600) + (minute * 60) + seconds)) * 1000;
 	}*/
 	
-	private static void calculateNotificationDate(){
+	private void calculateNotificationDate(){
 
 		mNextNotificationDate = Calendar.getInstance();
 

@@ -149,7 +149,7 @@ public class ListSessionFragment extends ListFragment {
 	@Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);        
-        Log.i("SAVE11"+(mDialog==null), "save of " + mCurCheckPosition);
+        Log.i("SAVE", "save of " + mCurCheckPosition);
         //outState.putInt(SAVE_CURRENT_CHOICE, mCurCheckPosition);
         if(!mMed.isCalledFromBack()){
             mMed.setCurretnPosSession(mCurCheckPosition);
