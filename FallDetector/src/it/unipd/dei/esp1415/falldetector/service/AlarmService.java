@@ -28,7 +28,7 @@ public class AlarmService extends Service{
 	
 	public final static String NOT_CONTROL = "notControl";
 	
-	private final static int ADV_DELAY = 3;
+	private final static int ADV_DELAY = 2;
 	
 	@Override
 	public void onCreate() {
@@ -110,7 +110,7 @@ public class AlarmService extends Service{
 		Calendar instance = Calendar.getInstance();
 		int instMinute = instance.get(Calendar.HOUR_OF_DAY)*60 + instance.get(Calendar.MINUTE);
 		
-		return instMinute <= (advMinute + ADV_DELAY);
+		return advMinute <= (instMinute + ADV_DELAY);
 	}
 
 }

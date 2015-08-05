@@ -30,7 +30,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 	
 	private boolean mIsActive = false;
 	
-	private AlarmManager mAlarm;
+	private static AlarmManager mAlarm;
 	
 	private SharedPreferences preferences;
 	private SharedPreferences localPref;
@@ -80,7 +80,9 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 			mCurrentNotificationDate = Calendar.getInstance();
 			mNextNotificationDate = Calendar.getInstance();
 			
-			mAlarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			if(mAlarm == null){
+				mAlarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			}
 			
 			splitTime(preferences.getString(SettingsMainFragment.SAVE_ADVISE_TIME, SettingsMainFragment.STANDARD_TIME));
 
@@ -113,6 +115,8 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 				deleteAlarm(context, intent);
 			}
 			
+			Log.i("DELETE ON", mCurrentNotificationDate.toString());
+			
 			mCurrentNotificationDate.setTimeInMillis(mNextNotificationDate.getTimeInMillis());
 			mNextNotificationDate.add(Calendar.DAY_OF_YEAR, 1);
 			
@@ -129,7 +133,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 			}
 			
 			
-			Log.i("ADVISE", mCurrentNotificationDate.toString());
+			Log.i("ADVISE ON", mCurrentNotificationDate.toString());
 			
 			PendingIntent intent = createPendingIntent(context, mCurrentNotificationDate.getTimeInMillis());
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
@@ -141,7 +145,6 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 			editor.putBoolean(IS_STARTED,true);
 			editor.putLong(NEXT_NOTIFICATION_DATE, mNextNotificationDate.getTimeInMillis());
 			editor.putLong(CURRENT_NOTIFICATION_DATE, mCurrentNotificationDate.getTimeInMillis());
-			
 		}else{
 			
 			boolean isStart = localPref.getBoolean(IS_STARTED, false);
@@ -198,7 +201,10 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 	}
 	
 	private void deleteAlarm(Context context, PendingIntent intent){
-		mAlarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		if(mAlarm == null){
+			mAlarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		}
+		
 		mAlarm.cancel(intent);
 	}
  

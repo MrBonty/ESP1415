@@ -27,6 +27,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -128,22 +129,15 @@ public class MainActivity extends ActionBarActivity {
 			boolean newSession  = intent.getBooleanExtra(AlarmService.NEW_TASK, false);
 			
 			if(newSession){
+
+				Log.i("SERVER MSG", "Received");
+				
 				openAdd();
-				
-				ActivityManager actMan = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-				List<RunningServiceInfo> list = actMan.getRunningServices(Integer.MAX_VALUE);
-				
-				for(RunningServiceInfo info : list){
-					if(info.service.getClassName().equals("it.unipd.dei.esp1415.falldetector.service.AlarmService")){
-						Intent intnt = new Intent(this, AlarmService.class);
-						stopService(intnt);
-						
-						break;
-					}
-				}
 			}
-			
 		}
+		
+		deleteService().run();
+		
 	}//[m] onCreate()
 	
 	@Override
@@ -280,4 +274,28 @@ public class MainActivity extends ActionBarActivity {
 			dialog.show();
 		}
 	}//[m] createConnectivityDialog()
+	
+	private Thread deleteService(){
+		return new Thread(){
+			@Override
+			public void run(){
+
+				ActivityManager actMan = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+				List<RunningServiceInfo> list = actMan.getRunningServices(Integer.MAX_VALUE);
+				
+				
+				for(RunningServiceInfo info : list){
+					if(info.service.getClassName().equals("it.unipd.dei.esp1415.falldetector.service.AlarmService")){
+						Intent intnt = new Intent(mContext, AlarmService.class);
+						stopService(intnt);
+						
+						Log.i("DELETE SERVICE", "Service stopped");
+						break;
+					}
+				}
+				
+				interrupt();
+			}
+		};
+	}
 }
