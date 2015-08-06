@@ -228,12 +228,11 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		mNotMinutes = Integer.parseInt(tmp[1]);
 		//mNotMill = timeToMill(mNotHour, mNotMinutes, 0);
 	}//[m] splitTime()
-	
-	/*
-	private static long timeToMill(int hour, int minute, int seconds){
-		return ((long)((hour* 3600) + (minute * 60) + seconds)) * 1000;
-	}*/
-	
+
+	/**
+	 * [m]
+	 *	Calculate the new notification date
+	 */
 	private void calculateNotificationDate(){
 
 		mNextNotificationDate = Calendar.getInstance();
@@ -255,5 +254,5 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		mNextNotificationDate.add(Calendar.SECOND, - second);
 		mNextNotificationDate.add(Calendar.MILLISECOND, - milli);
 	
-	}
+	}// [m] calculateNotificationDate()
 }
