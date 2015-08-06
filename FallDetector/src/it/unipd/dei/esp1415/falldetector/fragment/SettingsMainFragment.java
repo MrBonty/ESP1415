@@ -27,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TimePicker;
@@ -62,12 +63,16 @@ public class SettingsMainFragment extends Fragment{
 	private Context mContext;
 	private Activity mAct;
 	
+	private int mSessionDuration;
+	
 	private boolean isAdiviseChanged = false;
 	private boolean isDialogTimeActive = false;
 
 	// Constants
 	public static final String SAVE_ADVISE_CHK = "isToAdvise";
 	public static final String SAVE_ADVISE_TIME = "adviseTime";
+	
+	public static final String SAVE_SESSION_DURATION = "sessionDuration";
 
 	public static final String SAVE_ACCEL = "accellerometer";
 	public static final String SAVE_FREQ = "frequency";
@@ -81,6 +86,10 @@ public class SettingsMainFragment extends Fragment{
 	public static final int FREQ_HIGH = 9; 
 
 	public static final String STANDARD_TIME = "8:00"; //default time 8:00 am
+	
+	public static final int MIN_DURATION = 1;
+	public static final int MAX_DURATION = 24;
+	public static final int DEFAULT_DURATION = 12;
 
 	public static final String DIVISOR_ON_SAVE_STATE = "&&&";
 	private static final String DIALOG_TYPE = "type_dial";
@@ -113,6 +122,10 @@ public class SettingsMainFragment extends Fragment{
 		viewHolder.mailChk = (CheckBox) view.findViewById(R.id.mail_checkbox);
 		viewHolder.mailSetLay = (LinearLayout) view.findViewById(R.id.mail_list_set);
 		viewHolder.mailSummary = (TextView) view.findViewById(R.id.mail_summary);
+		
+		viewHolder.minus = (Button) view.findViewById(R.id.minus);
+		viewHolder.plus = (Button) view.findViewById(R.id.plus);
+		viewHolder.duration = (TextView) view.findViewById(R.id.number);
 
 		return view;
 	}//[m] onCreateView()
@@ -137,6 +150,8 @@ public class SettingsMainFragment extends Fragment{
 		//Get stored values from preferences
 		adviseChkValue = preferences.getBoolean(SAVE_ADVISE_CHK, false);
 		splitTime(preferences.getString(SAVE_ADVISE_TIME, STANDARD_TIME));
+		
+		mSessionDuration = preferences.getInt(SAVE_SESSION_DURATION, DEFAULT_DURATION);
 
 		frequencyValue = preferences.getInt(SAVE_FREQ, FREQ_MIDDLE);
 
@@ -148,7 +163,11 @@ public class SettingsMainFragment extends Fragment{
 		if(mailAccount == null || mailAccount.equals("")){
 			mailChkValue = false;
 		}
-
+		
+		viewHolder.minus.setOnClickListener(durationPickerListener());
+		viewHolder.plus.setOnClickListener(durationPickerListener());
+		viewHolder.duration.setText(mSessionDuration + "");
+		
 		switch (type) {
 		case SIGN_IN:
 			mailChkValue = true;
@@ -259,6 +278,8 @@ public class SettingsMainFragment extends Fragment{
 		
 		editor.putString(SAVE_ADVISE_TIME, getTimeString());
 		editor.putInt(SAVE_FREQ, frequencyValue);
+		
+		editor.putInt(SAVE_SESSION_DURATION, mSessionDuration);
 
 		editor.putString(SAVE_MAIL_ACCOUNT, mailAccount);
 		editor.putString(SAVE_MAIL_DATABASE64, mailDataConvertedBase64);
@@ -282,6 +303,48 @@ public class SettingsMainFragment extends Fragment{
 			broadcasting.unregisterReceiver(broadcaster);
 		}
 	}//[m] OnPause()
+	
+	/**[m]
+	 * Method to create lister for button minus and plus
+	 * 
+	 * @return the {@link android.view.View.OnClickListener}
+	 */
+	private OnClickListener durationPickerListener(){
+		return new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				switch (v.getId()) {
+				case R.id.minus:
+					mSessionDuration--;
+					viewHolder.duration.setText(mSessionDuration + "");
+					
+					if (mSessionDuration == MIN_DURATION){
+						viewHolder.minus.setClickable(false);
+					}
+					
+					if(mSessionDuration < MAX_DURATION && !viewHolder.plus.isClickable()){
+						viewHolder.plus.setClickable(true);
+					}
+					break;
+				case R.id.plus:
+					mSessionDuration ++;
+					viewHolder.duration.setText(mSessionDuration + "");
+					
+					if (mSessionDuration == MAX_DURATION){
+						viewHolder.plus.setClickable(false);
+					}
+					
+					if(mSessionDuration > MIN_DURATION && !viewHolder.minus.isClickable()){
+						viewHolder.minus.setClickable(true);
+					}
+					break;
+				}
+				
+			}
+		};
+	}//[m] durationPickerListener()
 
 	/**[m]
 	 * Method to create lister for time view
@@ -413,6 +476,10 @@ public class SettingsMainFragment extends Fragment{
 		private CheckBox adviseChk;
 		private LinearLayout timeSetLay;
 		private TextView adviseSummary;
+		
+		private Button minus;
+		private Button plus;
+		private TextView duration;
 
 		private LinearLayout freqSetLay;
 		private TextView freqSummary;

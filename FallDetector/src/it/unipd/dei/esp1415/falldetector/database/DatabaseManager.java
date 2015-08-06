@@ -85,6 +85,8 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_FE_DATE, fall.getTimeStampFallEvent());
 		values.put(DatabaseTable.COLUMN_FE_IS_NOTIFIED, fall.isNotifiedAsInteger());
 		values.put(DatabaseTable.COLUMN_FE_XML, fall.getXmlFileName());
+		values.put(DatabaseTable.COLUMN_FE_LONGITUDE, fall.getLongitude());
+		values.put(DatabaseTable.COLUMN_FE_LATITUDE, fall.getLatitude());
 		values.put(DatabaseTable.COLUMN_FE_FK_SESSION, fall.getSessionId());
 		
 		return insertInDatabase(DatabaseTable.FALL_EVENTS_TABLE, values);
@@ -195,6 +197,8 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_FE_DATE, fall.getTimeStampFallEvent());
 		values.put(DatabaseTable.COLUMN_FE_IS_NOTIFIED, fall.isNotifiedAsInteger());
 		values.put(DatabaseTable.COLUMN_FE_XML, fall.getXmlFileName());
+		values.put(DatabaseTable.COLUMN_FE_LONGITUDE, fall.getLongitude());
+		values.put(DatabaseTable.COLUMN_FE_LATITUDE, fall.getLatitude());
 		values.put(DatabaseTable.COLUMN_FE_FK_SESSION, fall.getSessionId());
 
 		String whereClause = "";
@@ -412,6 +416,8 @@ public class DatabaseManager {
 				f.setNotification(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_FE_IS_NOTIFIED)));
 				f.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
 				f.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_FE_XML)));
+				f.setLatitude(c.getFloat(c.getColumnIndex(DatabaseTable.COLUMN_FE_LATITUDE)));
+				f.setLongitude(c.getFloat(c.getColumnIndex(DatabaseTable.COLUMN_FE_LONGITUDE)));
 				
 				tmp.add(f);
 				

@@ -52,7 +52,7 @@
 	
 	<!-- Settings -->
 	
-	<string name="advise_tag">ADVISE SETTINGS</string>
+	<string name="general_tag">GENERAL SETTINGS</string>
 	<string name="ring_tag">Active advise:</string>
 	<string name="time_tag">Set advise time</string>
 	<string name="accel_set_tag">ACCELEROMETER SETTINGS</string>
@@ -62,6 +62,9 @@
     <string name="rapid_mail_tag">Send mail immediately</string>	
     <string name="mail_list_tag">Mail Address List</string>
     <string name="mail_add_tag">Add new</string>	
+    <string name="max_dur_tag">Max Session Duration:</string>
+    <string name="p">+</string>
+    <string name="m">-</string>
     
 	<string name="default_tag">No value</string>
 	

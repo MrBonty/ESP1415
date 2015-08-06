@@ -6,6 +6,8 @@ public class Fall {
 	private long id;
 	private long timeStampFallEvent;
 	private Calendar dateEvent;
+	private float latitude;
+	private float longitude;
 	private boolean isNotified;
 	private long sessionId;
 	private String xmlFile;
@@ -175,5 +177,21 @@ public class Fall {
 				+ dateEvent.get(Calendar.YEAR);
 	}// [m] generateXmlName()
 	
+	
+	public void setLatitude(float lat){
+		latitude = lat;
+	}
+	
+	public void setLongitude(float lon){
+		longitude = lon;
+	}
+	
+	public float getLatitude(){
+		return latitude;
+	}
+	
+	public float getLongitude(){
+		return longitude;
+	}
 }
 

@@ -246,7 +246,6 @@ public class DetailSessionFragment extends Fragment {
         alert.setOnDismissListener(new OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				mAdapter.notifyDataSetChanged();
 				alert = null;
 			}
 		});
