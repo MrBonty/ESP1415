@@ -24,7 +24,7 @@ public class AlarmService extends Service{
 
 	private int notifyID = 1;
 	public final static String NEW_TASK = "newSession";
-	private boolean hasToNotify = true;
+	private boolean hasToNotify = false;
 	
 	public final static String NOT_CONTROL = "notControl";
 	

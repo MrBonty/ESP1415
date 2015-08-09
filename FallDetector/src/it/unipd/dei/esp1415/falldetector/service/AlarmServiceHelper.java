@@ -210,6 +210,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
  
 	private static PendingIntent createPendingIntent(Context context, long time){
 		Intent intent = new Intent(context, AlarmService.class);
+		intent.putExtra(AlarmService.NOT_CONTROL, true);
 		
 		return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}

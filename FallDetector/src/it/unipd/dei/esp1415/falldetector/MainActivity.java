@@ -1,5 +1,6 @@
 package it.unipd.dei.esp1415.falldetector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
@@ -10,7 +11,6 @@ import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.service.AlarmService;
 import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
-
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -193,31 +193,37 @@ public class MainActivity extends ActionBarActivity {
 	 * Method use for open add dialog or an advise
 	 */
 	private void openAdd(){
-		if(mMed.getDataSession().get(0).getStartTimestamp() == 0){
+		if(mMed.getDataSession()!= null && mMed.getDataSession().size()> 0){
 			
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			if(mMed.getDataSession().get(0).getStartTimestamp() == 0){
 
-			builder.setMessage(R.string.dialog_message_tostart)
-			       .setTitle(R.string.dialog_title);
-			
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-			AlertDialog dialog = builder.create();
-			
-			dialog.show();
-		}else if(mMed.getDataSession().get(0).isActive()){
-			
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage(R.string.dialog_message_tostart)
+				.setTitle(R.string.dialog_title);
 
-			builder.setMessage(R.string.dialog_message)
-			       .setTitle(R.string.dialog_title);
 
-			AlertDialog dialog = builder.create();
+				AlertDialog dialog = builder.create();
+
+				dialog.show();
+			}else if(mMed.getDataSession().get(0).isActive()){
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+				builder.setMessage(R.string.dialog_message)
+				.setTitle(R.string.dialog_title);
+
+				AlertDialog dialog = builder.create();
+
+				dialog.show();
 			
-			dialog.show();
-			
+			}else{
+				createAddDialog(false, null);
+
+			}
 		}else{
 			createAddDialog(false, null);
-			
+
 		}
 	}//[m] openAdd()
 	
