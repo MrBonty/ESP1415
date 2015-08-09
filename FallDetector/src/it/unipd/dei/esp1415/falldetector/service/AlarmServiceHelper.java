@@ -113,26 +113,26 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 				// delete existing  alarm
 				PendingIntent intent = createPendingIntent(context, mCurrentNotificationDate.getTimeInMillis());
 				deleteAlarm(context, intent);
+				
+
+				Log.i("ADVISE", mCurrentNotificationDate.toString());
+				Log.i("EXPIRED", hasExpired(mCurrentNotificationDate) + "");
+				
+				if(hasExpired(mCurrentNotificationDate)){
+					Intent intnt = new Intent(context, AlarmService.class);
+					intnt.putExtra(AlarmService.NOT_CONTROL, true);
+					
+					context.startService(intnt);
+					
+					calculateNotificationDate();
+				}
 			}
 			
 			Log.i("DELETE ON", mCurrentNotificationDate.toString());
 			
 			mCurrentNotificationDate.setTimeInMillis(mNextNotificationDate.getTimeInMillis());
 			mNextNotificationDate.add(Calendar.DAY_OF_YEAR, 1);
-			
-			if(hasExpired(mCurrentNotificationDate)){
-				Intent intent = new Intent(context, AlarmService.class);
-				intent.putExtra(AlarmService.NOT_CONTROL, true);
-				
-				context.startService(intent);
-				
-				calculateNotificationDate();
-				
-				mCurrentNotificationDate.setTimeInMillis(mNextNotificationDate.getTimeInMillis());
-				mNextNotificationDate.add(Calendar.DAY_OF_YEAR, 1);
-			}
-			
-			
+
 			Log.i("ADVISE ON", mCurrentNotificationDate.toString());
 			
 			PendingIntent intent = createPendingIntent(context, mCurrentNotificationDate.getTimeInMillis());

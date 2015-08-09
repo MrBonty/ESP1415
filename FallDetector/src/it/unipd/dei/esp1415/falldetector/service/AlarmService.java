@@ -39,6 +39,7 @@ public class AlarmService extends Service{
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		
 		if(intent != null && intent.getBooleanExtra(NOT_CONTROL, false)){
+			Log.i("GET INTENT", "Service receive");
 			hasToNotify = true;
 		}else{
 			hasToNotify = verifyNotification();
