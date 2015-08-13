@@ -1,5 +1,6 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
+import it.unipd.dei.esp1415.falldetector.utility.AccelData;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import android.app.Service;
 import android.content.Context;
@@ -21,9 +22,16 @@ public class FallDetectorService extends Service {
 	public static final String X_AXIS_NEW_DATA = "X_AXIS_NEW_DATA";
 	public static final String Y_AXIS_NEW_DATA = "Y_AXIS_NEW_DATA";
 	public static final String Z_AXIS_NEW_DATA = "Z_AXIS_NEW_DATA";
-	
 	public static final String XYZ_DATA = "XYZ_DATA";
 
+	public static final int MIN_SAMPLE_RATE = 60;
+	
+	private AccelData[] acc_data;
+	private int count;
+	
+	private long lastSampleTime;
+	private long elapsedTime;
+	
 	private Mediator mMed;
 	
 	private SensorManager sensorManager;
@@ -39,6 +47,10 @@ public class FallDetectorService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		
+//		acc_data = new AccelData[1000];
+//		count = 0;
+		lastSampleTime = 0l;
+		
 		// Initialize the sensor manager
 		sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 		
@@ -49,8 +61,7 @@ public class FallDetectorService extends Service {
 		Sensor accelerometer = sensorManager
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-		// Attach sensorListener to our accelerometer sensor/ every 100000 microseconds = 100milliseconds
-		sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_UI);
+		sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 		
 		// for GPS, change the first parameter to GPS_PROVIDER
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
@@ -125,21 +136,44 @@ public class FallDetectorService extends Service {
 
 			// Ensure mutually exclusive access to the sensor.
 			synchronized (this) {
-				Log.i("event.values[0]: ", event.values[0] + "");
-				Log.i("event.values[1]: ", event.values[1] + "");
-				Log.i("event.values[2]: ", event.values[2] + "");
-				Log.i("size: ", mMed.getSize() + "");
 				
-	        	mMed.setX_data(event.values[0]);
-				mMed.setY_data(event.values[1]);
-				mMed.setZ_data(event.values[2]);
-				mMed.incrementSize();
-			    
+				elapsedTime = System.currentTimeMillis() - lastSampleTime;
 				
-				broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_NEW_DATA, event.values[0]);
-				broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_NEW_DATA, event.values[1]);
-				broadcastDataIntent.putExtra(FallDetectorService.Z_AXIS_NEW_DATA, event.values[2]);
-				broadcaster.sendBroadcast(broadcastDataIntent);
+				if(elapsedTime > MIN_SAMPLE_RATE){
+					Log.i("event.values[0]: ", event.values[0] + "");
+					Log.i("event.values[1]: ", event.values[1] + "");
+					Log.i("event.values[2]: ", event.values[2] + "");
+					Log.i("size: ", mMed.getSize() + "");
+					
+					
+		        	mMed.setX_data(event.values[0]);
+					mMed.setY_data(event.values[1]);
+					mMed.setZ_data(event.values[2]);
+					mMed.incrementSize();
+					
+					Log.i("module", "module: " + Math.sqrt(Math.pow(event.values[0], 2) 
+						  	+ Math.pow(event.values[1], 2) 
+						  	+ Math.pow(event.values[2], 2)
+						  	));
+					
+//					acc_data[count].setX((double) event.values[0]);
+//					acc_data[count].setY((double) event.values[1]);
+//					acc_data[count].setZ((double) event.values[2]);
+//					count++;
+//					
+//					if(count >= 1000){
+//						count = 0;
+//						
+//					}
+				    
+					
+					broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_NEW_DATA, event.values[0]);
+					broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_NEW_DATA, event.values[1]);
+					broadcastDataIntent.putExtra(FallDetectorService.Z_AXIS_NEW_DATA, event.values[2]);
+					broadcaster.sendBroadcast(broadcastDataIntent);
+					
+					lastSampleTime = System.currentTimeMillis();
+				}
 			}
 		}
 	};

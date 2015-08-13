@@ -71,7 +71,7 @@ public class MainActivity extends ActionBarActivity {
 	    
 		mMed.isLarge(xlarge || large);
 		
-		if(!mMed.hasDataSession()){
+//		if(!mMed.hasDataSession()){
 			
 		DatabaseManager db = new DatabaseManager(mContext);
 		mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
@@ -108,7 +108,7 @@ public class MainActivity extends ActionBarActivity {
 			//TODO END REMOVE ARRAY FOR TEST
 			
 			*/
-		}
+//		}
 		
 		FragmentManager manager = getSupportFragmentManager();
 		
@@ -254,6 +254,7 @@ public class MainActivity extends ActionBarActivity {
 			
 			@Override
 			public void onDismiss(DialogInterface dialog) {
+				ListSessionFragment.mAdapter.resetArray(NEW_SESSION_POSITION);
 				ListSessionFragment.mAdapter.notifyDataSetChanged();
 				mDialog = null;
 				
