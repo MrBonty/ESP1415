@@ -58,7 +58,7 @@
                 android:singleLine="true"
                 android:text="@string/not_started" />
 
-            <TextView
+            <Chronometer
                 android:id="@+id/duration"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -77,6 +77,18 @@
 
     </LinearLayout>
  <!-- session information label -->
+ 
+ 		<TextView
+		    android:id="@+id/fall_title"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:layout_marginTop="15dp"
+		    android:gravity="center|bottom"
+		    android:singleLine="true"
+		    android:text="@string/fall_title"
+		    android:textSize="20sp"
+		    android:textStyle="bold" />
+ 
 
     <ListView
         android:id="@+id/session_falls"

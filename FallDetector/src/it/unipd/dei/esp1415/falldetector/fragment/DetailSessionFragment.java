@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.widget.EditText;
 import android.app.Activity;
 import android.widget.AdapterView;
+import android.widget.Chronometer;
 
 public class DetailSessionFragment extends Fragment {
 	public static final String SAVE_MODIFY_DIALOG = "modifyDialog";
@@ -47,6 +49,7 @@ public class DetailSessionFragment extends Fragment {
     private AlertDialog alert;
     private static EditText input;
     private static boolean create=false; //establishes if an AlertDialog is active
+    private DatabaseManager dm;
 	
 	public DetailSessionFragment(){
 	}
@@ -60,14 +63,14 @@ public class DetailSessionFragment extends Fragment {
 		mMod = new Mediator();
 		mArray = mMod.getDataSession();
 
-		viewHolder= new ViewHolder();
+		viewHolder = new ViewHolder();
 		
 		viewHolder.lt = (LinearLayout) rootView.findViewById(R.id.detail_layout);
 		viewHolder.sessionName = (TextView) rootView.findViewById(R.id.detailFrag_session_name);
 		viewHolder.sessionImage = (ImageView) rootView.findViewById(R.id.current_thumbnail);
 		viewHolder.sessionDate = (TextView) rootView.findViewById(R.id.date);
 		viewHolder.sessionTime = (TextView) rootView.findViewById(R.id.session_start_time);
-		viewHolder.sessionDuration = (TextView) rootView.findViewById(R.id.duration);
+		viewHolder.sessionDuration = (Chronometer) rootView.findViewById(R.id.duration);
 		viewHolder.sessionFalls = (ListView) rootView.findViewById(R.id.session_falls);
 		
 		mIndex = mMod.getCurretnPosSession();
@@ -85,9 +88,10 @@ public class DetailSessionFragment extends Fragment {
 			viewHolder.sessionImage.setImageBitmap(mArray.get(mIndex).getBitmap());
 			viewHolder.sessionDate.setText("Starts on "+mArray.get(mIndex).getStartDate());
 			viewHolder.sessionTime.setText("at "+mArray.get(mIndex).getStartTimeToString());
-			viewHolder.sessionDuration.setText("Duration: "+mArray.get(mIndex).getDuration());
+			viewHolder.sessionDuration.setBase(SystemClock.elapsedRealtime()-mArray.get(mIndex).getDuration());
 			
-			mContext = mMod.getContext(); 
+			mContext = mMod.getContext();
+			dm = new DatabaseManager(mContext);
 			
 			//creation of EditOk and definition of the method ok(String result)
 	        mEditOk = new EditOk() {
@@ -99,7 +103,6 @@ public class DetailSessionFragment extends Fragment {
 	            	viewHolder.sessionName.setText(result);
 	            	
 					String name = result;
-					DatabaseManager dm = new DatabaseManager(mContext);
 	            	
 					if(name.length() > 0){
 						if(show != null && show.getView().getWindowVisibility() == View.VISIBLE){
@@ -115,7 +118,6 @@ public class DetailSessionFragment extends Fragment {
 							int error = 0;
 							do{
 								error = dm.upgradeASession(mArray.get(mIndex).getId(), cv);
-
 							}while(error == DatabaseManager.ON_OPEN_ERROR);
 
 							show = Toast.makeText(mContext, R.string.modify_made, Toast.LENGTH_SHORT);
@@ -137,7 +139,7 @@ public class DetailSessionFragment extends Fragment {
 				}
 			});
 			
-			mFallsEvent = mArray.get(mIndex).getFallEvents();
+			mFallsEvent = mArray.get(mIndex).getFallEvents(); //TODO substitute with dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_SS_START_DATE);
 			
 			if(mFallsEvent != null){
 				if(mFallsEvent.size() > 0){
@@ -246,7 +248,6 @@ public class DetailSessionFragment extends Fragment {
         alert.setOnDismissListener(new OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				mAdapter.notifyDataSetChanged();
 				alert = null;
 			}
 		});
@@ -260,7 +261,7 @@ public class DetailSessionFragment extends Fragment {
 		private TextView sessionName;
 		private TextView sessionDate;
 		private TextView sessionTime;
-		private TextView sessionDuration;
+		private Chronometer sessionDuration;
 		private ImageView sessionImage;
 		private ListView sessionFalls;
 	}

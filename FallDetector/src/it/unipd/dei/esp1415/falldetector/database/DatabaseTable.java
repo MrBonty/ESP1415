@@ -33,10 +33,13 @@ public class DatabaseTable {
 	public static final String COLUMN_FE_DATE = "event_date"; //save as integer timestamp
 	public static final String COLUMN_FE_IS_NOTIFIED = "is_notified"; //save as integer default 0
 	public static final String COLUMN_FE_XML = "file"; //save as text that define the name of file 
+	public static final String COLUMN_FE_LATITUDE = "latitude";
+	public static final String COLUMN_FE_LONGITUDE = "longitude";
 	public static final String COLUMN_FE_FK_SESSION = "session"; //integer not null that define the foreign key 
 	
 	public static final String[] ALL_COLUMNS_FALL_EVENTS = {COLUMN_PK_ID, COLUMN_FE_DATE,
 															COLUMN_FE_IS_NOTIFIED, COLUMN_FE_XML,
+															COLUMN_FE_LATITUDE, COLUMN_FE_LONGITUDE,
 															COLUMN_FE_FK_SESSION};
 	
 	//Accel Data Columns
@@ -74,6 +77,8 @@ public class DatabaseTable {
 			+ COLUMN_FE_DATE + " INTEGER, "
 			+ COLUMN_FE_IS_NOTIFIED +  " INTEGER DEFAULT 0, " //set to default to 0 ->false
 			+ COLUMN_FE_XML + " TEXT, "
+			+ COLUMN_FE_LATITUDE + " REAL, " 
+			+ COLUMN_FE_LONGITUDE + " REAL, "
 			+ COLUMN_FE_FK_SESSION + " INTEGER, "
 			+ "FOREIGN KEY(" + COLUMN_FE_FK_SESSION + ") REFERENCES " 
 			+ SESSION_TABLE + "(" + COLUMN_PK_ID + ") " 
@@ -95,6 +100,12 @@ public class DatabaseTable {
 			+ COLUMN_ML_NAME + " TEXT, "
 			+ COLUMN_ML_SURNAME + " TEXT, "
 			+ COLUMN_ML_ADDRESS + " TEXT );" ;
+	
+	private static final String ALTER_TABLE_FALL_EVENTS_1 = ""
+			+ "ALTER TABLE " + FALL_EVENTS_TABLE + " ADD COLUMN " + COLUMN_FE_LATITUDE + " REAL;";
+
+	private static final String ALTER_TABLE_FALL_EVENTS_2 = ""
+			+ "ALTER TABLE " + FALL_EVENTS_TABLE + " ADD COLUMN " + COLUMN_FE_LONGITUDE + " REAL;";
 	
 	//Utility string for db
     public static final String SET_FK_ON = "PRAGMA foreign_keys = ON;";
@@ -135,6 +146,9 @@ public class DatabaseTable {
 			db.execSQL(CREATE_MAIL);
 		case 2:
 			db.execSQL(CREATE_ACCEL_DATA);
+		case 3:
+			db.execSQL(ALTER_TABLE_FALL_EVENTS_1);
+			db.execSQL(ALTER_TABLE_FALL_EVENTS_2);
 		default:
 			break;
 		}

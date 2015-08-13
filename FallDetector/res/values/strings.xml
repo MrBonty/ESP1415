@@ -24,6 +24,7 @@
 	<string name="end_button">End</string>
 	<string name="play_button">Play</string>
 	<string name="fall_title">Fall Events</string>
+	<string name="fall_data">Fall Data</string>
 	
     <string name= "modify">Modify</string>
     <string name= "delete">Delete</string>

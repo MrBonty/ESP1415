@@ -2,10 +2,15 @@ package it.unipd.dei.esp1415.falldetector;
 
 import java.util.ArrayList;
 
+import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
+import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
+import it.unipd.dei.esp1415.falldetector.utility.AccelData;
+import it.unipd.dei.esp1415.falldetector.utility.ChartView;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.support.v7.app.ActionBarActivity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -23,6 +28,16 @@ public class FallDetailActivity extends ActionBarActivity {
 	private static ViewHolder viewHolder;
 	private Fall current;
     private static int mCurrentFall; //the position of the current Fall
+	private static Context mContext;
+    private DatabaseManager dm;
+    
+	private ChartView xChart;
+	private ChartView yChart;
+	private ChartView zChart;
+	
+	private static float[] x_data;
+	private static float[] y_data;
+	private static float[] z_data;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +51,9 @@ public class FallDetailActivity extends ActionBarActivity {
 		
 		mMod = new Mediator();
 		mArray = mMod.getDataSession();
+		
+		mContext = mMod.getContext();
+		dm = new DatabaseManager(mContext);
 
 		viewHolder= new ViewHolder();
 		
@@ -54,6 +72,7 @@ public class FallDetailActivity extends ActionBarActivity {
 		Log.i("Fall Session", "Activity "+mIndex);
 		Log.i("Fall Session", "Activity "+mCurrentFall);
 		
+		//TODO substitute with dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_SS_START_DATE).get(mCurrentFall);
 		current = mArray.get(mIndex).getFall(mCurrentFall); //get the current Fall
 		
 		String[] tmp = current.dateTimeStampFallEven();
@@ -61,8 +80,8 @@ public class FallDetailActivity extends ActionBarActivity {
 		viewHolder.sessionImage.setImageBitmap(mArray.get(mIndex).getBitmap());
 		viewHolder.sessionDate.setText("Happen on "+tmp[0]);
 		viewHolder.sessionTime.setText("at "+tmp[1]);
-		viewHolder.sessionLatitude.setText("Latitude: "); //TODO INSERT METHOD TO GET THE LATITUDE
-		viewHolder.sessionLongitude.setText("Longitude:"); //TODO INSERT METHOD TO GET THE LONGITUDE
+		viewHolder.sessionLatitude.setText("Latitude: "+current.getLatitude()); 
+		viewHolder.sessionLongitude.setText("Longitude: "+current.getLongitude()); 
 		
 		Log.i("Fall Session", "Activity "+tmp[0]);
 		Log.i("Fall Session", "Activity "+tmp[1]);
@@ -74,6 +93,27 @@ public class FallDetailActivity extends ActionBarActivity {
 		else s = "Not sended";
 		
 		viewHolder.sessionSended.setText(s);
+		
+		x_data = new float[1000];
+		y_data = new float[1000];
+		z_data = new float[1000];
+		
+		ArrayList<AccelData> temp = dm.getAccelDataAsArrayForAFall(current.getId(), DatabaseTable.COLUMN_AC_TS);
+		
+		for(int i=0; i<temp.size(); i++){
+			x_data[i] = (float)temp.get(i).getX();
+			y_data[i] = (float)temp.get(i).getY();
+			z_data[i] = (float)temp.get(i).getZ();
+		}
+		
+		xChart = (ChartView) findViewById(R.id.chart_x_axis);
+		xChart.setChartData(x_data, x_data.length);
+		
+		yChart = (ChartView) findViewById(R.id.chart_y_axis);
+		yChart.setChartData(y_data, y_data.length);
+		
+		zChart = (ChartView) findViewById(R.id.chart_z_axis);
+		zChart.setChartData(z_data, z_data.length);
 	}
 
 	@Override
