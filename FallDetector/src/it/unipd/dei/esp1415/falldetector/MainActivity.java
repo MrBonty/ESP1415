@@ -1,8 +1,5 @@
 package it.unipd.dei.esp1415.falldetector;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.extraview.ConnectionDialog;
@@ -11,22 +8,25 @@ import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.service.AlarmService;
 import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -73,8 +73,8 @@ public class MainActivity extends ActionBarActivity {
 		
 		if(!mMed.hasDataSession()){
 			
-			DatabaseManager db = new DatabaseManager(mContext);
-			mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
+		DatabaseManager db = new DatabaseManager(mContext);
+		mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
 
 			/*
 			
@@ -144,10 +144,13 @@ public class MainActivity extends ActionBarActivity {
 	protected void onResume() {
 		super.onResume();
 
-		
 		if(!(mMed.isLocationControlled() && mMed.isConnectionControlled())){
 			createConnectivityDialog();
 		}
+		
+//		DatabaseManager db = new DatabaseManager(mContext);
+//		mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
+		
 	}//[m] onResume()
 
 	@Override

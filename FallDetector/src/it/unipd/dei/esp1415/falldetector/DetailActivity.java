@@ -51,8 +51,8 @@ public class DetailActivity extends ActionBarActivity {
 				items.add(second);
 				item.add(third);
 				
-				mSessions.get(1).setFallEvents(items);
-				mSessions.get(2).setFallEvents(item);
+//				mSessions.get(1).setFallEvents(items);
+//				mSessions.get(2).setFallEvents(item);
 			}
 		}
 		//END TEST

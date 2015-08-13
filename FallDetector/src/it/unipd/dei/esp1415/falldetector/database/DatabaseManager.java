@@ -1,11 +1,12 @@
 package it.unipd.dei.esp1415.falldetector.database;
 
-import java.util.ArrayList;
-
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.MailAddress;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
+
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -339,6 +340,44 @@ public class DatabaseManager {
 		
 		return tmp;
 	}//[m] upgradeRow()
+	
+	
+	// Metodo di prova Xu
+	public Session getLastSession(String selection, String orderBy){
+		
+		Cursor c = getSessionAsCursor(selection, orderBy);
+		Session s = null;
+		
+		if(c == null){
+			return null;
+		}
+		
+		if(c.moveToFirst()){
+			s = new Session(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_NAME)),
+						c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_START_DATE)));
+			s.setColorThumbnail(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL)));
+			s.setDuration(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_DURATION)));
+			s.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+			s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
+			s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
+			s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
+			
+			while(c.moveToNext()){
+				if(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)) > s.getId()){
+					s = new Session(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_NAME)),
+							c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_START_DATE)));
+					s.setColorThumbnail(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL)));
+					s.setDuration(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_DURATION)));
+					s.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+					s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
+					s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
+					s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
+				}
+			}
+		}
+		close();
+		return s;
+	}//[m] getSessionAsArray()
 	
 	/**
 	 * [m]

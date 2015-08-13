@@ -7,7 +7,9 @@ import android.graphics.Bitmap;
 
 public class Session {
 	private String name;
+	
 	private Calendar startDate;
+	
 	private long startTimeStamp;
 	private long endTimeStamp;
 	private long duration = 0;  
@@ -26,6 +28,7 @@ public class Session {
 	public static final int ASC = 1;
 	
 	private Bitmap bitmapIcon = null;
+	
 	
 	/**
 	 * [c] Create a Session object At the creation of the Session it make a
@@ -175,8 +178,8 @@ public class Session {
 	 * @param timeStamp the new timeStamp -> duration = timeStamp - startTimeStamp
 	 */
 	public void setDuration(long timeStamp){
-		endTimeStamp = timeStamp;
-		duration = endTimeStamp - startTimeStamp;
+		//endTimeStamp = timeStamp;
+		duration = timeStamp;
 	}//[m] setDuration()
 	
 	/**
@@ -362,6 +365,16 @@ public class Session {
 		}
 		return tmp;
 	}//[m] getDurationString()
+	
+	public void setStartDateAndTimestamp(Calendar sessionStartTime){
+		startDate = sessionStartTime;
+		startTimeStamp = sessionStartTime.getTimeInMillis();
+	}
+	
+	public Calendar getStartDateCalendar(){
+		startDate.setTimeInMillis(startTimeStamp);
+		return startDate;
+	}
 	
 	
 }
