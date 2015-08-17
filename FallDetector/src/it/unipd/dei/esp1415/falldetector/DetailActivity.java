@@ -1,11 +1,11 @@
 package it.unipd.dei.esp1415.falldetector;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 
 import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
-import it.unipd.dei.esp1415.falldetector.utility.Fall;
+//import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
-import it.unipd.dei.esp1415.falldetector.utility.Session;
+//import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -37,7 +37,7 @@ public class DetailActivity extends ActionBarActivity {
 		
 		setContentView(R.layout.activity_detail);
 		
-		//TODO ELIMINATE THIS TEST
+		/*//TODO ELIMINATE THIS TEST
 		ArrayList<Session> mSessions = mMed.getDataSession();
 		if(mSessions != null){
 			if(mSessions.size() > 0){
@@ -55,7 +55,7 @@ public class DetailActivity extends ActionBarActivity {
 				mSessions.get(2).setFallEvents(item);
 			}
 		}
-		//END TEST
+		//END TEST*/
 		
 		Fragment detailSession = new DetailSessionFragment();
 		
