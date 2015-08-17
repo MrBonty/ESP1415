@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.unipd.dei.esp1415.falldetector.R;
+import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import android.content.Context;
@@ -274,4 +275,44 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		private TextView falls;
 	}// {c} ViewHolder
 
+	public void resetArray(int pos){
+		int[] tmp = null;
+		boolean isVoid= mExpCol.length > 0;
+
+		if(isVoid){
+			tmp = copyArray(mExpCol);
+
+		}
+
+		mExpCol = new int[mArray.size()];
+
+		if(isVoid){
+
+			for(int i = 0; i < pos; i++){
+				mExpCol[i] = tmp[i];
+			}
+
+			int j= pos;
+
+			mExpCol[j] = COLLAPSED;
+
+
+			for(int i = pos + 1; i < mExpCol.length; i++ ){
+
+				if(j< tmp.length){
+					mExpCol[i] = tmp[j];
+				}
+				j++;
+			}
+		}
+	}
+
+	private int[] copyArray(int[] ar){
+		int[] tmp = new int[ar.length];
+		for(int i = 0; i< ar.length; i++){
+			tmp[i] = ar[i];
+		}
+
+		return tmp;
+	}
 }// {c} ListSessionAdapter

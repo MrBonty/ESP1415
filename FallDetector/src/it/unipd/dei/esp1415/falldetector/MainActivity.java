@@ -252,6 +252,8 @@ public class MainActivity extends ActionBarActivity {
 			
 			@Override
 			public void onDismiss(DialogInterface dialog) {
+				ListSessionFragment.mAdapter.resetArray(NEW_SESSION_POSITION);
+				
 				ListSessionFragment.mAdapter.notifyDataSetChanged();
 				mDialog = null;
 				
