@@ -105,6 +105,7 @@ public class MainActivity extends ActionBarActivity {
 			}
 
 			mMed.setDataSession(tmp);
+			
 			//TODO END REMOVE ARRAY FOR TEST
 			
 			*/
