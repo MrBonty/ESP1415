@@ -8,7 +8,9 @@ import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.service.AlarmService;
 import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
+import it.unipd.dei.esp1415.falldetector.utility.Session;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
@@ -72,9 +74,8 @@ public class MainActivity extends ActionBarActivity {
 		mMed.isLarge(xlarge || large);
 		
 //		if(!mMed.hasDataSession()){
-			
-		DatabaseManager db = new DatabaseManager(mContext);
-		mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
+		
+		downloadData();
 		
 		FragmentManager manager = getSupportFragmentManager();
 		
@@ -113,9 +114,9 @@ public class MainActivity extends ActionBarActivity {
 		if(!(mMed.isLocationControlled() && mMed.isConnectionControlled())){
 			createConnectivityDialog();
 		}
+
+		downloadData();
 		
-//		DatabaseManager db = new DatabaseManager(mContext);
-//		mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));		
 		ListSessionFragment.mAdapter.notifyDataSetChanged();
 		
 	}//[m] onResume()
@@ -221,8 +222,9 @@ public class MainActivity extends ActionBarActivity {
 			
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				ListSessionFragment.mAdapter.resetArray(NEW_SESSION_POSITION);
-				ListSessionFragment.mAdapter.notifyDataSetChanged();
+				Log.i("MED", mMed.getDataSession().size()+ "");
+
+				Log.i("ADAP", ListSessionFragment.mAdapter.getCount() + "");
 				mDialog = null;
 				
 				//TODO intent to start the new session;
@@ -274,5 +276,25 @@ public class MainActivity extends ActionBarActivity {
 				interrupt();
 			}
 		};
+	}
+	
+	private void downloadData(){
+		DatabaseManager db = new DatabaseManager(mContext);
+		
+		ArrayList<Session> tmp = db.getSessionAsArray(DatabaseTable.COLUMN_SS_IS_ACTIVE + " > " + Session.FALSE + " OR " + DatabaseTable.COLUMN_SS_START_DATE  + " = 0" , null);
+		Log.i("SIZE", tmp.size()+ "");
+		
+		addToArray(tmp,db.getSessionAsArray(DatabaseTable.COLUMN_SS_IS_ACTIVE + " = " + Session.FALSE + " AND " + DatabaseTable.COLUMN_SS_START_DATE  + " > 0", DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.DESC));
+		
+		mMed.setDataSession(tmp);
+		
+		Log.i("MED", mMed.getDataSession().size()+ "");
+	}
+	
+	private void addToArray(ArrayList<Session> tmp1, ArrayList<Session> tmp2){
+		for(int i = 0; i< tmp2.size(); i++){
+			tmp1.add(tmp2.get(i));
+		}
+		
 	}
 }

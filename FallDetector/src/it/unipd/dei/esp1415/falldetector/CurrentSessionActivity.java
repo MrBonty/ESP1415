@@ -2,6 +2,7 @@ package it.unipd.dei.esp1415.falldetector;
 
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
+import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.service.FallDetectorService;
 import it.unipd.dei.esp1415.falldetector.utility.ChartView;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
@@ -238,6 +239,12 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		// Get the current time and set the session to active
 		mCurrent.setStartDateAndTimestamp(Calendar.getInstance(TimeZone.getDefault()));
 		mCurrent.setToActive(true);
+		
+		if(ListSessionFragment.mArray != null){
+			ListSessionFragment.mArray.get(0).setStartDateAndTimestamp(mCurrent.getStartDateCalendar());
+			ListSessionFragment.mArray.get(0).setToActive(true);
+			
+		}
 
 		mMed.setSessionPaused(false);
 
@@ -273,6 +280,11 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		mCurrent.setDuration(SystemClock.elapsedRealtime()
 				- chroDuration.getBase());
 		chroDuration.stop();
+		
+		if(ListSessionFragment.mArray != null){
+			ListSessionFragment.mArray.get(0).setDuration(mCurrent.getDuration());
+			
+		}
 
 		// Update duration in db
 		ContentValues values = new ContentValues();
@@ -317,11 +329,22 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			mCurrent.setDuration(SystemClock.elapsedRealtime()
 					- chroDuration.getBase());
 			chroDuration.stop();
+			
+			if(ListSessionFragment.mArray != null){
+				ListSessionFragment.mArray.get(0).setDuration(mCurrent.getDuration());
+				
+			}
+
+			
 			mMed.setChronoBaseTime(SystemClock.elapsedRealtime());
 			values.put(DatabaseTable.COLUMN_SS_DURATION, mCurrent.getDuration());
 		}
 
 		mCurrent.setToActive(false);
+		if(ListSessionFragment.mArray != null){
+			ListSessionFragment.mArray.get(0).setDuration(mCurrent.getDuration());
+			ListSessionFragment.mArray.get(0).setToActive(false);
+		}
 		values.put(DatabaseTable.COLUMN_SS_IS_ACTIVE,
 				mCurrent.isActiveAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);

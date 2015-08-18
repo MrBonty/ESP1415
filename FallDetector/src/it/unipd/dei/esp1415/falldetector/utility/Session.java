@@ -21,8 +21,8 @@ public class Session {
 	private ArrayList<Fall> fallsEvent; // TODO describe fall event with a
 											// class
 
-	private static final int TRUE = 1;
-	private static final int FALSE = 0;
+	public static final int TRUE = 1;
+	public static final int FALSE = 0;
 	
 	public static final int DESC = 0;
 	public static final int ASC = 1;

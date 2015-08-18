@@ -2,6 +2,7 @@ package it.unipd.dei.esp1415.falldetector.fragment.adapter;
 
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
+import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 
 import java.util.ArrayList;
@@ -289,8 +290,9 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		private TextView falls;
 	}// {c} ViewHolder
 
-	public void resetArray(int pos) {
+	public void resetArray(int pos, boolean hasNewElement) {
 		int[] tmp = null;
+		
 		boolean isVoid = mExpCol.length > 0;
 
 		if (isVoid) {
@@ -306,10 +308,13 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 				mExpCol[i] = tmp[i];
 			}
 
+			
 			int j = pos;
 
-			mExpCol[j] = COLLAPSED;
-
+			if(hasNewElement){
+				mExpCol[j] = COLLAPSED;
+			}
+			
 			for (int i = pos + 1; i < mExpCol.length; i++) {
 
 				if (j < tmp.length) {
@@ -328,4 +333,6 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 		return tmp;
 	}
+	
+	
 }// {c} ListSessionAdapter

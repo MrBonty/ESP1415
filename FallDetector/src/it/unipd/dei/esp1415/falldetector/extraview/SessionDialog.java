@@ -3,6 +3,7 @@ package it.unipd.dei.esp1415.falldetector.extraview;
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
+import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
@@ -218,6 +219,12 @@ public class SessionDialog extends Dialog{
 						(new Mediator()).getDataSession().add(mPos, mSession);
 						
 						toShow = Toast.makeText(mContext, R.string.add_session, Toast.LENGTH_SHORT);
+						
+
+						ListSessionFragment.mArray.add(mPos, mSession);
+						
+						ListSessionFragment.mAdapter.resetArray(mPos, true);
+						ListSessionFragment.mAdapter.notifyDataSetChanged();
 						
 					}else{
 						
