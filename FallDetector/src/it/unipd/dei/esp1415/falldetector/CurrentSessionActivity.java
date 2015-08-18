@@ -37,16 +37,15 @@ import android.widget.TextView;
 public class CurrentSessionActivity extends ActionBarActivity {
 
 	private Mediator mMed;
+	
+	//current session
 	private Session mCurrent;
 
 	private DatabaseManager dm;
 
-	/**
-	 * Displays the start time of the session
-	 */
-	private TextView txtvStartTime;
-
+	//Text view for session name and session start time
 	private TextView sessionName;
+	private TextView txtvStartTime;
 	
 	/**
 	 * Display the duration of the session
@@ -68,11 +67,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	private TextView txtvAccDataY;
 	private TextView txtvAccDataZ;
 
-	// Accelerometer data
-	private float x;
-	private float y;
-	private float z;
-
+	private int size;
+	
 	private ImageView thmb;
 
 	private BroadcastReceiver broadcastDataReceiver;
@@ -84,10 +80,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		txtvStartTime = null;
 		ibtnPlayPause = null;
 		chroDuration = null;
-
-		x = 0.0f;
-		y = 0.0f;
-		z = 0.0f;
+		
+		size = 0;
 	}
 
 	@Override
@@ -95,50 +89,41 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.current_session_interface);
 
+		sessionName = (TextView) findViewById(R.id.current_sesstion_name);
+		
+		thmb = (ImageView) findViewById(R.id.current_thumbnail);
+		
+		txtvStartTime = (TextView) findViewById(R.id.session_start_time);
+		
+		// Initialize the chronometer
+		chroDuration = (Chronometer) findViewById(R.id.session_duration);
+		
+		// Initialize the play-pause button view
+		ibtnPlayPause = (ImageButton) findViewById(R.id.play_button);
+		
+		// Shows the acceleration axises data in a graphic way
+		txtvAccDataX = (TextView) findViewById(R.id.acc_data_x);
+		xChart = (ChartView) findViewById(R.id.chart_x_axis);
+		
+		txtvAccDataY = (TextView) findViewById(R.id.acc_data_y);
+		yChart = (ChartView) findViewById(R.id.chart_y_axis);
+		
+		txtvAccDataZ = (TextView) findViewById(R.id.acc_data_z);
+		zChart = (ChartView) findViewById(R.id.chart_z_axis);
+		
+		// lstvFalls referes to the ListView in the layout
+		ListView lstvFalls = (ListView) findViewById(R.id.session_falls);
+		
+		// end button
+		final ImageButton ibtnEnd = (ImageButton) findViewById(R.id.end_button);
+		
 		mMed = new Mediator();
 		dm = new DatabaseManager(mMed.getContext());
-
-		// Updating chartView
-		broadcastDataReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				x = intent.getFloatExtra(FallDetectorService.X_AXIS_NEW_DATA,
-						0.0f);
-				y = intent.getFloatExtra(FallDetectorService.Y_AXIS_NEW_DATA,
-						0.0f);
-				z = intent.getFloatExtra(FallDetectorService.Z_AXIS_NEW_DATA,
-						0.0f);
-
-				Log.w("x: ", x + "");
-				Log.w("y: ", y + "");
-				Log.w("z: ", z + "");
-				Log.w("size: ", xChart.getSize() + "");
-
-				// Update chart X axis data and text
-				xChart.addNewData(x);
-				xChart.invalidate();
-				txtvAccDataX.setText("X: " + x);
-				txtvAccDataX.invalidate();
-
-				// Update chart Y axis data and text
-				yChart.addNewData(y);
-				yChart.invalidate();
-				txtvAccDataY.setText("Y: " + y);
-				txtvAccDataY.invalidate();
-
-				// Update chart Z axis data and text
-				zChart.addNewData(z);
-				zChart.invalidate();
-				txtvAccDataZ.setText("Z: " + z);
-				txtvAccDataZ.invalidate();
-			}
-		};
 
 		// Fetch session from database
 		mCurrent = dm.getLastSession(null, DatabaseTable.COLUMN_SS_START_DATE
 				+ " " + DatabaseManager.DESC);
-
-		sessionName = (TextView) findViewById(R.id.current_sesstion_name);
+		
 		sessionName.setText(mCurrent.getName());
 		
 		// Set up thumbnail
@@ -150,49 +135,33 @@ public class CurrentSessionActivity extends ActionBarActivity {
 					image);
 			mCurrent.setBitmap(image);
 		}
-		thmb = (ImageView) findViewById(R.id.current_thumbnail);
+		
 		thmb.setImageBitmap(ColorUtil.recolorIconBicolor(
 				mCurrent.getColorThumbnail(), mCurrent.getBitmap()));
-
-		// Initialize the chronometer
-		chroDuration = (Chronometer) findViewById(R.id.session_duration);
-
+		
 		// Set up start time
 		if (mCurrent.getStartTimestamp() <= 0) {
 			// Initialize txtvStartTime view
-			txtvStartTime = (TextView) findViewById(R.id.session_start_time);
+			ibtnPlayPause.setImageResource(R.drawable.play_button_default);
 		} else {
 			// Fetch data from current session
-			
-			txtvStartTime = (TextView) findViewById(R.id.session_start_time);
 			txtvStartTime.setText(mCurrent.getStartDateCalendar().getTime()
 					.toString());
-
 			// Set up chronometer
-			if (mMed.isSessionPaused())
+			if (mMed.isSessionPaused()){
 				chroDuration.setBase(SystemClock.elapsedRealtime()
 						- mCurrent.getDuration());
+				ibtnPlayPause.setImageResource(R.drawable.play_button_default);
+			}
 			else {
 				chroDuration.setBase(mMed.getChronoBaseTime()
 						- mCurrent.getDuration());
+				ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
 			}
 
 			if (mCurrent.isActive() && !mMed.isSessionPaused())
 				chroDuration.start();
-		}
-
-		// Initialize the play-pause button view
-		ibtnPlayPause = (ImageButton) findViewById(R.id.play_button);
-		if ((mCurrent.getStartTimestamp() > 0) && (!mMed.isSessionPaused()))
-			ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
-		else
-			ibtnPlayPause.setImageResource(R.drawable.play_button_default);
-
-		// end button
-		final ImageButton ibtnEnd = (ImageButton) findViewById(R.id.end_button);
-
-		// lstvFalls referes to the ListView in the layout
-		ListView lstvFalls = (ListView) findViewById(R.id.session_falls);
+		}// timestamp
 
 		// List of falls occur during the session
 		final ArrayList<String> falls = new ArrayList<String>();
@@ -205,33 +174,15 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				android.R.layout.simple_list_item_1, falls);
 		lstvFalls.setAdapter(arrayAdapter);
 
-		// Shows the acceleration axises data in a graphic way
-		xChart = (ChartView) findViewById(R.id.chart_x_axis);
-		xChart.setChartData(mMed.getX_array(), mMed.getSize());
-
-		yChart = (ChartView) findViewById(R.id.chart_y_axis);
-		yChart.setChartData(mMed.getY_array(), mMed.getSize());
-
-		zChart = (ChartView) findViewById(R.id.chart_z_axis);
-		zChart.setChartData(mMed.getZ_array(), mMed.getSize());
-
-		// Displays acceleration value in each axis
-		txtvAccDataX = (TextView) findViewById(R.id.acc_data_x);
-		txtvAccDataY = (TextView) findViewById(R.id.acc_data_y);
-		txtvAccDataZ = (TextView) findViewById(R.id.acc_data_z);
-
 		// Manages play and pause events
 		ibtnPlayPause.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
-
 				if (mCurrent.getStartTimestamp() > 0) {
 					// (Paused) The session has already started and it's paused
 					if (mMed.isSessionPaused())
 						sessionResume();
-					// (Running) the session has already started and is not
-					// paused
+					// (Running) the session has already started and is not paused
 					else
 						sessionPause();
 				}
@@ -241,21 +192,53 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			}
 		});
 
-		// TODO manages end button press
+		// Manages end button event
 		ibtnEnd.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				sessionEnd();
 			}
 		});
+		
+		// Updating chartView
+		broadcastDataReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+					
+				size = intent.getIntExtra(FallDetectorService.ARRAY_SIZE, 0);
+
+				// Update chart X axis data and text
+				xChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.X_AXIS_ARRAY), size);
+				xChart.invalidate();
+				txtvAccDataX.setText("X: " + xChart.getLastElement());
+				txtvAccDataX.invalidate();
+
+				// Update chart Y axis data and text
+				yChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.Y_AXIS_ARRAY), size);
+				yChart.invalidate();
+				txtvAccDataY.setText("Y: " + yChart.getLastElement());
+				txtvAccDataY.invalidate();
+
+				// Update chart Z axis data and text
+				zChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.Z_AXIS_ARRAY), size);
+				zChart.invalidate();
+				txtvAccDataZ.setText("Z: " + zChart.getLastElement());
+				txtvAccDataZ.invalidate();
+				
+				Log.w("x: ", xChart.getLastElement() + "");
+				Log.w("y: ", yChart.getLastElement() + "");
+				Log.w("z: ", zChart.getLastElement() + "");
+				Log.w("size: ", (size - 1) + " size");
+			}
+		};
 	}
 
 	private void sessionStart() {
 
 		// Get the current time and set the session to active
-		mCurrent.setStartDateAndTimestamp(Calendar.getInstance(TimeZone
-				.getDefault()));
+		mCurrent.setStartDateAndTimestamp(Calendar.getInstance(TimeZone.getDefault()));
 		mCurrent.setToActive(true);
+
 		mMed.setSessionPaused(false);
 
 		// Update database
@@ -271,22 +254,16 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				.toString());
 
 		// Start the chronometer
-		Log.w("timestamp", "Timestamp: " + mCurrent.getStartTimestamp());
-		Log.w("elapsedRealTime",
-				"ElapsedRealTime: " + SystemClock.elapsedRealtime());
 		chroDuration.setBase(SystemClock.elapsedRealtime());
 		chroDuration.start();
 
 		// Change the icon of play-pause button
 		ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
-
-		xChart.setChartData(mMed.getX_array(), mMed.getSize());
-		yChart.setChartData(mMed.getY_array(), mMed.getSize());
-		zChart.setChartData(mMed.getZ_array(), mMed.getSize());
-
+		
 		// Start service
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
+		serviceIntent.putExtra(FallDetectorService.IS_PLAY, true);
 		startService(serviceIntent);
 	}
 
@@ -310,7 +287,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		// Stop service after button press
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
-		stopService(serviceIntent);
+		serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
+		startService(serviceIntent);
 	}
 
 	private void sessionResume() {
@@ -326,6 +304,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
+		serviceIntent.putExtra(FallDetectorService.IS_PLAY, true);
 		startService(serviceIntent);
 
 	}
@@ -346,29 +325,37 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		values.put(DatabaseTable.COLUMN_SS_IS_ACTIVE,
 				mCurrent.isActiveAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);
+		
+		// Clear tmp acc data from database
+		dm.deleteTempAccDataTable();
 
 		// Stop service after button press
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
+		serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
 		stopService(serviceIntent);
-
 		finish();
-
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		LocalBroadcastManager.getInstance(this).registerReceiver(
-				(broadcastDataReceiver),
-				new IntentFilter(FallDetectorService.XYZ_DATA));
+		
+		LocalBroadcastManager
+			.getInstance(this).registerReceiver((broadcastDataReceiver),
+			new IntentFilter(FallDetectorService.XYZ_ARRAY));
+		
+		Intent serviceIntent = new Intent(getApplicationContext(),
+				FallDetectorService.class);
+		startService(serviceIntent); 
 	}
 
 	@Override
 	protected void onResume() {
-		xChart.setChartData(mMed.getX_array(), mMed.getSize());
-		yChart.setChartData(mMed.getY_array(), mMed.getSize());
-		zChart.setChartData(mMed.getZ_array(), mMed.getSize());
+		Intent serviceIntent = new Intent(getApplicationContext(),
+				FallDetectorService.class);
+		serviceIntent.putExtra(FallDetectorService.GET_ARRAY, true);
+		startService(serviceIntent); 
 		super.onResume();
 	};
 
@@ -449,10 +436,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			chroDuration.start();
 		else
 			chroDuration.stop();
-
-		xChart.setChartData(mMed.getX_array(), mMed.getSize());
-		yChart.setChartData(mMed.getY_array(), mMed.getSize());
-		zChart.setChartData(mMed.getZ_array(), mMed.getSize());
 	};
 
 	@Override

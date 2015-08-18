@@ -34,7 +34,7 @@ public class SimpleFallAlgorithm {
 	
 	public void setElement(AccelData element){
 		accDataBuffer[accDataSize] = element;
-		if((accDataSize + 1) >= 1000){
+		if((accDataSize + 1) >= ACC_DATA_SIZE){
 			System.arraycopy(accDataBuffer, 0, accDataAnalyzer, accDataAnalyzerBlockIndex * ACC_DATA_SIZE, accDataSize);
 			accDataSize = 0;
 			accDataAnalyzerBlockIndex = (accDataAnalyzerBlockIndex + 1) % NUM_BLOCK;

@@ -274,27 +274,6 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 	}// [m] collapse
 
-	public void resetArray(int pos) {
-		int[] tmp = null;
-		boolean isVoid = mExpCol.length > 0;
-
-		if (isVoid) {
-			tmp = copyArray(mExpCol);
-
-		}
-
-		mExpCol = new int[mArray.size()]; 
-	}
-
-	private int[] copyArray(int[] ar) {
-		int[] tmp = new int[ar.length];
-		for (int i = 0; i < ar.length; i++) {
-			tmp[i] = ar[i];
-		}
-
-		return tmp;
-	}
-
 	static class ViewHolder {
 		private ImageView thumbnail;
 		private TextView sessionName;
@@ -310,4 +289,43 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		private TextView falls;
 	}// {c} ViewHolder
 
+	public void resetArray(int pos) {
+		int[] tmp = null;
+		boolean isVoid = mExpCol.length > 0;
+
+		if (isVoid) {
+			tmp = copyArray(mExpCol);
+
+		}
+
+		mExpCol = new int[mArray.size()];
+
+		if (isVoid) {
+
+			for (int i = 0; i < pos; i++) {
+				mExpCol[i] = tmp[i];
+			}
+
+			int j = pos;
+
+			mExpCol[j] = COLLAPSED;
+
+			for (int i = pos + 1; i < mExpCol.length; i++) {
+
+				if (j < tmp.length) {
+					mExpCol[i] = tmp[j];
+				}
+				j++;
+			}
+		}
+	}
+
+	private int[] copyArray(int[] ar) {
+		int[] tmp = new int[ar.length];
+		for (int i = 0; i < ar.length; i++) {
+			tmp[i] = ar[i];
+		}
+
+		return tmp;
+	}
 }// {c} ListSessionAdapter

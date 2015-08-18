@@ -306,7 +306,7 @@ public class Session {
 	 */
 	public String getStartTimeToString(){
 		if(startTimeStamp > 0){
-		String tmp = startDate.get(Calendar.HOUR)
+		String tmp = startDate.get(Calendar.HOUR_OF_DAY)
 				+ ":" + startDate.get(Calendar.MINUTE)
 				+ ":" + startDate.get(Calendar.SECOND);
 		return tmp;

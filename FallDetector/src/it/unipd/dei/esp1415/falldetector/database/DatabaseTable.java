@@ -11,6 +11,7 @@ public class DatabaseTable {
 	public static final String FALL_EVENTS_TABLE = "Fall_Events";
 	public static final String ACCEL_TABLE = "Accel_Data";
 	public static final String MAIL_TABLE = "Mail_Address";
+	public static final String TMP_ACC_TABLE = "Temp_Acc_Data";
 			
 	//Common names of columns
 	public static final String COLUMN_PK_ID = "_id";
@@ -47,11 +48,17 @@ public class DatabaseTable {
 	public static final String COLUMN_AC_X = "x"; //data on x
 	public static final String COLUMN_AC_Y = "y"; //data on y
 	public static final String COLUMN_AC_Z = "z"; //data on z
-	public static final String COLUMN_AC_FK_FALLS = "fall"; //integer not null that define the foreign key 
+	public static final String COLUMN_AC_FK_FALLS = "fall"; //integer not null that define the foreign key
 	
 	public static final String[] ALL_COLUMNS_ACCEL = {COLUMN_PK_ID, COLUMN_AC_TS,
 													  COLUMN_AC_X, COLUMN_AC_Y,
 													  COLUMN_AC_Z, COLUMN_AC_FK_FALLS};
+	
+	//Accel temporary data
+	public static final String COLUMN_TMP_AC_TS = "accel_timestamp"; //save as integer timestamp
+	public static final String COLUMN_TMP_AC_X = "x"; //data on x
+	public static final String COLUMN_TMP_AC_Y = "y"; //data on y
+	public static final String COLUMN_TMP_AC_Z = "z"; //data on z
 	
 	//Mail columns
 	public static final String COLUMN_ML_NAME = "name"; //save as Text
@@ -101,6 +108,14 @@ public class DatabaseTable {
 			+ COLUMN_ML_SURNAME + " TEXT, "
 			+ COLUMN_ML_ADDRESS + " TEXT );" ;
 	
+	//Temporary accelerometer data
+	public static final String CREATE_TMP_ACC = "CREATE TABLE " + TMP_ACC_TABLE + " ("
+			+ COLUMN_PK_ID + " INTEGER PRIMARY KEY, "
+			+ COLUMN_TMP_AC_TS + " INTEGER, "
+			+ COLUMN_TMP_AC_X + " REAL, "
+			+ COLUMN_TMP_AC_Y + " REAL, "
+			+ COLUMN_TMP_AC_Z + " REAL); ";
+	
 	private static final String ALTER_TABLE_FALL_EVENTS_1 = ""
 			+ "ALTER TABLE " + FALL_EVENTS_TABLE + " ADD COLUMN " + COLUMN_FE_LATITUDE + " REAL;";
 
@@ -126,6 +141,7 @@ public class DatabaseTable {
 		db.execSQL(CREATE_FALL_EVENTS);
 		db.execSQL(CREATE_MAIL);
 		db.execSQL(CREATE_ACCEL_DATA);
+		db.execSQL(CREATE_TMP_ACC);
 	}//[m] onCreate()
     
 	/**
@@ -149,6 +165,8 @@ public class DatabaseTable {
 		case 3:
 			db.execSQL(ALTER_TABLE_FALL_EVENTS_1);
 			db.execSQL(ALTER_TABLE_FALL_EVENTS_2);
+		case 4:
+			db.execSQL(CREATE_TMP_ACC);
 		default:
 			break;
 		}

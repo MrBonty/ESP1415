@@ -131,6 +131,25 @@ public class DatabaseManager {
 	
 	/**
 	 * [m]
+	 * Method to insert a temporary accelerometer Data into the database
+	 * 
+	 * @param data to insert in the database
+	 * @return the id of the temporary accelerometer data, or ON_OPEN_ERROR if an error is occurred on open the database,
+	 * or INSERT_ERROR if an error is occurred during the insertion.
+	 */
+	public long insertATempAccelData(AccelData data){
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_PK_ID, data.getId());
+		values.put(DatabaseTable.COLUMN_TMP_AC_TS, data.getTimestamp());
+		values.put(DatabaseTable.COLUMN_TMP_AC_X, data.getX());
+		values.put(DatabaseTable.COLUMN_TMP_AC_Y, data.getY());
+		values.put(DatabaseTable.COLUMN_TMP_AC_Z, data.getZ());
+		
+		return insertInDatabase(DatabaseTable.TMP_ACC_TABLE, values);
+	}//[m] insertAnTempAccelData()
+	
+	/**
+	 * [m]
 	 * Method to upgrade a specific part of the Session
 	 * 
 	 * @param sessionId the id of the session to upgrade
@@ -292,6 +311,33 @@ public class DatabaseManager {
 		
 		return upgradeRow(DatabaseTable.ACCEL_TABLE, values, whereClause, null);
 	}//[m] upgradeAnAccelData()
+	
+	/**
+	 * [m]
+	 * Method to upgrade all Accelerometer Data values (not ID)
+	 * 
+	 * @param data the data to upgrade
+	 * @return the number of rows affected, or ON_OPEN_ERROR if an error occurred on open the database, 
+	 * or ID_NOT_SET_ERROR if the id of the fall in not set.
+	 */
+	public int upgradeATempAccelData(AccelData data){
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_TMP_AC_TS, data.getTimestamp());
+		values.put(DatabaseTable.COLUMN_TMP_AC_X, data.getX());
+		values.put(DatabaseTable.COLUMN_TMP_AC_Y, data.getY());
+		values.put(DatabaseTable.COLUMN_TMP_AC_Z, data.getZ());
+
+		String whereClause = "";
+		long id = data.getId();
+		if(id > 0){
+			whereClause = DatabaseTable.COLUMN_PK_ID + " = " + id;
+		}else{
+			return ID_NOT_SET_ERROR;
+		}//if... else...
+		
+		return upgradeRow(DatabaseTable.TMP_ACC_TABLE, values, whereClause, null);
+	}//[m] upgradeAnAccelData()
+	
 	
 	/**
 	 * [m]
@@ -578,6 +624,38 @@ public class DatabaseManager {
     	return tmp;
     }//[m] getMailAddressAsCursor()
 	
+	
+	//TODO aggiungere info
+	public Cursor getTempAccelDataAsCursor(String orderBy){ 
+		
+    	Cursor tmp = queryDb(DatabaseTable.TMP_ACC_TABLE, null, null, orderBy);
+    	return tmp;
+    }
+	
+	//TODO aggiungere info
+	public ArrayList<AccelData> getTempAccelDataAsArray(String orderBy){
+		ArrayList<AccelData> tmp = new ArrayList<AccelData>();
+		Cursor c = getTempAccelDataAsCursor(orderBy);
+    	if(c == null){
+			return null;
+		}
+    	
+		if(c.moveToFirst()){
+			do{
+				AccelData toAdd = new AccelData();
+				toAdd.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+				toAdd.setTimestamp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_TMP_AC_TS)));
+				toAdd.setX(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_TMP_AC_X)));
+				toAdd.setY(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_TMP_AC_Y)));
+				toAdd.setZ(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_TMP_AC_Z)));
+				tmp.add(toAdd);
+			}while(c.moveToNext());
+			
+		}
+		close();
+		return tmp;
+	}
+	
 	/**
 	 * [m]
 	 * Complex method to query the given table, returning a Cursor over the result set. After read call close()
@@ -732,6 +810,15 @@ public class DatabaseManager {
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + dataId;
 		return deleteFromDb(DatabaseTable.ACCEL_TABLE, whereClause);
 	}// [m] deleteAnAccelData()
+	
+	
+	/**
+	 * delete all data from temporary data from table
+	 * @return the number of rows deleted
+	 */
+	public int deleteTempAccDataTable(){
+		return deleteFromDb(DatabaseTable.TMP_ACC_TABLE, null);
+	}
 	
 	/**
 	 * [m]

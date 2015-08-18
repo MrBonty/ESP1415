@@ -9,6 +9,8 @@ public class AccelData {
 	private double z;
 	private long fallId;
 	
+	public AccelData(){}
+	
 	public AccelData(long timeStamp, long fallId){
 		this.timestamp = timeStamp;
 		this.fallId = fallId;

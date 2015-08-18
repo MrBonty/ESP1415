@@ -75,40 +75,6 @@ public class MainActivity extends ActionBarActivity {
 			
 		DatabaseManager db = new DatabaseManager(mContext);
 		mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
-
-			/*
-			
-			//TODO REMOVE ARRAY FOR TEST
-			ArrayList<Session> tmp = new ArrayList<Session>();
-			tmp.add(new Session("a"));
-			tmp.add(new Session("b"));
-			tmp.add(new Session("c"));
-			tmp.add(new Session("d"));
-			tmp.add(new Session("e"));
-			tmp.add(new Session("f"));
-			tmp.add(new Session("g"));
-			tmp.add(new Session("h"));
-			tmp.add(new Session("i"));
-			tmp.add(new Session("l"));
-			tmp.add(new Session("m"));
-			tmp.add(new Session("n"));
-			tmp.add(new Session("o"));
-			tmp.add(new Session("p"));
-			tmp.add(new Session("q"));
-			
-			//tmp.get(0).setToActive(true);
-			
-			for(int i = tmp.size()-1; i >= 0; i--){
-				
-				tmp.get(i).setColorThumbnail(ColorUtil.imageColorSelector());
-				
-			}
-
-			mMed.setDataSession(tmp);
-			//TODO END REMOVE ARRAY FOR TEST
-			
-			*/
-//		}
 		
 		FragmentManager manager = getSupportFragmentManager();
 		
@@ -149,7 +115,8 @@ public class MainActivity extends ActionBarActivity {
 		}
 		
 //		DatabaseManager db = new DatabaseManager(mContext);
-//		mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
+//		mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));		
+		ListSessionFragment.mAdapter.notifyDataSetChanged();
 		
 	}//[m] onResume()
 

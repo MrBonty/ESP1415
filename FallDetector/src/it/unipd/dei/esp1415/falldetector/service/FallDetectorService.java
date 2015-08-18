@@ -1,7 +1,12 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
+import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
+import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
-import it.unipd.dei.esp1415.falldetector.utility.Mediator;
+import it.unipd.dei.esp1415.falldetector.utility.SimpleFallAlgorithm;
+
+import java.util.ArrayList;
+
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -19,20 +24,28 @@ import android.util.Log;
 
 public class FallDetectorService extends Service {
 	
-	public static final String X_AXIS_NEW_DATA = "X_AXIS_NEW_DATA";
-	public static final String Y_AXIS_NEW_DATA = "Y_AXIS_NEW_DATA";
-	public static final String Z_AXIS_NEW_DATA = "Z_AXIS_NEW_DATA";
-	public static final String XYZ_DATA = "XYZ_DATA";
-
+	public static final String X_AXIS_ARRAY = "X_AXIS_ARRAY";
+	public static final String Y_AXIS_ARRAY = "Y_AXIS_ARRAY";
+	public static final String Z_AXIS_ARRAY = "Z_AXIS_ARRAY";
+	public static final String ARRAY_SIZE = "ARRAY_SIZE";
+	public static final String XYZ_ARRAY = "XYZ_DATA";
+	
+	public static final String IS_PLAY = "IS_PLAY";
+	public static final String IS_PAUSE = "IS_PAUSE";
+	public static final String GET_ARRAY = "GET_ARRAY";
+	
 	public static final int MIN_SAMPLE_RATE = 60;
 	
-	private AccelData[] acc_data;
-	private int count;
+	private float[] accDataX;
+	private float[] accDataY;
+	private float[] accDataZ;
+	
+	private AccelData newData;
+	
+	private int accDataIndex;
 	
 	private long lastSampleTime;
 	private long elapsedTime;
-	
-	private Mediator mMed;
 	
 	private SensorManager sensorManager;
 	
@@ -44,47 +57,111 @@ public class FallDetectorService extends Service {
 	
 	private double latitude, longitude;
 
+	private boolean isPlaying;
+	
+	private DatabaseManager dm;
+	
 	public void onCreate() {
 		super.onCreate();
 		
-//		acc_data = new AccelData[1000];
-//		count = 0;
+		dm = new DatabaseManager(this.getApplicationContext());
+		
+		ArrayList<AccelData> tmpAccData 
+			= dm.getTempAccelDataAsArray(DatabaseTable.COLUMN_PK_ID + " " + DatabaseManager.ASC);
+		
+		accDataX = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		accDataY = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		accDataZ = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		
+		accDataIndex = 0;
+		
+		for(AccelData accData : tmpAccData){
+			
+			accDataX[accDataIndex] = (float) accData.getX();
+			accDataY[accDataIndex] = (float) accData.getY();
+			accDataZ[accDataIndex] = (float) accData.getZ();
+			accDataIndex++;
+		}
+		
+		newData = new AccelData();
+		
 		lastSampleTime = 0l;
 		
-		// Initialize the sensor manager
-		sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
-		
-		// Initialize the location manager
-		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		
-		// Get default accelerometer sensor
-		Sensor accelerometer = sensorManager
-				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
-		sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-		
-		// for GPS, change the first parameter to GPS_PROVIDER
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+		isPlaying = false;
 		
 		broadcaster = LocalBroadcastManager.getInstance(this);
-		broadcastDataIntent = new Intent(FallDetectorService.XYZ_DATA);
-		
-		mMed = new Mediator();
+		broadcastDataIntent = new Intent(FallDetectorService.XYZ_ARRAY);
+
+		Log.i("onCreate: ", "onCreate called");
 	}
 	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		return Service.START_STICKY;
+		if(intent != null){
+			if(intent.getBooleanExtra(FallDetectorService.GET_ARRAY, false)){
+				
+				broadcastDataIntent.putExtra(FallDetectorService.ARRAY_SIZE, accDataIndex);
+				broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_ARRAY, accDataX);
+				broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_ARRAY, accDataY);
+				broadcastDataIntent.putExtra(FallDetectorService.Z_AXIS_ARRAY, accDataZ);
+				
+				broadcaster.sendBroadcast(broadcastDataIntent);
+			}
+			
+			if(intent.getBooleanExtra(FallDetectorService.IS_PLAY, false)){
+				
+				isPlaying = true;
+				
+				// Initialize the sensor manager
+				sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
+				
+				// Initialize the location manager
+				locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+				
+				// Get default accelerometer sensor
+				Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		
+				sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+				
+				// for GPS, change the first parameter to GPS_PROVIDER
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+			}
+			
+			if(intent.getBooleanExtra(FallDetectorService.IS_PAUSE, false)){
+				isPlaying = false;
+				
+				// Remove listener on sensorManager
+				sensorManager.unregisterListener(sensorEventListener);
+				// Remove the listener on locationManager
+				locationManager.removeUpdates(locationListener);
+			}
+		}//if(intent != null)
+		
+		else{
+			if(isPlaying){
+				// Initialize the sensor manager
+				sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
+				
+				// Initialize the location manager
+				locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+				
+				// Get default accelerometer sensor
+				Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+		
+				sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+				
+				// for GPS, change the first parameter to GPS_PROVIDER
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+			}
+		}
+
+		Log.i("onStartCommand: ", "onStartCommand called");
+		return Service.START_REDELIVER_INTENT;
 	}
 	
 	@Override
 	public void onDestroy() {
-		
-		// Remove listener on sensorManager
-		sensorManager.unregisterListener(sensorEventListener);
-		
-		// Remove the listener on locationManager
-		locationManager.removeUpdates(locationListener);
+		Log.e("destroy", "distrutto");
 		super.onDestroy();
 	}
 	
@@ -107,22 +184,13 @@ public class FallDetectorService extends Service {
 		}
 
 		@Override
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void onStatusChanged(String provider, int status, Bundle extras) {}
 
 		@Override
-		public void onProviderEnabled(String provider) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void onProviderEnabled(String provider) {}
 
 		@Override
-		public void onProviderDisabled(String provider) {
-			// TODO Auto-generated method stub
-			
-		}
+		public void onProviderDisabled(String provider) {}
 	};
 	
 	// Accelerometer listener
@@ -140,41 +208,58 @@ public class FallDetectorService extends Service {
 				elapsedTime = System.currentTimeMillis() - lastSampleTime;
 				
 				if(elapsedTime > MIN_SAMPLE_RATE){
-					Log.i("event.values[0]: ", event.values[0] + "");
-					Log.i("event.values[1]: ", event.values[1] + "");
-					Log.i("event.values[2]: ", event.values[2] + "");
-					Log.i("size: ", mMed.getSize() + "");
 					
-					
-		        	mMed.setX_data(event.values[0]);
-					mMed.setY_data(event.values[1]);
-					mMed.setZ_data(event.values[2]);
-					mMed.incrementSize();
-					
-					Log.i("module", "module: " + Math.sqrt(Math.pow(event.values[0], 2) 
-						  	+ Math.pow(event.values[1], 2) 
-						  	+ Math.pow(event.values[2], 2)
-						  	));
-					
-//					acc_data[count].setX((double) event.values[0]);
-//					acc_data[count].setY((double) event.values[1]);
-//					acc_data[count].setZ((double) event.values[2]);
-//					count++;
-//					
-//					if(count >= 1000){
-//						count = 0;
-//						
-//					}
-				    
-					
-					broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_NEW_DATA, event.values[0]);
-					broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_NEW_DATA, event.values[1]);
-					broadcastDataIntent.putExtra(FallDetectorService.Z_AXIS_NEW_DATA, event.values[2]);
-					broadcaster.sendBroadcast(broadcastDataIntent);
+					if(isPlaying){
+						
+						if(accDataIndex >= SimpleFallAlgorithm.ACC_DATA_SIZE){
+							if(accDataIndex >= (SimpleFallAlgorithm.ACC_DATA_SIZE * 2))
+								accDataIndex = SimpleFallAlgorithm.ACC_DATA_SIZE;
+							newData.setId(accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE);
+							newData.setTimestamp(event.timestamp);
+							newData.setX((double) (accDataX[accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE]
+									= event.values[0]));
+							newData.setY((double) (accDataY[accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE]
+									= event.values[1]));
+							newData.setZ((double) (accDataZ[accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE]
+									= event.values[2]));
+							dm.upgradeATempAccelData(newData);
+							broadcastDataIntent
+								.putExtra(FallDetectorService.ARRAY_SIZE, 
+										(accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE));
+							
+						}else{
+							newData.setId(accDataIndex);
+							newData.setTimestamp(event.timestamp);
+							newData.setX((double) (accDataX[accDataIndex] = event.values[0]));
+							newData.setY((double) (accDataY[accDataIndex] = event.values[1]));
+							newData.setZ((double) (accDataZ[accDataIndex] = event.values[2]));
+							dm.insertATempAccelData(newData);
+							broadcastDataIntent.putExtra(FallDetectorService.ARRAY_SIZE, (accDataIndex));
+						}
+						
+						Log.i("sensorChanged", "X: " + newData.getX());
+						Log.i("sensorChanged", "Y: " + newData.getY());
+						Log.i("sensorChanged", "Z: " + newData.getZ());
+						Log.i("size: ", accDataIndex + "");
+						
+						broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_ARRAY, accDataX);
+						broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_ARRAY, accDataY);
+						broadcastDataIntent.putExtra(FallDetectorService.Z_AXIS_ARRAY, accDataZ);
+						broadcaster.sendBroadcast(broadcastDataIntent);
+						
+						accDataIndex++;
+					}
 					
 					lastSampleTime = System.currentTimeMillis();
 				}
 			}
 		}
 	};
+	
+	private class Algorithm{
+		public static final double FALL_UPPER_BOUND = 18.5;
+		public static final double FALL_LOWER_BOUND = 2.5;
+		
+//		public fallDetector(int from, int to, AccelData)
+	}
 }
