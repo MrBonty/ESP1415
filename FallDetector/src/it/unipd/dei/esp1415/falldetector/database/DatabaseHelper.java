@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class DatabaseHelper  extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "Fall_app.db";
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 	
 	/**[c]
 	 * Constructor for the class

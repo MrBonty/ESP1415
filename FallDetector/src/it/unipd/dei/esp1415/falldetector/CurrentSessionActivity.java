@@ -8,6 +8,7 @@ import it.unipd.dei.esp1415.falldetector.utility.ChartView;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
+import it.unipd.dei.esp1415.falldetector.utility.SimpleFallAlgorithm;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,13 +63,16 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	private ChartView xChart;
 	private ChartView yChart;
 	private ChartView zChart;
-
+	private float[] xTmpArray;
+	private float[] yTmpArray;
+	private float[] zTmpArray;
+	
 	// Text view for displaying acceleromter data
 	private TextView txtvAccDataX;
 	private TextView txtvAccDataY;
 	private TextView txtvAccDataZ;
 
-	private int size;
+	private int index;
 	
 	private ImageView thmb;
 
@@ -82,7 +86,11 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		ibtnPlayPause = null;
 		chroDuration = null;
 		
-		size = 0;
+		index = 0;
+		
+		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
 	}
 
 	@Override
@@ -119,7 +127,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		final ImageButton ibtnEnd = (ImageButton) findViewById(R.id.end_button);
 		
 		mMed = new Mediator();
-		dm = new DatabaseManager(mMed.getContext());
+		dm = new DatabaseManager(getApplicationContext());
 
 		// Fetch session from database
 		mCurrent = dm.getLastSession(null, DatabaseTable.COLUMN_SS_START_DATE
@@ -130,7 +138,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		// Set up thumbnail
 		if (mCurrent.getBitmap() == null) {
 			Bitmap image = null;
-			image = BitmapFactory.decodeResource(mMed.getContext()
+			image = BitmapFactory.decodeResource(getApplicationContext()
 					.getResources(), R.drawable.thumbnail);
 			image = ColorUtil.recolorIconBicolor(mCurrent.getColorThumbnail(),
 					image);
@@ -149,18 +157,18 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			txtvStartTime.setText(mCurrent.getStartDateCalendar().getTime()
 					.toString());
 			// Set up chronometer
-			if (mMed.isSessionPaused()){
+			if (mCurrent.isPause()){
 				chroDuration.setBase(SystemClock.elapsedRealtime()
 						- mCurrent.getDuration());
 				ibtnPlayPause.setImageResource(R.drawable.play_button_default);
 			}
 			else {
-				chroDuration.setBase(mMed.getChronoBaseTime()
+				chroDuration.setBase(mCurrent.getChrono_tmp()
 						- mCurrent.getDuration());
 				ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
 			}
 
-			if (mCurrent.isActive() && !mMed.isSessionPaused())
+			if (mCurrent.isActive() && !mCurrent.isPause())
 				chroDuration.start();
 		}// timestamp
 
@@ -181,7 +189,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				if (mCurrent.getStartTimestamp() > 0) {
 					// (Paused) The session has already started and it's paused
-					if (mMed.isSessionPaused())
+					if (mCurrent.isPause())
 						sessionResume();
 					// (Running) the session has already started and is not paused
 					else
@@ -206,30 +214,64 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 					
-				size = intent.getIntExtra(FallDetectorService.ARRAY_SIZE, 0);
+				index = intent.getIntExtra(FallDetectorService.ARRAY_SIZE, 0);
+				xTmpArray = intent.getFloatArrayExtra(FallDetectorService.X_AXIS_ARRAY);
+				yTmpArray = intent.getFloatArrayExtra(FallDetectorService.Y_AXIS_ARRAY);
+				zTmpArray = intent.getFloatArrayExtra(FallDetectorService.Z_AXIS_ARRAY);
+				
+				if(index >= SimpleFallAlgorithm.ACC_DATA_SIZE){
+					index = index % SimpleFallAlgorithm.ACC_DATA_SIZE;
+					
+					float[] tmp = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+					System.arraycopy(xTmpArray, (index + 1), tmp, 0, (SimpleFallAlgorithm.ACC_DATA_SIZE - index - 1));
+					System.arraycopy(xTmpArray, 0, tmp, SimpleFallAlgorithm.ACC_DATA_SIZE - index, index);
+					// Update chart X axis data and text
+					xChart.setChartData(tmp, SimpleFallAlgorithm.ACC_DATA_SIZE);
+					xChart.invalidate();
+					txtvAccDataX.setText("X: " + xChart.getLastElement());
+					txtvAccDataX.invalidate();
+					
+					System.arraycopy(yTmpArray, (index + 1), tmp, 0, (SimpleFallAlgorithm.ACC_DATA_SIZE - index - 1));
+					System.arraycopy(yTmpArray, 0, tmp, SimpleFallAlgorithm.ACC_DATA_SIZE - index, index);
+					// Update chart Y axis data and text
+					yChart.setChartData(tmp, SimpleFallAlgorithm.ACC_DATA_SIZE);
+					yChart.invalidate();
+					txtvAccDataY.setText("Y: " + yChart.getLastElement());
+					txtvAccDataY.invalidate();
+					
+					System.arraycopy(zTmpArray, (index + 1), tmp, 0, (SimpleFallAlgorithm.ACC_DATA_SIZE - index - 1));
+					System.arraycopy(zTmpArray, 0, tmp, SimpleFallAlgorithm.ACC_DATA_SIZE - index, index);
+					// Update chart Z axis data and text
+					zChart.setChartData(tmp, SimpleFallAlgorithm.ACC_DATA_SIZE);
+					zChart.invalidate();
+					txtvAccDataZ.setText("Z: " + zChart.getLastElement());
+					txtvAccDataZ.invalidate();
+				}
+					
+				else{
+					// Update chart X axis data and text
+					xChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.X_AXIS_ARRAY), index);
+					xChart.invalidate();
+					txtvAccDataX.setText("X: " + xChart.getLastElement());
+					txtvAccDataX.invalidate();
 
-				// Update chart X axis data and text
-				xChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.X_AXIS_ARRAY), size);
-				xChart.invalidate();
-				txtvAccDataX.setText("X: " + xChart.getLastElement());
-				txtvAccDataX.invalidate();
+					// Update chart Y axis data and text
+					yChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.Y_AXIS_ARRAY), index);
+					yChart.invalidate();
+					txtvAccDataY.setText("Y: " + yChart.getLastElement());
+					txtvAccDataY.invalidate();
 
-				// Update chart Y axis data and text
-				yChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.Y_AXIS_ARRAY), size);
-				yChart.invalidate();
-				txtvAccDataY.setText("Y: " + yChart.getLastElement());
-				txtvAccDataY.invalidate();
-
-				// Update chart Z axis data and text
-				zChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.Z_AXIS_ARRAY), size);
-				zChart.invalidate();
-				txtvAccDataZ.setText("Z: " + zChart.getLastElement());
-				txtvAccDataZ.invalidate();
+					// Update chart Z axis data and text
+					zChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.Z_AXIS_ARRAY), index);
+					zChart.invalidate();
+					txtvAccDataZ.setText("Z: " + zChart.getLastElement());
+					txtvAccDataZ.invalidate();
+				}
 				
 				Log.w("x: ", xChart.getLastElement() + "");
 				Log.w("y: ", yChart.getLastElement() + "");
 				Log.w("z: ", zChart.getLastElement() + "");
-				Log.w("size: ", (size - 1) + " size");
+				Log.w("index: ", index + " index");
 			}
 		};
 	}
@@ -245,15 +287,16 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			ListSessionFragment.mArray.get(0).setToActive(true);
 			
 		}
-
-		mMed.setSessionPaused(false);
-
+		mCurrent.setPause(false);
+		
 		// Update database
 		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_SS_START_DATE,
 				mCurrent.getStartTimestamp());
 		values.put(DatabaseTable.COLUMN_SS_IS_ACTIVE,
 				mCurrent.isActiveAsInteger());
+		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE,
+				mCurrent.isPauseAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);
 
 		// Set the current time to the text view field
@@ -286,12 +329,13 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			
 		}
 
+		mCurrent.setPause(true);
+		
 		// Update duration in db
 		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_SS_DURATION, mCurrent.getDuration());
+		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, mCurrent.isPauseAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);
-
-		mMed.setSessionPaused(true);
 
 		// Change the icon of play-pause button to play
 		ibtnPlayPause.setImageResource(R.drawable.play_button_default);
@@ -309,7 +353,11 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				- mCurrent.getDuration());
 		chroDuration.start();
 
-		mMed.setSessionPaused(false);
+		mCurrent.setPause(false);
+		
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, mCurrent.isPauseAsInteger());
+		dm.upgradeASession(mCurrent.getId(), values);
 
 		// Change the icon of play-pause button to pause
 		ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
@@ -325,7 +373,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		ContentValues values = new ContentValues();
 
 		// Save the passed time and stop the chronometer
-		if (!mMed.isSessionPaused()) {
+		if (!mCurrent.isPause()) {
 			mCurrent.setDuration(SystemClock.elapsedRealtime()
 					- chroDuration.getBase());
 			chroDuration.stop();
@@ -336,7 +384,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			}
 
 			
-			mMed.setChronoBaseTime(SystemClock.elapsedRealtime());
+			mCurrent.setChrono_tmp(SystemClock.elapsedRealtime());
+			values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, mCurrent.getChrono_tmp());
 			values.put(DatabaseTable.COLUMN_SS_DURATION, mCurrent.getDuration());
 		}
 
@@ -349,14 +398,16 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				mCurrent.isActiveAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);
 		
-		// Clear tmp acc data from database
-		dm.deleteTempAccDataTable();
-
 		// Stop service after button press
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
 		serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
+		startService(serviceIntent);
+		
 		stopService(serviceIntent);
+		
+		// Clear tmp acc data from database
+		dm.deleteTempAccDataTable();
 		finish();
 	}
 
@@ -385,14 +436,16 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-
-		if (mCurrent.isActive() && !mMed.isSessionPaused()) {
+		ContentValues values = new ContentValues();
+		
+		if (mCurrent.isActive() && !mCurrent.isPause()) {
 			mCurrent.setDuration(SystemClock.elapsedRealtime()
 					- chroDuration.getBase());
-			mMed.setChronoBaseTime(SystemClock.elapsedRealtime());
+			
+			mCurrent.setChrono_tmp(SystemClock.elapsedRealtime());
+			values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, mCurrent.getChrono_tmp());
 		}
 
-		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_SS_DURATION, mCurrent.getDuration());
 		dm.upgradeASession(mCurrent.getId(), values);
 	};
@@ -419,7 +472,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 		// Saves play-pause button status and chronometer
 		if (mCurrent.getStartTimestamp() > 0) {
-			if (mMed.isSessionPaused()) {
+			if (mCurrent.isPause()) {
 				savedInstanceState.putLong("duration", mCurrent.getDuration());
 				savedInstanceState.putInt("ibtnPlayPause",
 						R.drawable.play_button_default);
@@ -455,7 +508,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		chroDuration.setBase(SystemClock.elapsedRealtime()
 				- mCurrent.getDuration());
 
-		if ((mCurrent.getStartTimestamp() > 0) && !mMed.isSessionPaused())
+		if ((mCurrent.getStartTimestamp() > 0) && !mCurrent.isPause())
 			chroDuration.start();
 		else
 			chroDuration.stop();

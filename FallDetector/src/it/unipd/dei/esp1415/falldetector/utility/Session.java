@@ -17,6 +17,8 @@ public class Session {
 	private long id;
 	private int falls = 0;
 	private boolean isActive;
+	private boolean isPause;
+	private long chrono_tmp;
 	private String xmlFile;
 	private ArrayList<Fall> fallsEvent; // TODO describe fall event with a
 											// class
@@ -245,6 +247,40 @@ public class Session {
 	}// [m] setToActive()
 	
 	/**
+	 * @return the isPause
+	 */
+	public boolean isPause() {
+		return isPause;
+	}
+	
+	/**
+	 * @return the isPause
+	 */
+	public int isPauseAsInteger() {
+		if(isPause)
+			return 1;
+		return 0;
+	}
+
+	/**
+	 * @param isPause the isPause to set
+	 */
+	public void setPause(boolean isPause) {
+		this.isPause = isPause;
+	}
+	
+	/**
+	 * @param isPause the isPause to set
+	 */
+	public void setPause(int isPause) {
+		if(isPause == TRUE)
+			this.isPause = true;
+		else
+			this.isPause = false;
+	}
+
+	
+	/**
 	 * [m]
 	 * Method to get the name of the file xml
 	 * 
@@ -374,6 +410,20 @@ public class Session {
 	public Calendar getStartDateCalendar(){
 		startDate.setTimeInMillis(startTimeStamp);
 		return startDate;
+	}
+	
+	/**
+	 * @return the chrono_tmp
+	 */
+	public long getChrono_tmp() {
+		return chrono_tmp;
+	}
+
+	/**
+	 * @param chrono_tmp the chrono_tmp to set
+	 */
+	public void setChrono_tmp(long chrono_tmp) {
+		this.chrono_tmp = chrono_tmp;
 	}
 	
 	

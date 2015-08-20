@@ -24,11 +24,14 @@ public class DatabaseTable {
 	public static final String COLUMN_SS_FALLS_NUMBER = "falls_number"; //save as integer
 	public static final String COLUMN_SS_IS_ACTIVE = "is_active"; //save as integer default 0
 	public static final String COLUMN_SS_XML = "file"; //save as text that define the name of file 
+	public static final String COLUMN_SS_IS_PAUSE = "is_pause";
+	public static final String COLUMN_SS_CHRONO_TMP = "chrono_tmp";	// used for calculate duration
 	
 	public static final String[] ALL_COLUMNS_SESSION = {COLUMN_PK_ID, COLUMN_SS_NAME,
 													   COLUMN_SS_START_DATE, COLUMN_SS_DURATION, 
 													   COLUMN_SS_COLOR_THUMBNAIL, COLUMN_SS_FALLS_NUMBER,
-													   COLUMN_SS_IS_ACTIVE, COLUMN_SS_XML};
+													   COLUMN_SS_IS_ACTIVE, COLUMN_SS_XML,
+													   COLUMN_SS_IS_PAUSE, COLUMN_SS_CHRONO_TMP};
 	
 	//Fall Events columns
 	public static final String COLUMN_FE_DATE = "event_date"; //save as integer timestamp
@@ -77,7 +80,9 @@ public class DatabaseTable {
 			+ COLUMN_SS_COLOR_THUMBNAIL + " INTEGER, "
 			+ COLUMN_SS_FALLS_NUMBER + " INTEGER, "
 			+ COLUMN_SS_IS_ACTIVE + " INTEGER DEFAULT 0, " //set to default to 0 ->false
-			+ COLUMN_SS_XML + " TEXT" + ");";
+			+ COLUMN_SS_XML + " TEXT"
+			+ COLUMN_SS_IS_PAUSE + " INTEGER DEFAULT 0, "
+			+ COLUMN_SS_CHRONO_TMP + " INTEGER" + ");";
 
 	private static final String CREATE_FALL_EVENTS = "CREATE TABLE " + FALL_EVENTS_TABLE + " ("
 			+ COLUMN_PK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -121,6 +126,12 @@ public class DatabaseTable {
 
 	private static final String ALTER_TABLE_FALL_EVENTS_2 = ""
 			+ "ALTER TABLE " + FALL_EVENTS_TABLE + " ADD COLUMN " + COLUMN_FE_LONGITUDE + " REAL;";
+	
+	private static final String ALTER_TABLE_SESSION_1 = ""
+			+ "ALTER TABLE " + SESSION_TABLE + " ADD COLUMN " + COLUMN_SS_IS_PAUSE + " INTEGER DEFAULT 0;";
+	
+	private static final String ALTER_TABLE_SESSION_2 = ""
+			+ "ALTER TABLE " + SESSION_TABLE + " ADD COLUMN " + COLUMN_SS_CHRONO_TMP+ " INTEGER;";
 	
 	//Utility string for db
     public static final String SET_FK_ON = "PRAGMA foreign_keys = ON;";
@@ -167,6 +178,9 @@ public class DatabaseTable {
 			db.execSQL(ALTER_TABLE_FALL_EVENTS_2);
 		case 4:
 			db.execSQL(CREATE_TMP_ACC);
+		case 5:
+			db.execSQL(ALTER_TABLE_SESSION_1);
+			db.execSQL(ALTER_TABLE_SESSION_2);
 		default:
 			break;
 		}

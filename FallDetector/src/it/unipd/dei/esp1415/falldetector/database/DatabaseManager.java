@@ -69,6 +69,8 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL, session.getColorThumbnail());
 		values.put(DatabaseTable.COLUMN_SS_FALLS_NUMBER, session.getFallsNum());
 		values.put(DatabaseTable.COLUMN_SS_XML, session.getXmlFileName());
+		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, session.isPauseAsInteger());
+		values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, session.getChrono_tmp());
 				
 		return insertInDatabase(DatabaseTable.SESSION_TABLE, values); 
 	}//[m] insertASession()
@@ -178,6 +180,8 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL, session.getColorThumbnail());
 		values.put(DatabaseTable.COLUMN_SS_FALLS_NUMBER, session.getFallsNum());
 		values.put(DatabaseTable.COLUMN_SS_XML, session.getXmlFileName());
+		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, session.isPauseAsInteger());
+		values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, session.getChrono_tmp());
 		
 		String whereClause = "";
 		long id = session.getId();
@@ -407,6 +411,8 @@ public class DatabaseManager {
 			s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
 			s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
 			s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
+			s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
+			s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
 			
 			while(c.moveToNext()){
 				if(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)) > s.getId()){
@@ -418,6 +424,8 @@ public class DatabaseManager {
 					s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
 					s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
 					s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
+					s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
+					s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
 				}
 			}
 		}
@@ -452,6 +460,8 @@ public class DatabaseManager {
 				s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
 				s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
 				s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
+				s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
+				s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
 				
 				tmp.add(s);
 			
