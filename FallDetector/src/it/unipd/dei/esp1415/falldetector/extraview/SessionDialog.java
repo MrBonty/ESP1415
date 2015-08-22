@@ -210,6 +210,8 @@ public class SessionDialog extends Dialog{
 							toShow.cancel();
 						} // close all toast if is visible
 						
+						dm.deleteTempAccDataTable();
+						
 						mSession = new Session(name, 0);
 						mSession.setColorThumbnail(mSessionColor);
 						mSession.setBitmap(mSessionImage);

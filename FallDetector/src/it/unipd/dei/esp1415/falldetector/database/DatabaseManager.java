@@ -666,6 +666,23 @@ public class DatabaseManager {
 		return tmp;
 	}
 	
+	public int getTempAccelDataLastIndex(){
+		
+		String orderBy = DatabaseTable.COLUMN_TMP_AC_TS + " " + DatabaseManager.DESC;
+		Cursor c = getTempAccelDataAsCursor(orderBy);
+    	if(c == null){
+			return 0;
+		}
+    	int index = 0;
+    	
+    	if(c.moveToFirst())
+    		index = ((int) c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+    	
+    	return index;
+    		
+
+	}
+	
 	/**
 	 * [m]
 	 * Complex method to query the given table, returning a Cursor over the result set. After read call close()

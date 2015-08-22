@@ -222,27 +222,21 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				if(index >= SimpleFallAlgorithm.ACC_DATA_SIZE){
 					index = index % SimpleFallAlgorithm.ACC_DATA_SIZE;
 					
-					float[] tmp = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
-					System.arraycopy(xTmpArray, (index + 1), tmp, 0, (SimpleFallAlgorithm.ACC_DATA_SIZE - index - 1));
-					System.arraycopy(xTmpArray, 0, tmp, SimpleFallAlgorithm.ACC_DATA_SIZE - index, index);
-					// Update chart X axis data and text
-					xChart.setChartData(tmp, SimpleFallAlgorithm.ACC_DATA_SIZE);
+					xTmpArray = swapArrayData(xTmpArray, index);
+					xChart.setChartData(xTmpArray, SimpleFallAlgorithm.ACC_DATA_SIZE);
 					xChart.invalidate();
 					txtvAccDataX.setText("X: " + xChart.getLastElement());
 					txtvAccDataX.invalidate();
 					
-					System.arraycopy(yTmpArray, (index + 1), tmp, 0, (SimpleFallAlgorithm.ACC_DATA_SIZE - index - 1));
-					System.arraycopy(yTmpArray, 0, tmp, SimpleFallAlgorithm.ACC_DATA_SIZE - index, index);
-					// Update chart Y axis data and text
-					yChart.setChartData(tmp, SimpleFallAlgorithm.ACC_DATA_SIZE);
+
+					yTmpArray = swapArrayData(yTmpArray, index);
+					yChart.setChartData(yTmpArray, SimpleFallAlgorithm.ACC_DATA_SIZE);
 					yChart.invalidate();
 					txtvAccDataY.setText("Y: " + yChart.getLastElement());
 					txtvAccDataY.invalidate();
 					
-					System.arraycopy(zTmpArray, (index + 1), tmp, 0, (SimpleFallAlgorithm.ACC_DATA_SIZE - index - 1));
-					System.arraycopy(zTmpArray, 0, tmp, SimpleFallAlgorithm.ACC_DATA_SIZE - index, index);
-					// Update chart Z axis data and text
-					zChart.setChartData(tmp, SimpleFallAlgorithm.ACC_DATA_SIZE);
+					zTmpArray = swapArrayData(zTmpArray, index);
+					zChart.setChartData(zTmpArray, SimpleFallAlgorithm.ACC_DATA_SIZE);
 					zChart.invalidate();
 					txtvAccDataZ.setText("Z: " + zChart.getLastElement());
 					txtvAccDataZ.invalidate();
@@ -513,6 +507,21 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		else
 			chroDuration.stop();
 	};
+	
+	private float[] swapArrayData(float[] array, int index){
+		float[] tmp = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		int i = 0;
+		while((i + index + 1) < SimpleFallAlgorithm.ACC_DATA_SIZE){
+			tmp[i] = array[i + index + 1];
+			i++;
+		}
+		int j = 0;
+		while(j <= index){
+			tmp[i + j] = array[j];
+			j++;
+		}
+		return tmp;
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

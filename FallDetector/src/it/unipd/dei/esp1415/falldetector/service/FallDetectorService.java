@@ -3,6 +3,7 @@ package it.unipd.dei.esp1415.falldetector.service;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
+import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.SimpleFallAlgorithm;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -50,6 +52,9 @@ public class FallDetectorService extends Service {
 	private SensorManager sensorManager;
 	
 	private LocationManager locationManager;
+	private Location location;
+	private Criteria criteria;
+	private String provider;
 	
 	private LocalBroadcastManager broadcaster;
 	
@@ -59,10 +64,15 @@ public class FallDetectorService extends Service {
 
 	private boolean isPlaying;
 	
+	private boolean isPotentialFall;
+	
+	private int potentialFallcount;
+	
 	private DatabaseManager dm;
 	
 	public void onCreate() {
 		super.onCreate();
+		Log.i("onCreate: ", "onCreate called");
 		
 		dm = new DatabaseManager(this.getApplicationContext());
 		
@@ -73,8 +83,6 @@ public class FallDetectorService extends Service {
 		accDataY = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
 		accDataZ = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
 		
-		accDataIndex = 0;
-		
 		for(AccelData accData : tmpAccData){
 			
 			accDataX[accDataIndex] = (float) accData.getX();
@@ -83,30 +91,46 @@ public class FallDetectorService extends Service {
 			accDataIndex++;
 		}
 		
+		if(accDataIndex >= SimpleFallAlgorithm.ACC_DATA_SIZE){
+			accDataIndex = dm.getTempAccelDataLastIndex();
+			accDataIndex = accDataIndex + SimpleFallAlgorithm.ACC_DATA_SIZE + 1;
+		}
+		
 		newData = new AccelData();
 		
 		lastSampleTime = 0l;
 		
 		isPlaying = false;
+		isPotentialFall = false;
+		
+		potentialFallcount = 0;
 		
 		broadcaster = LocalBroadcastManager.getInstance(this);
 		broadcastDataIntent = new Intent(FallDetectorService.XYZ_ARRAY);
-
-		Log.i("onCreate: ", "onCreate called");
 		
 		// Initialize the sensor manager
 		sensorManager = (SensorManager) this.getSystemService(Context.SENSOR_SERVICE);
 		
 		// Initialize the location manager
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		
+		criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		criteria.setPowerRequirement(Criteria.POWER_LOW); 
+		criteria.setAltitudeRequired(false); 
+		criteria.setBearingRequired(false); 
+		criteria.setSpeedRequired(false); 
+		criteria.setCostAllowed(true);
+		provider = locationManager.getBestProvider(criteria, true);
+		location = locationManager.getLastKnownLocation(provider);
+		if(location != null){
+			latitude = location.getLatitude();
+			longitude = location.getLongitude();
+		}
+			
 		// Get default accelerometer sensor
 		Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
 		sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-		
-		// for GPS, change the first parameter to GPS_PROVIDER
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 	}
 	
 	@Override
@@ -131,6 +155,7 @@ public class FallDetectorService extends Service {
 				
 				// Initialize the location manager
 				locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+				location = locationManager.getLastKnownLocation(provider);
 				
 				// Get default accelerometer sensor
 				Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -138,7 +163,7 @@ public class FallDetectorService extends Service {
 				sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 				
 				// for GPS, change the first parameter to GPS_PROVIDER
-				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, locationListener);
 			}
 			
 			if(intent.getBooleanExtra(FallDetectorService.IS_PAUSE, false)){
@@ -166,7 +191,7 @@ public class FallDetectorService extends Service {
 				sensorManager.registerListener(sensorEventListener, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 				
 				// for GPS, change the first parameter to GPS_PROVIDER
-				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, locationListener);
 			}
 		}
 
@@ -187,14 +212,18 @@ public class FallDetectorService extends Service {
 	}
 	
 	
-	private LocationListener locationListener = new LocationListener(){
+	private final LocationListener locationListener = new LocationListener(){
 		@Override
 		public void onLocationChanged(Location location) {
 			// Called when a new location is find by the network location provider, not GPS.
-			latitude = location.getLatitude();
-			longitude = location.getLongitude();
-			Log.i("Location", "Latitude_location: " + latitude);
-			Log.i("Location", "Longitude_location: " + longitude);
+			if(location != null){
+				latitude = location.getLatitude();
+				longitude = location.getLongitude();
+			}
+			else{
+				latitude = 180;
+				longitude = 180;
+			}
 			
 		}
 
@@ -249,10 +278,32 @@ public class FallDetectorService extends Service {
 							broadcastDataIntent.putExtra(FallDetectorService.ARRAY_SIZE, accDataIndex);
 						}
 						
+						if(isPotentialFall){
+							if(SimpleFallAlgorithm.module(newData) <= SimpleFallAlgorithm.FALL_LOWER_BOUND)
+								fallDetected(newData);
+							potentialFallcount--;
+							if(potentialFallcount <= 0)
+								isPotentialFall = false; 
+						}
+						
+						if(SimpleFallAlgorithm.module(newData) >= SimpleFallAlgorithm.FALL_UPPER_BOUND){
+							isPotentialFall = true;
+							potentialFallcount = 5;
+						}
+						
+						Log.e("onSensorChanged", "module: " + SimpleFallAlgorithm.module(newData));
+						if(isPotentialFall)
+							Log.e("onSensorChanged", "isPotentialFall: true");
+						else
+							Log.e("onSensorChanged", "isPotentialFall: false");
+						
 						Log.i("sensorChanged", "X: " + newData.getX());
 						Log.i("sensorChanged", "Y: " + newData.getY());
 						Log.i("sensorChanged", "Z: " + newData.getZ());
-						Log.i("size: ", accDataIndex + "");
+						Log.i("sensorChanged", "size: " + accDataIndex);
+						Log.i("sensorChanged", "Latitude_location: " + latitude);
+						Log.i("sensorChanged", "Longitude_location: " + longitude);
+						Log.i("sensorChanged", "provider: " + provider);
 						
 						broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_ARRAY, accDataX);
 						broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_ARRAY, accDataY);
@@ -268,10 +319,17 @@ public class FallDetectorService extends Service {
 		}
 	};
 	
-//	private class Algorithm{
-//		public static final double FALL_UPPER_BOUND = 18.5;
-//		public static final double FALL_LOWER_BOUND = 2.5;
-//		
-////		public fallDetector(int from, int to, AccelData)
-//	}
+	//What to do when the fall occurs
+	private void fallDetected(AccelData data){
+		Log.i("fallDetected", "fall!");
+		isPotentialFall = false;
+		Fall fall = new Fall(data.getTimestamp(), 
+							 dm.getLastSession(null,
+									 DatabaseTable.COLUMN_SS_START_DATE
+									 + " " + DatabaseManager.DESC).getId());
+		fall.setLatitude(latitude);
+		fall.setLongitude(longitude);
+		fall.setId(newData.getTimestamp());
+		dm.insertAFall(fall);
+	}
 }

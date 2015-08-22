@@ -4,8 +4,8 @@ import it.unipd.dei.esp1415.falldetector.service.FallDetectorService;
 
 public class SimpleFallAlgorithm {
 
-	public static double FALL_UPPER_BOUND = 18.5;
-	public static double FALL_LOWER_BOUND = 2.5;
+	public static double FALL_UPPER_BOUND = 20;
+	public static double FALL_LOWER_BOUND = 3;
 	public static int ACC_DATA_SIZE = 1000;
 	public static int NUM_BLOCK = 3;
 	
@@ -13,7 +13,7 @@ public class SimpleFallAlgorithm {
 	private int accDataSize;
 	
 	//what to do?
-	private AccelData[] fallData;
+	//private AccelData[] fallData;
 	
 	private AccelData[]	accDataAnalyzer;
 
@@ -29,7 +29,7 @@ public class SimpleFallAlgorithm {
 		accDataAnalyzer = new AccelData[NUM_BLOCK * ACC_DATA_SIZE];
 		accDataAnalyzerBlockIndex = 0;
 		
-		fallData = new AccelData[SEC_DATA_NUMBER];
+		//fallData = new AccelData[SEC_DATA_NUMBER];
 	}
 	
 	public void setElement(AccelData element){
@@ -44,7 +44,7 @@ public class SimpleFallAlgorithm {
 		accDataSize++;	
 	}
 	
-	private double module(AccelData element){
+	public static double module(AccelData element){
 		return Math.sqrt(Math.pow(element.getX(), 2) 
 				+ Math.pow(element.getY() , 2) 
 				+ Math.pow(element.getZ() , 2));
