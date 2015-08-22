@@ -139,7 +139,7 @@ public class DetailSessionFragment extends Fragment {
 				}
 			});
 			
-			mFallsEvent = dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_SS_START_DATE); //mArray.get(mIndex).getFallEvents(); 
+			mFallsEvent = dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_FE_DATE); //mArray.get(mIndex).getFallEvents(); 
 			
 			if(mFallsEvent != null){
 				if(mFallsEvent.size() > 0){

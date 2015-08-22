@@ -12,7 +12,7 @@ import android.view.View;
  * of data */
 public class ChartView extends View{
 
-	private static final int MAX_DATA = 1000000;		// 1 million data per chart, about a total of 10MB
+	private static final int MAX_DATA = 1000;		// 1 million data per chart, about a total of 10MB
 	
 	/**
 	 * Provides how to draw the graph
@@ -97,6 +97,18 @@ public class ChartView extends View{
 	};
 	
 	/**
+	 * Set the data to be display
+	 * 
+	 * @param array
+	 */
+	public void setChartData(float[] array){
+		if(array != null){
+			chartData = array;
+			size = array.length;
+		}
+	};
+	
+	/**
 	 * Add new data to displays in chart
 	 * @param data New data to display
 	 */
@@ -142,4 +154,11 @@ public class ChartView extends View{
         this.viewWidht = w;
         this.viewHeight= h;
     }
+	
+	public float getLastElement(){
+		if(size > 0)
+			return chartData[size - 1];
+		else
+			return 0.0f;
+	}
 }

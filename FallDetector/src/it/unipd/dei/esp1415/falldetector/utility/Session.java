@@ -7,7 +7,9 @@ import android.graphics.Bitmap;
 
 public class Session {
 	private String name;
+	
 	private Calendar startDate;
+	
 	private long startTimeStamp;
 	private long endTimeStamp;
 	private long duration = 0;  
@@ -15,17 +17,20 @@ public class Session {
 	private long id;
 	private int falls = 0;
 	private boolean isActive;
+	private boolean isPause;
+	private long chrono_tmp;
 	private String xmlFile;
 	private ArrayList<Fall> fallsEvent; // TODO describe fall event with a
 											// class
 
-	private static final int TRUE = 1;
-	private static final int FALSE = 0;
+	public static final int TRUE = 1;
+	public static final int FALSE = 0;
 	
 	public static final int DESC = 0;
 	public static final int ASC = 1;
 	
 	private Bitmap bitmapIcon = null;
+	
 	
 	/**
 	 * [c] Create a Session object At the creation of the Session it make a
@@ -175,8 +180,8 @@ public class Session {
 	 * @param timeStamp the new timeStamp -> duration = timeStamp - startTimeStamp
 	 */
 	public void setDuration(long timeStamp){
-		endTimeStamp = timeStamp;
-		duration = endTimeStamp - startTimeStamp;
+		//endTimeStamp = timeStamp;
+		duration = timeStamp;
 	}//[m] setDuration()
 	
 	/**
@@ -240,6 +245,40 @@ public class Session {
 	public void setToActive(boolean value){
 		isActive = value;
 	}// [m] setToActive()
+	
+	/**
+	 * @return the isPause
+	 */
+	public boolean isPause() {
+		return isPause;
+	}
+	
+	/**
+	 * @return the isPause
+	 */
+	public int isPauseAsInteger() {
+		if(isPause)
+			return 1;
+		return 0;
+	}
+
+	/**
+	 * @param isPause the isPause to set
+	 */
+	public void setPause(boolean isPause) {
+		this.isPause = isPause;
+	}
+	
+	/**
+	 * @param isPause the isPause to set
+	 */
+	public void setPause(int isPause) {
+		if(isPause == TRUE)
+			this.isPause = true;
+		else
+			this.isPause = false;
+	}
+
 	
 	/**
 	 * [m]
@@ -362,6 +401,30 @@ public class Session {
 		}
 		return tmp;
 	}//[m] getDurationString()
+	
+	public void setStartDateAndTimestamp(Calendar sessionStartTime){
+		startDate = sessionStartTime;
+		startTimeStamp = sessionStartTime.getTimeInMillis();
+	}
+	
+	public Calendar getStartDateCalendar(){
+		startDate.setTimeInMillis(startTimeStamp);
+		return startDate;
+	}
+	
+	/**
+	 * @return the chrono_tmp
+	 */
+	public long getChrono_tmp() {
+		return chrono_tmp;
+	}
+
+	/**
+	 * @param chrono_tmp the chrono_tmp to set
+	 */
+	public void setChrono_tmp(long chrono_tmp) {
+		this.chrono_tmp = chrono_tmp;
+	}
 	
 	
 }

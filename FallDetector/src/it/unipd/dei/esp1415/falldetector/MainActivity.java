@@ -11,22 +11,27 @@ import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.service.AlarmService;
 import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import it.unipd.dei.esp1415.falldetector.utility.Session;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -70,46 +75,8 @@ public class MainActivity extends ActionBarActivity {
 	    boolean large = ((conf.screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
 	    
 		mMed.isLarge(xlarge || large);
-		
-		if(!mMed.hasDataSession()){
-			
-			DatabaseManager db = new DatabaseManager(mContext);
-			mMed.setDataSession(db.getSessionAsArray(null, DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.ASC));
 
-			/*
-			
-			//TODO REMOVE ARRAY FOR TEST
-			ArrayList<Session> tmp = new ArrayList<Session>();
-			tmp.add(new Session("a"));
-			tmp.add(new Session("b"));
-			tmp.add(new Session("c"));
-			tmp.add(new Session("d"));
-			tmp.add(new Session("e"));
-			tmp.add(new Session("f"));
-			tmp.add(new Session("g"));
-			tmp.add(new Session("h"));
-			tmp.add(new Session("i"));
-			tmp.add(new Session("l"));
-			tmp.add(new Session("m"));
-			tmp.add(new Session("n"));
-			tmp.add(new Session("o"));
-			tmp.add(new Session("p"));
-			tmp.add(new Session("q"));
-			
-			//tmp.get(0).setToActive(true);
-			
-			for(int i = tmp.size()-1; i >= 0; i--){
-				
-				tmp.get(i).setColorThumbnail(ColorUtil.imageColorSelector());
-				
-			}
-
-			mMed.setDataSession(tmp);
-			
-			//TODO END REMOVE ARRAY FOR TEST
-			
-			*/
-		}
+		downloadData();
 		
 		FragmentManager manager = getSupportFragmentManager();
 		
@@ -145,10 +112,14 @@ public class MainActivity extends ActionBarActivity {
 	protected void onResume() {
 		super.onResume();
 
-		
 		if(!(mMed.isLocationControlled() && mMed.isConnectionControlled())){
 			createConnectivityDialog();
 		}
+
+		downloadData();
+		
+		ListSessionFragment.mAdapter.notifyDataSetChanged();
+		
 	}//[m] onResume()
 
 	@Override
@@ -252,9 +223,7 @@ public class MainActivity extends ActionBarActivity {
 			
 			@Override
 			public void onDismiss(DialogInterface dialog) {
-				ListSessionFragment.mAdapter.resetArray(NEW_SESSION_POSITION);
 				
-				ListSessionFragment.mAdapter.notifyDataSetChanged();
 				mDialog = null;
 				
 				//TODO intent to start the new session;
@@ -306,5 +275,25 @@ public class MainActivity extends ActionBarActivity {
 				interrupt();
 			}
 		};
+	}
+	
+	private void downloadData(){
+		DatabaseManager db = new DatabaseManager(mContext);
+		
+		ArrayList<Session> tmp = db.getSessionAsArray(DatabaseTable.COLUMN_SS_IS_ACTIVE + " > " + Session.FALSE + " OR " + DatabaseTable.COLUMN_SS_START_DATE  + " = 0" , null);
+		Log.i("SIZE", tmp.size()+ "");
+		
+		addToArray(tmp,db.getSessionAsArray(DatabaseTable.COLUMN_SS_IS_ACTIVE + " = " + Session.FALSE + " AND " + DatabaseTable.COLUMN_SS_START_DATE  + " > 0", DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.DESC));
+		
+		mMed.setDataSession(tmp);
+		
+		Log.i("MED", mMed.getDataSession().size()+ "");
+	}
+	
+	private void addToArray(ArrayList<Session> tmp1, ArrayList<Session> tmp2){
+		for(int i = 0; i< tmp2.size(); i++){
+			tmp1.add(tmp2.get(i));
+		}
+		
 	}
 }

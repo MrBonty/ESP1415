@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 public class ListSessionFragment extends ListFragment {
 
-	private static ArrayList<Session> mArray;
+	public static ArrayList<Session> mArray;
 	private static Context mContext;
 	private static int mCurCheckPosition;
 	private static Mediator mMed;
@@ -232,6 +232,10 @@ public class ListSessionFragment extends ListFragment {
 		int i = dbm.deleteASession(tmp.getId());
 		if(i>0){
 			mArray.remove(pos);
+			mMed.getDataSession().remove(pos);
+			
+			mAdapter.resetArray(pos, false);
+			
 			mAdapter.notifyDataSetChanged();
 			return true;
 		}
@@ -281,4 +285,6 @@ public class ListSessionFragment extends ListFragment {
 		});
 		
 	}//[m] createModifyDialog()
+	
+	
 }

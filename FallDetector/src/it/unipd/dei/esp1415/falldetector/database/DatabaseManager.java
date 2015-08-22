@@ -1,11 +1,12 @@
 package it.unipd.dei.esp1415.falldetector.database;
 
-import java.util.ArrayList;
-
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.MailAddress;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
+
+import java.util.ArrayList;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -68,6 +69,8 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL, session.getColorThumbnail());
 		values.put(DatabaseTable.COLUMN_SS_FALLS_NUMBER, session.getFallsNum());
 		values.put(DatabaseTable.COLUMN_SS_XML, session.getXmlFileName());
+		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, session.isPauseAsInteger());
+		values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, session.getChrono_tmp());
 				
 		return insertInDatabase(DatabaseTable.SESSION_TABLE, values); 
 	}//[m] insertASession()
@@ -130,6 +133,25 @@ public class DatabaseManager {
 	
 	/**
 	 * [m]
+	 * Method to insert a temporary accelerometer Data into the database
+	 * 
+	 * @param data to insert in the database
+	 * @return the id of the temporary accelerometer data, or ON_OPEN_ERROR if an error is occurred on open the database,
+	 * or INSERT_ERROR if an error is occurred during the insertion.
+	 */
+	public long insertATempAccelData(AccelData data){
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_PK_ID, data.getId());
+		values.put(DatabaseTable.COLUMN_TMP_AC_TS, data.getTimestamp());
+		values.put(DatabaseTable.COLUMN_TMP_AC_X, data.getX());
+		values.put(DatabaseTable.COLUMN_TMP_AC_Y, data.getY());
+		values.put(DatabaseTable.COLUMN_TMP_AC_Z, data.getZ());
+		
+		return insertInDatabase(DatabaseTable.TMP_ACC_TABLE, values);
+	}//[m] insertAnTempAccelData()
+	
+	/**
+	 * [m]
 	 * Method to upgrade a specific part of the Session
 	 * 
 	 * @param sessionId the id of the session to upgrade
@@ -158,6 +180,8 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL, session.getColorThumbnail());
 		values.put(DatabaseTable.COLUMN_SS_FALLS_NUMBER, session.getFallsNum());
 		values.put(DatabaseTable.COLUMN_SS_XML, session.getXmlFileName());
+		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, session.isPauseAsInteger());
+		values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, session.getChrono_tmp());
 		
 		String whereClause = "";
 		long id = session.getId();
@@ -294,6 +318,33 @@ public class DatabaseManager {
 	
 	/**
 	 * [m]
+	 * Method to upgrade all Accelerometer Data values (not ID)
+	 * 
+	 * @param data the data to upgrade
+	 * @return the number of rows affected, or ON_OPEN_ERROR if an error occurred on open the database, 
+	 * or ID_NOT_SET_ERROR if the id of the fall in not set.
+	 */
+	public int upgradeATempAccelData(AccelData data){
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_TMP_AC_TS, data.getTimestamp());
+		values.put(DatabaseTable.COLUMN_TMP_AC_X, data.getX());
+		values.put(DatabaseTable.COLUMN_TMP_AC_Y, data.getY());
+		values.put(DatabaseTable.COLUMN_TMP_AC_Z, data.getZ());
+
+		String whereClause = "";
+		long id = data.getId();
+		if(id > 0){
+			whereClause = DatabaseTable.COLUMN_PK_ID + " = " + id;
+		}else{
+			return ID_NOT_SET_ERROR;
+		}//if... else...
+		
+		return upgradeRow(DatabaseTable.TMP_ACC_TABLE, values, whereClause, null);
+	}//[m] upgradeAnAccelData()
+	
+	
+	/**
+	 * [m]
 	 * private generic method to insert a new row in the database
 	 * 
 	 * @param tableName the name of the table into add the new row.
@@ -340,6 +391,48 @@ public class DatabaseManager {
 		return tmp;
 	}//[m] upgradeRow()
 	
+	
+	// Metodo di prova Xu
+	public Session getLastSession(String selection, String orderBy){
+		
+		Cursor c = getSessionAsCursor(selection, orderBy);
+		Session s = null;
+		
+		if(c == null){
+			return null;
+		}
+		
+		if(c.moveToFirst()){
+			s = new Session(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_NAME)),
+						c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_START_DATE)));
+			s.setColorThumbnail(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL)));
+			s.setDuration(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_DURATION)));
+			s.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+			s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
+			s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
+			s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
+			s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
+			s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
+			
+			while(c.moveToNext()){
+				if(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)) > s.getId()){
+					s = new Session(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_NAME)),
+							c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_START_DATE)));
+					s.setColorThumbnail(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL)));
+					s.setDuration(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_DURATION)));
+					s.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+					s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
+					s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
+					s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
+					s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
+					s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
+				}
+			}
+		}
+		close();
+		return s;
+	}//[m] getSessionAsArray()
+	
 	/**
 	 * [m]
 	 * Method to get all Session stored in database as ArrayList
@@ -367,6 +460,8 @@ public class DatabaseManager {
 				s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
 				s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
 				s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
+				s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
+				s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
 				
 				tmp.add(s);
 			
@@ -539,6 +634,55 @@ public class DatabaseManager {
     	return tmp;
     }//[m] getMailAddressAsCursor()
 	
+	
+	//TODO aggiungere info
+	public Cursor getTempAccelDataAsCursor(String orderBy){ 
+		
+    	Cursor tmp = queryDb(DatabaseTable.TMP_ACC_TABLE, null, null, orderBy);
+    	return tmp;
+    }
+	
+	//TODO aggiungere info
+	public ArrayList<AccelData> getTempAccelDataAsArray(String orderBy){
+		ArrayList<AccelData> tmp = new ArrayList<AccelData>();
+		Cursor c = getTempAccelDataAsCursor(orderBy);
+    	if(c == null){
+			return null;
+		}
+    	
+		if(c.moveToFirst()){
+			do{
+				AccelData toAdd = new AccelData();
+				toAdd.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+				toAdd.setTimestamp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_TMP_AC_TS)));
+				toAdd.setX(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_TMP_AC_X)));
+				toAdd.setY(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_TMP_AC_Y)));
+				toAdd.setZ(c.getDouble(c.getColumnIndex(DatabaseTable.COLUMN_TMP_AC_Z)));
+				tmp.add(toAdd);
+			}while(c.moveToNext());
+			
+		}
+		close();
+		return tmp;
+	}
+	
+	public int getTempAccelDataLastIndex(){
+		
+		String orderBy = DatabaseTable.COLUMN_TMP_AC_TS + " " + DatabaseManager.DESC;
+		Cursor c = getTempAccelDataAsCursor(orderBy);
+    	if(c == null){
+			return 0;
+		}
+    	int index = 0;
+    	
+    	if(c.moveToFirst())
+    		index = ((int) c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
+    	
+    	return index;
+    		
+
+	}
+	
 	/**
 	 * [m]
 	 * Complex method to query the given table, returning a Cursor over the result set. After read call close()
@@ -693,6 +837,15 @@ public class DatabaseManager {
 		String whereClause = DatabaseTable.COLUMN_PK_ID + " = " + dataId;
 		return deleteFromDb(DatabaseTable.ACCEL_TABLE, whereClause);
 	}// [m] deleteAnAccelData()
+	
+	
+	/**
+	 * delete all data from temporary data from table
+	 * @return the number of rows deleted
+	 */
+	public int deleteTempAccDataTable(){
+		return deleteFromDb(DatabaseTable.TMP_ACC_TABLE, null);
+	}
 	
 	/**
 	 * [m]

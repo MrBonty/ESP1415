@@ -23,9 +23,9 @@ public class Mediator {
 	private static boolean mIsWifiControlled = false;
 	private static boolean mIsMobileControlled = false;
 	private static boolean mIsLocationControlled = false;
-
-	private static boolean isSessionStarted = false;
+	
 	private static boolean isSessionPaused = true;
+	private static long chronoBaseTime;
 	private static float[] x_data;
 	private static float[] y_data;
 	private static float[] z_data;
@@ -71,14 +71,6 @@ public class Mediator {
 	 */
 	public void setZ_data(float z_data) {
 		Mediator.z_data[size] = z_data;
-	}
-	
-	public boolean isSessionStarted() {
-		return isSessionStarted;
-	}
-
-	public void setSessionStarted(boolean isSessionStarted) {
-		Mediator.isSessionStarted = isSessionStarted;
 	}
 
 	public boolean isSessionPaused() {
@@ -249,5 +241,13 @@ public class Mediator {
 	
 	public boolean isConnectionControlled(){
 		return mIsMobileControlled && mIsWifiControlled;
+	}
+	
+	public void setChronoBaseTime(long baseTime){
+		chronoBaseTime = baseTime;
+	}
+	
+	public long getChronoBaseTime(){
+		return chronoBaseTime;
 	}
 }
