@@ -6,12 +6,15 @@ import it.unipd.dei.esp1415.falldetector.FallDetailActivity;
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
+import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -82,6 +85,15 @@ public class DetailSessionFragment extends Fragment {
 		}else{
 			if(viewHolder.lt != null){
 				viewHolder.lt.setVisibility(View.VISIBLE);
+			}
+			
+			Bitmap image = null;
+			if ((image = mArray.get(mIndex).getBitmap()) == null) {
+				image = BitmapFactory.decodeResource(getResources(),
+						R.drawable.thumbnail);
+				image = ColorUtil.recolorIconBicolor(mArray.get(mIndex).getColorThumbnail(),
+						image);
+				mArray.get(mIndex).setBitmap(image);
 			}
 			
 			viewHolder.sessionName.setText(mArray.get(mIndex).getName());

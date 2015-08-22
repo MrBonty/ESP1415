@@ -73,7 +73,7 @@ public class FallDetailActivity extends ActionBarActivity {
 		Log.i("Fall Session", "Activity "+mCurrentFall);
 		
 		//TODO substitute with mArray.get(mIndex).getFall(mCurrentFall); 
-		current = dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_SS_START_DATE).get(mCurrentFall); //get the current Fall
+		current = dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_FE_DATE).get(mCurrentFall); //get the current Fall
 		
 		String[] tmp = current.dateTimeStampFallEven();
 
