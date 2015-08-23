@@ -147,6 +147,7 @@ public class SignInDialog extends Dialog{
 						mAccount = accountVisible;
 						mData = account+ SettingsActivity.DIVISOR_DATA + password;
 						hasData = true;
+						dismiss();
 					}else{
 						switchInfo(GENERAL_ERROR_INFO);
 					}
