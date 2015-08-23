@@ -1,16 +1,25 @@
 package it.unipd.dei.esp1415.falldetector.fragment.adapter;
 
 import it.unipd.dei.esp1415.falldetector.R;
+import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
+import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
+import it.unipd.dei.esp1415.falldetector.service.FallDetectorService;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.SystemClock;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -55,6 +64,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 	 */
 	public ListSessionAdapter(Context context, ArrayList<Session> objects,
 			boolean isLand) {
+		
 		this(context, R.layout.activity_main_fragment_list_row, objects, isLand);
 	}// [c] ListSessionAdapter
 
@@ -233,16 +243,29 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 		boolean hasToStart = mSession.getStartTimestamp() == 0;
 
-		if (position == FIRST_POS && (mSession.isActive() || hasToStart)) { // TODO
-																			// get
-																			// is
-																			// active
-																			// from
-																			// session
+		if (position == FIRST_POS && (mSession.isActive() || hasToStart)) { 
 			// position == 0
 			mViewHolder.executeLayout.setVisibility(View.VISIBLE);
-			mViewHolder.playPause.setOnClickListener(null); // TODO listener
-			mViewHolder.stop.setOnClickListener(null); // TODO listener
+
+			if(hasToStart){
+				mViewHolder.stop.setClickable(false);
+			}else{
+				mViewHolder.stop.setClickable(true);
+			}
+			
+		    if(mSession.isActive()){
+		    	if(!mSession.isPause()){
+		    		mViewHolder.playPause.setImageResource(R.drawable.pause_button_default);
+		    	}else{
+		    		mViewHolder.playPause.setImageResource(R.drawable.play_button_default);
+		    	}
+		    }else{
+				mViewHolder.playPause.setImageResource(R.drawable.play_button_default);
+			}
+		    mViewHolder.stop.setImageResource(R.drawable.end_button_default);
+			
+			mViewHolder.playPause.setOnClickListener(manageSession()); // TODO listener
+			mViewHolder.stop.setOnClickListener(manageSession()); // TODO listener
 
 			mViewHolder.playPause.setFocusable(false);
 			mViewHolder.playPause.setFocusableInTouchMode(false);
@@ -250,6 +273,10 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 			mViewHolder.stop.setFocusable(false);
 			mViewHolder.stop.setFocusableInTouchMode(false);
 		}// if
+		
+		if(position == FIRST_POS && !mSession.isActive() && !hasToStart){
+			mViewHolder.executeLayout.setVisibility(View.GONE);
+		}
 
 		mViewHolder.duration.setText(mSession.getDurationString());
 		mViewHolder.falls.setText(mSession.getFallsNum() + "");
@@ -266,15 +293,162 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		mViewHolder.expandButton.setImageResource(R.drawable.ic_action_expand);
 		mViewHolder.expandLayout.setVisibility(View.GONE);
 
-		if (position == FIRST_POS && mSession.isActive()) { // TODO get is
-															// active from
-															// session
+		if (position == FIRST_POS && mSession.isActive()) { 
 			// position == 0
 			mViewHolder.executeLayout.setVisibility(View.GONE);
 		}// if
+		
 
 	}// [m] collapse
+	
+	private OnClickListener manageSession(){
+		return new OnClickListener() {
+			private DatabaseManager dm = new DatabaseManager(mContext);;
+			private Session ses = mArray.get(FIRST_POS);
+			private Mediator med = new Mediator();
+			private ArrayList<Session> arr = med.getDataSession();
+			
+			@Override
+			public void onClick(View v) {
+				switch (v.getId()) {
+				case R.id.row_execute_play_pause_button:
+					if(ses.getStartTimestamp() > 0){
+						if(ses.isPause()){
+							sessionResume();
+						}else{
+							sessionPause();
+						}
+					}else{
+						sessionStart();
+					}
+					break;
 
+				case R.id.row_execute_stop_button:
+					sessionEnd();
+					break;
+				}
+				
+			}
+			
+
+
+			private void sessionStart(){
+				ses.setStartDateAndTimestamp(Calendar.getInstance(TimeZone.getDefault()));
+				ses.setToActive(true);
+				ses.setChrono_tmp(SystemClock.elapsedRealtime());
+				ses.setPause(false);
+				
+				if(arr != null){
+					arr.get(FIRST_POS).setStartDateAndTimestamp(Calendar.getInstance(TimeZone.getDefault()));
+					arr.get(FIRST_POS).setToActive(true);
+					arr.get(FIRST_POS).setChrono_tmp(SystemClock.elapsedRealtime());
+					arr.get(FIRST_POS).setPause(false);
+				}
+				
+				mViewHolder.stop.setClickable(true);
+				mViewHolder.playPause.setImageResource(R.drawable.pause_button_default);
+				notifyDataSetChanged();
+				
+				// Update database
+				ContentValues values = new ContentValues();
+				values.put(DatabaseTable.COLUMN_SS_START_DATE,
+						ses.getStartTimestamp());
+				values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, ses.getChrono_tmp());
+				values.put(DatabaseTable.COLUMN_SS_IS_ACTIVE,
+						ses.isActiveAsInteger());
+				values.put(DatabaseTable.COLUMN_SS_IS_PAUSE,
+						ses.isPauseAsInteger());
+				dm.upgradeASession(ses.getId(), values);
+				
+				Intent serviceIntent = new Intent(mContext,
+						FallDetectorService.class);
+				serviceIntent.putExtra(FallDetectorService.IS_PLAY, true);
+				mContext.startService(serviceIntent);
+			}
+			
+			private void sessionPause(){
+				ses.setDuration(); // TODO DURATION
+				ses.setPause(true);
+				
+				if(arr != null){
+					arr.get(FIRST_POS).setDuration(ses.getDuration());
+					arr.get(FIRST_POS).setPause(true);
+				}
+				
+				mViewHolder.playPause.setImageResource(R.drawable.play_button_default);
+				notifyDataSetChanged();
+				
+				ContentValues values = new ContentValues();
+				values.put(DatabaseTable.COLUMN_SS_DURATION, ses.getDuration());
+				values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, ses.isPauseAsInteger());
+				dm.upgradeASession(ses.getId(), values);
+				
+				Intent serviceIntent = new Intent(mContext,
+						FallDetectorService.class);
+				serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
+				mContext.startService(serviceIntent);
+			}
+
+			private void sessionResume(){
+
+				ses.setPause(false);
+				if(arr != null){
+					arr.get(FIRST_POS).setPause(false);
+				}
+				
+				mViewHolder.playPause.setImageResource(R.drawable.pause_button_default);
+				
+				ContentValues values = new ContentValues();
+				values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, ses.isPauseAsInteger());
+				dm.upgradeASession(ses.getId(), values);
+
+				Intent serviceIntent = new Intent(mContext,
+						FallDetectorService.class);
+				serviceIntent.putExtra(FallDetectorService.IS_PLAY, true);
+				mContext.startService(serviceIntent);
+			}
+			
+			private void sessionEnd(){
+				ContentValues values = new ContentValues();
+				if (!ses.isPause()) {
+					ses.setDuration(); // TODO DURATION
+					
+
+					ses.setChrono_tmp(SystemClock.elapsedRealtime());
+					
+					if(arr != null){
+						arr.get(FIRST_POS).setDuration(ses.getDuration());
+						arr.get(FIRST_POS).setChrono_tmp(ses.getChrono_tmp());
+					}
+					
+					values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, ses.getChrono_tmp());
+					values.put(DatabaseTable.COLUMN_SS_DURATION, ses.getDuration());
+				}
+				
+				ses.setToActive(false);
+				if(arr != null){
+					arr.get(FIRST_POS).setToActive(false);
+				}
+				
+				notifyDataSetChanged();
+				
+				values.put(DatabaseTable.COLUMN_SS_IS_ACTIVE,
+						ses.isActiveAsInteger());
+				dm.upgradeASession(ses.getId(), values);
+				
+				// Stop service after button press
+				Intent serviceIntent = new Intent(mContext,
+						FallDetectorService.class);
+				serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
+				mContext.startService(serviceIntent);
+				
+				mContext.stopService(serviceIntent);
+				
+				// Clear tmp acc data from database
+				dm.deleteTempAccDataTable();
+			}
+		};
+	}
 	static class ViewHolder {
 		private ImageView thumbnail;
 		private TextView sessionName;

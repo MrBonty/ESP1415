@@ -6,11 +6,14 @@ import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
 import it.unipd.dei.esp1415.falldetector.utility.ChartView;
+import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.support.v7.app.ActionBarActivity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -76,6 +79,15 @@ public class FallDetailActivity extends ActionBarActivity {
 		current = dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_FE_DATE).get(mCurrentFall); //get the current Fall
 		
 		String[] tmp = current.dateTimeStampFallEven();
+		
+		Bitmap image = null;
+		if ((image = mArray.get(mIndex).getBitmap()) == null) {
+			image = BitmapFactory.decodeResource(getResources(),
+					R.drawable.thumbnail);
+			image = ColorUtil.recolorIconBicolor(mArray.get(mIndex).getColorThumbnail(),
+					image);
+			mArray.get(mIndex).setBitmap(image);
+		}
 
 		viewHolder.sessionImage.setImageBitmap(mArray.get(mIndex).getBitmap());
 		viewHolder.sessionDate.setText("Happen on "+tmp[0]);

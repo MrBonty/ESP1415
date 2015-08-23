@@ -281,13 +281,10 @@ public class MainActivity extends ActionBarActivity {
 		DatabaseManager db = new DatabaseManager(mContext);
 		
 		ArrayList<Session> tmp = db.getSessionAsArray(DatabaseTable.COLUMN_SS_IS_ACTIVE + " > " + Session.FALSE + " OR " + DatabaseTable.COLUMN_SS_START_DATE  + " = 0" , null);
-		Log.i("SIZE", tmp.size()+ "");
-		
+
 		addToArray(tmp,db.getSessionAsArray(DatabaseTable.COLUMN_SS_IS_ACTIVE + " = " + Session.FALSE + " AND " + DatabaseTable.COLUMN_SS_START_DATE  + " > 0", DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.DESC));
 		
 		mMed.setDataSession(tmp);
-		
-		Log.i("MED", mMed.getDataSession().size()+ "");
 	}
 	
 	private void addToArray(ArrayList<Session> tmp1, ArrayList<Session> tmp2){
