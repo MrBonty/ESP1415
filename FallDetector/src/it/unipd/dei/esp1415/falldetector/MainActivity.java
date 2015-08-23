@@ -6,6 +6,7 @@ import java.util.List;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.extraview.ConnectionDialog;
+import it.unipd.dei.esp1415.falldetector.extraview.SelectMailDialog;
 import it.unipd.dei.esp1415.falldetector.extraview.SessionDialog;
 import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.service.AlarmService;
@@ -137,7 +138,10 @@ public class MainActivity extends ActionBarActivity {
 		
 		switch (item.getItemId()) {
 		case R.id.action_add:
-			openAdd();
+			//openAdd();
+			
+			SelectMailDialog sel = new SelectMailDialog(this);
+			sel.show();
 			return true;
 		case R.id.action_settings:
 			Intent intent = new Intent(this, SettingsActivity.class);

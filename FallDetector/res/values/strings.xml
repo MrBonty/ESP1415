@@ -126,5 +126,8 @@
 	
 	<string name="alarm_title">Start a new Session!!</string>
 	<string name="alarm_info">Click here!!</string>
+	
+	<string name="first_log">On first log in control the site https://www.google.com/settings/security/lesssecureapps</string>
+	
 
 </resources>
