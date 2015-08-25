@@ -13,9 +13,6 @@ import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
@@ -230,8 +227,6 @@ public class MainActivity extends ActionBarActivity {
 			public void onDismiss(DialogInterface dialog) {
 				
 				mDialog = null;
-				
-				//TODO intent to start the new session;
 			}//[m] onDismiss()
 		});
 	}//[m] createAddDialog()
@@ -289,6 +284,10 @@ public class MainActivity extends ActionBarActivity {
 		};
 	}
 	
+	/**
+	 * [m]
+	 * Method to download data from db
+	 */
 	private void downloadData(){
 		DatabaseManager db = new DatabaseManager(mContext);
 		
@@ -297,12 +296,19 @@ public class MainActivity extends ActionBarActivity {
 		addToArray(tmp,db.getSessionAsArray(DatabaseTable.COLUMN_SS_IS_ACTIVE + " = " + Session.FALSE + " AND " + DatabaseTable.COLUMN_SS_START_DATE  + " > 0", DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.DESC));
 		
 		mMed.setDataSession(tmp);
-	}
+	}//[m] downloadData()
 	
+	/**
+	 * [m]
+	 * Method to copy array into an array
+	 * 
+	 * @param tmp1 array that receive tmp2
+	 * @param tmp2 array to copy into tmp1
+	 */
 	private void addToArray(ArrayList<Session> tmp1, ArrayList<Session> tmp2){
 		for(int i = 0; i< tmp2.size(); i++){
 			tmp1.add(tmp2.get(i));
 		}
 		
-	}
+	}//[m] addToArray()
 }
