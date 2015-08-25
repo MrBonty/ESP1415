@@ -10,7 +10,6 @@ public class Fall {
 	private double longitude;
 	private boolean isNotified;
 	private long sessionId;
-	private String xmlFile;
 	
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
@@ -142,41 +141,6 @@ public class Fall {
 	public long getSessionId(){
 		return sessionId;
 	}// [m] getSessionId()
-	
-	/**
-	 * [m]
-	 * Method to get the name of the file xml
-	 * 
-	 * @return the name of the xml file
-	 */
-	public String getXmlFileName(){
-		return xmlFile;
-	}//[m] getXmlFileName()
-	
-	/**
-	 * [m]
-	 * Method to get the name of the file xml from existing on stored on db
-	 * 
-	 * @param xml the name get from db
-	 */
-	public void setXmlFileName(String xml){
-		xmlFile = xml;
-	} // [m] setXmlFileName()
-	
-	/**
-	 * [m]
-	 * Method to set name of file xml as hhmmssmmmddmmaaaa
-	 */
-	public void generateXmlName(){
-		xmlFile = "" + dateEvent.get(Calendar.HOUR)
-				+ dateEvent.get(Calendar.MINUTE)
-				+ dateEvent.get(Calendar.SECOND)
-				+ dateEvent.get(Calendar.MILLISECOND)
-				+ dateEvent.get(Calendar.DAY_OF_MONTH)
-				+ (dateEvent.get(Calendar.MONTH) + 1)
-				+ dateEvent.get(Calendar.YEAR);
-	}// [m] generateXmlName()
-	
 	
 	public void setLatitude(double lat){
 		latitude = lat;

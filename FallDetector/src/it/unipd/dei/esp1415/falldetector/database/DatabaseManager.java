@@ -68,7 +68,6 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_SS_DURATION, session.getDuration());
 		values.put(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL, session.getColorThumbnail());
 		values.put(DatabaseTable.COLUMN_SS_FALLS_NUMBER, session.getFallsNum());
-		values.put(DatabaseTable.COLUMN_SS_XML, session.getXmlFileName());
 		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, session.isPauseAsInteger());
 		values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, session.getChrono_tmp());
 				
@@ -87,7 +86,6 @@ public class DatabaseManager {
 		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_FE_DATE, fall.getTimeStampFallEvent());
 		values.put(DatabaseTable.COLUMN_FE_IS_NOTIFIED, fall.isNotifiedAsInteger());
-		values.put(DatabaseTable.COLUMN_FE_XML, fall.getXmlFileName());
 		values.put(DatabaseTable.COLUMN_FE_LONGITUDE, fall.getLongitude());
 		values.put(DatabaseTable.COLUMN_FE_LATITUDE, fall.getLatitude());
 		values.put(DatabaseTable.COLUMN_FE_FK_SESSION, fall.getSessionId());
@@ -179,7 +177,6 @@ public class DatabaseManager {
 		values.put(DatabaseTable.COLUMN_SS_DURATION, session.getDuration());
 		values.put(DatabaseTable.COLUMN_SS_COLOR_THUMBNAIL, session.getColorThumbnail());
 		values.put(DatabaseTable.COLUMN_SS_FALLS_NUMBER, session.getFallsNum());
-		values.put(DatabaseTable.COLUMN_SS_XML, session.getXmlFileName());
 		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, session.isPauseAsInteger());
 		values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, session.getChrono_tmp());
 		
@@ -220,7 +217,6 @@ public class DatabaseManager {
 		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_FE_DATE, fall.getTimeStampFallEvent());
 		values.put(DatabaseTable.COLUMN_FE_IS_NOTIFIED, fall.isNotifiedAsInteger());
-		values.put(DatabaseTable.COLUMN_FE_XML, fall.getXmlFileName());
 		values.put(DatabaseTable.COLUMN_FE_LONGITUDE, fall.getLongitude());
 		values.put(DatabaseTable.COLUMN_FE_LATITUDE, fall.getLatitude());
 		values.put(DatabaseTable.COLUMN_FE_FK_SESSION, fall.getSessionId());
@@ -410,7 +406,6 @@ public class DatabaseManager {
 			s.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
 			s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
 			s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
-			s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
 			s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
 			s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
 			
@@ -423,7 +418,6 @@ public class DatabaseManager {
 					s.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
 					s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
 					s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
-					s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
 					s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
 					s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
 				}
@@ -459,7 +453,6 @@ public class DatabaseManager {
 				s.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
 				s.setFallsNum(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_FALLS_NUMBER)));
 				s.setToActive(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_ACTIVE)));
-				s.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_SS_XML)));
 				s.setPause(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_SS_IS_PAUSE)));
 				s.setChrono_tmp(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_SS_CHRONO_TMP)));
 				
@@ -510,7 +503,6 @@ public class DatabaseManager {
 				Fall f = new Fall(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_FE_DATE)), c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_FE_FK_SESSION)));
 				f.setNotification(c.getInt(c.getColumnIndex(DatabaseTable.COLUMN_FE_IS_NOTIFIED)));
 				f.setId(c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
-				f.setXmlFileName(c.getString(c.getColumnIndex(DatabaseTable.COLUMN_FE_XML)));
 				f.setLatitude(c.getFloat(c.getColumnIndex(DatabaseTable.COLUMN_FE_LATITUDE)));
 				f.setLongitude(c.getFloat(c.getColumnIndex(DatabaseTable.COLUMN_FE_LONGITUDE)));
 				
