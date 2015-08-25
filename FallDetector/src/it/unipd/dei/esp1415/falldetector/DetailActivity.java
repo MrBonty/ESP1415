@@ -37,26 +37,6 @@ public class DetailActivity extends ActionBarActivity {
 		
 		setContentView(R.layout.activity_detail);
 		
-		/*//TODO ELIMINATE THIS TEST
-		ArrayList<Session> mSessions = mMed.getDataSession();
-		if(mSessions != null){
-			if(mSessions.size() > 0){
-				Fall first = new Fall(1L,1);
-				Fall second = new Fall(20L,1);
-				Fall third = new Fall(100L,2);
-				
-				ArrayList<Fall> items = new ArrayList<Fall>();
-				ArrayList<Fall> item = new ArrayList<Fall>();
-				items.add(first);
-				items.add(second);
-				item.add(third);
-				
-//				mSessions.get(1).setFallEvents(items);
-//				mSessions.get(2).setFallEvents(item);
-			}
-		}
-		//END TEST*/
-		
 		Fragment detailSession = new DetailSessionFragment();
 		
 		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();

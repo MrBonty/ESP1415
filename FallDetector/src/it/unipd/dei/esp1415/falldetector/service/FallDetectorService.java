@@ -1,17 +1,30 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
 import it.unipd.dei.esp1415.falldetector.CurrentSessionActivity;
+import it.unipd.dei.esp1415.falldetector.MainActivity;
+import it.unipd.dei.esp1415.falldetector.R;
+import it.unipd.dei.esp1415.falldetector.SettingsActivity;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
+import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
+import it.unipd.dei.esp1415.falldetector.fragment.SettingsMainFragment;
+import it.unipd.dei.esp1415.falldetector.mail.Mail;
+import it.unipd.dei.esp1415.falldetector.mail.MailSender;
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
+import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.FallAlgorithmUtility;
+import it.unipd.dei.esp1415.falldetector.utility.MailAddress;
+import it.unipd.dei.esp1415.falldetector.utility.Session;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,8 +33,10 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -76,6 +91,7 @@ public class FallDetectorService extends Service {
 	private int posTmp;
 	private Fall fallTmp;
 	private int isSaving = 0;
+	 
 	
 	public void onCreate() {
 		super.onCreate();
@@ -393,6 +409,95 @@ public class FallDetectorService extends Service {
 			dm.insertAnAccelData(array.get(i));
 		}
 		
+		Session last = dm.getLastSession();
+		ContentValues values = new ContentValues();
+		values.put(DatabaseTable.COLUMN_SS_FALLS_NUMBER, last.getFallsNum() + 1);
+		dm.upgradeASession(last.getId(), values);
 		
+		if(ListSessionFragment.mArray != null){
+			ListSessionFragment.mArray.get(0).setFallsNum(last.getFallsNum() + 1);
+		}
+		
+		boolean isSend = false;
+		ConnectivityStatus status = new ConnectivityStatus(getApplicationContext());
+		
+		if(status.hasMobileConnectionON() || status.hasWifiConnectionON()){
+			ArrayList<MailAddress> receiversMail = dm.getMailAddressAsArray();
+			
+			
+			Calendar cal = Calendar.getInstance();
+			cal.setTimeInMillis(fallTmp.getTimeStampFallEvent());
+
+			String sbj = getApplicationContext().getResources().getString(R.string.mail_sbj);
+
+			String msg = getApplicationContext().getResources().getString(R.string.mail_msg1);
+			msg = msg + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + " of "
+					+ cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH + 1) 
+					+ cal.get(Calendar.YEAR);
+			msg = msg + getApplicationContext().getResources().getString(R.string.mail_msg2) + "\n";
+			msg = msg + getApplicationContext().getResources().getString(R.string.latitude) + ":" 
+					+ fallTmp.getLatitude() + "\n";
+			msg = msg + getApplicationContext().getResources().getString(R.string.longitude) + ":" 
+					+ fallTmp.getLongitude() + "\n";
+			msg = msg + getApplicationContext().getResources().getString(R.string.mail_end1) + "\n\n";
+			msg = msg + getApplicationContext().getResources().getString(R.string.mail_end2) + "\n";
+
+			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
+			if(preferences.getBoolean(SettingsMainFragment.SAVE_MAIL_CHK, false)){
+				ArrayList<String> receivers = new ArrayList<String>();
+				for(int i = 0; i < receiversMail.size(); i++){
+					receivers.add(receiversMail.get(i).getAddress());
+				}
+				String[] data = preferences.getString(SettingsMainFragment.SAVE_MAIL_DATABASE64, "").split(SettingsActivity.DIVISOR_DATA);
+				String sender = preferences.getString(SettingsMainFragment.SAVE_MAIL_ACCOUNT, "");
+				
+				if(data.length > 1){
+					MailSender mailSend = new MailSender(MailSender.GMAIL_PORT, MailSender.GMAIL_SERVER, data[0], data[1], false);
+					
+					if(mailSend.connect()){
+						Mail mail = new Mail(sender, receivers);
+						mail.setSubject(sbj);
+						mail.setMessage(msg);
+						
+						mailSend.send(mail);
+						
+						mailSend.close();
+						
+						isSend = true;
+					}
+				}
+			}else{
+				String[] receivers = new String[receiversMail.size()];
+				for(int i = 0; i < receiversMail.size(); i++){
+					receivers[i] = receiversMail.get(i).getAddress();
+				}
+				
+				Intent sendTo = new Intent(Intent.ACTION_SENDTO);
+				sendTo.setData(Uri.parse("mailto:"));
+				sendTo.putExtra(Intent.EXTRA_EMAIL, receivers);
+				sendTo.putExtra(Intent.EXTRA_SUBJECT, sbj);
+				sendTo.putExtra(Intent.EXTRA_TEXT, msg);
+				
+
+				isSend = true;
+				
+				if (sendTo.resolveActivity(getPackageManager()) != null) {
+					sendTo.setFlags(sendTo.getFlags() | Intent.FLAG_ACTIVITY_NEW_TASK);
+			        startActivity(sendTo);
+			    }
+			}
+			
+			if(isSend){
+				ContentValues val = new ContentValues();
+				val.put(DatabaseTable.COLUMN_FE_IS_NOTIFIED, isSend);
+				dm.upgradeAFall(fallTmp.getId(), val);
+
+				if((CurrentSessionActivity.arrayAdapter != null) && (CurrentSessionActivity.falls != null)){
+					Log.e("Add fall:", "Adding fall");
+					CurrentSessionActivity.falls.get(CurrentSessionActivity.falls.size()-1).setNotification(isSend);
+					CurrentSessionActivity.lstvFalls.setAdapter(CurrentSessionActivity.arrayAdapter);
+				}
+			}
+		}
 	}
 }

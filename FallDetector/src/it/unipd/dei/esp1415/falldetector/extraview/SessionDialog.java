@@ -252,6 +252,12 @@ public class SessionDialog extends Dialog{
 
 							}while(error == DatabaseManager.ON_OPEN_ERROR);
 
+							ListSessionFragment.mArray.get(mPos).setName(name);
+							ListSessionFragment.mArray.get(mPos).setColorThumbnail(mSessionColor);
+							ListSessionFragment.mArray.get(mPos).setBitmap(mSessionImage);
+
+							ListSessionFragment.mAdapter.notifyDataSetChanged();
+							
 							toShow = Toast.makeText(mContext, R.string.modify_made, Toast.LENGTH_SHORT);
 						}else{
 							toShow = Toast.makeText(mContext, R.string.modify_no_made, Toast.LENGTH_SHORT);

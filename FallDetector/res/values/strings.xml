@@ -127,4 +127,9 @@
 	<string name="alarm_title">Start a new Session!!</string>
 	<string name="alarm_info">Click here!!</string>
 
+	<string name="mail_sbj">I\'m fall, help me!!</string>
+	<string name="mail_msg1">I\'m fall at\u0020</string>
+	<string name="mail_msg2">\u0020on location:</string>
+	<string name="mail_end1">Please save me!! Thank\'s!!</string>
+	<string name="mail_end2">Power by Android Buccaneers</string>
 </resources>
