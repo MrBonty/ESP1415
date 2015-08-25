@@ -112,7 +112,7 @@
 			    android:textColor="#ff0000"
 			    android:textSize="12sp" />
 	        
-	        <it.unipd.dei.esp1415.falldetector.utility.ChartView
+	        <it.unipd.dei.esp1415.falldetector.utility.ChartViewUI4
 	        	android:id="@+id/chart_x_axis"
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="35dp"
@@ -139,7 +139,7 @@
 	            android:text="@string/y"
 	        />
 		    
-	        <it.unipd.dei.esp1415.falldetector.utility.ChartView
+	        <it.unipd.dei.esp1415.falldetector.utility.ChartViewUI4
 			    android:id="@+id/chart_y_axis"
 			    android:layout_width="fill_parent"
 			    android:layout_height="35dp"
@@ -166,7 +166,7 @@
 	            android:text="@string/z"
 	        />
 	    
-		    <it.unipd.dei.esp1415.falldetector.utility.ChartView 
+		    <it.unipd.dei.esp1415.falldetector.utility.ChartViewUI4
 	        	android:id="@+id/chart_z_axis"
 	        	android:layout_width="fill_parent"
 	        	android:layout_height="35dp"

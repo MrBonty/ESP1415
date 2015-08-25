@@ -425,6 +425,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		
 		Intent activityIntent = new Intent(this, MainActivity.class);
 		activityIntent.putExtra(MainActivity.OPEN_UI2, true);
+		activityIntent.setFlags(activityIntent.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
 		startActivity(activityIntent);
 		finish();
 	}

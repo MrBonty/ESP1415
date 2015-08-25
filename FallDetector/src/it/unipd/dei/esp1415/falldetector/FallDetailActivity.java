@@ -1,23 +1,24 @@
 package it.unipd.dei.esp1415.falldetector;
 
-import java.util.ArrayList;
-
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.fragment.SettingsMainFragment;
-import android.content.SharedPreferences;
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
-import it.unipd.dei.esp1415.falldetector.utility.ChartView;
+import it.unipd.dei.esp1415.falldetector.utility.ChartViewUI4;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
-import android.support.v7.app.ActionBarActivity;
+
+import java.util.ArrayList;
+
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,9 +39,9 @@ public class FallDetailActivity extends ActionBarActivity {
     private DatabaseManager dm;
     
     //accelerometer data must be displayed in graphical form with these
-	private ChartView xChart;
-	private ChartView yChart;
-	private ChartView zChart;
+	private ChartViewUI4 xChart;
+	private ChartViewUI4 yChart;
+	private ChartViewUI4 zChart;
 	
 	private SharedPreferences preferences; //preferences for the frequency
 	private int frequencyValue;
@@ -154,13 +155,13 @@ public class FallDetailActivity extends ActionBarActivity {
 			}
 		}
 		
-		xChart = (ChartView) findViewById(R.id.chart_x_axis);
+		xChart = (ChartViewUI4) findViewById(R.id.chart_x_axis);
 		xChart.setChartData(x_data, x_data.length);
 		
-		yChart = (ChartView) findViewById(R.id.chart_y_axis);
+		yChart = (ChartViewUI4) findViewById(R.id.chart_y_axis);
 		yChart.setChartData(y_data, y_data.length);
 		
-		zChart = (ChartView) findViewById(R.id.chart_z_axis);
+		zChart = (ChartViewUI4) findViewById(R.id.chart_z_axis);
 		zChart.setChartData(z_data, z_data.length);
 	}
 
