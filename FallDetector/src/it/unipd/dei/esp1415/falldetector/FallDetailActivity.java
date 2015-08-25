@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
+import it.unipd.dei.esp1415.falldetector.fragment.SettingsMainFragment;
+import android.content.SharedPreferences;
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
 import it.unipd.dei.esp1415.falldetector.utility.ChartView;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
@@ -15,6 +17,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,15 +32,20 @@ public class FallDetailActivity extends ActionBarActivity {
 	private static int mIndex;
 	private Mediator mMod;
 	private static ViewHolder viewHolder;
-	private Fall current;
+	private Fall current; //the current Fall
     private static int mCurrentFall; //the position of the current Fall
 	private static Context mContext;
     private DatabaseManager dm;
     
+    //accelerometer data must be displayed in graphical form with these
 	private ChartView xChart;
 	private ChartView yChart;
 	private ChartView zChart;
 	
+	private SharedPreferences preferences; //preferences for the frequency
+	private int frequencyValue;
+	
+	//arrays for saving data [500 ms of accelerometer data before and after the event]
 	private static float[] x_data;
 	private static float[] y_data;
 	private static float[] z_data;
@@ -75,7 +83,6 @@ public class FallDetailActivity extends ActionBarActivity {
 		Log.i("Fall Session", "Activity "+mIndex);
 		Log.i("Fall Session", "Activity "+mCurrentFall);
 		
-		//TODO substitute with mArray.get(mIndex).getFall(mCurrentFall); 
 		current = dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_FE_DATE).get(mCurrentFall); //get the current Fall
 		
 		String[] tmp = current.dateTimeStampFallEven();
@@ -106,16 +113,45 @@ public class FallDetailActivity extends ActionBarActivity {
 		
 		viewHolder.sessionSended.setText(s);
 		
-		x_data = new float[1000];
-		y_data = new float[1000];
-		z_data = new float[1000];
+		preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+		frequencyValue = preferences.getInt(SettingsMainFragment.SAVE_FREQ, SettingsMainFragment.FREQ_MIDDLE);
+		
+		x_data = new float[frequencyValue];
+		y_data = new float[frequencyValue];
+		z_data = new float[frequencyValue];
 		
 		ArrayList<AccelData> temp = dm.getAccelDataAsArrayForAFall(current.getId(), DatabaseTable.COLUMN_AC_TS);
 		
-		for(int i=0; i<temp.size(); i++){
-			x_data[i] = (float)temp.get(i).getX();
-			y_data[i] = (float)temp.get(i).getY();
-			z_data[i] = (float)temp.get(i).getZ();
+		//save data based on sample rate used
+		if(frequencyValue == 19)
+			for(int i=0; i<temp.size(); i++){
+				x_data[i] = (float)temp.get(i).getX();
+				y_data[i] = (float)temp.get(i).getY();
+				z_data[i] = (float)temp.get(i).getZ();
+			}
+		else if(frequencyValue == 13){
+			int j=0;
+			
+			for(int i=0; i<temp.size(); i++){
+				if(i!=2 && i!=5 && i!=8 && i!=10 && i!=13 && i!=16){
+					x_data[j] = (float)temp.get(i).getX();
+					y_data[j] = (float)temp.get(i).getY();
+					z_data[j] = (float)temp.get(i).getZ();
+					j++;
+				}					
+			}		
+		}
+		else{
+			int j=0;
+			
+			for(int i=0; i<temp.size(); i++){
+				if(i==0 || i==2 || i==4 || i==6 || i==9 || i==12 || i==14 || i==16 || i==18){
+					x_data[j] = (float)temp.get(i).getX();
+					y_data[j] = (float)temp.get(i).getY();
+					z_data[j] = (float)temp.get(i).getZ();
+					j++;
+				}					
+			}
 		}
 		
 		xChart = (ChartView) findViewById(R.id.chart_x_axis);
