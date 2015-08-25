@@ -20,7 +20,7 @@
 	<string name="thumbnail">Thumbnail</string>
 	<string name="date">Session start time</string>
 	<string name="not_started">Session not yet started</string>
-	<string name="duration">Duration</string>
+	<string name="duration">Duration:</string>
 	<string name="end_button">End</string>
 	<string name="play_button">Play</string>
 	<string name="fall_title">Fall Events</string>

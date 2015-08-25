@@ -65,6 +65,15 @@
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="@string/not_started" />
+            
+             <TextView
+                android:id="@+id/duration_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:singleLine="true"
+                android:text="@string/duration"
+                android:textStyle="italic|bold" />
 
             <Chronometer
                 android:id="@+id/duration"
@@ -72,8 +81,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:singleLine="true"
-                android:text="@string/duration"
-                android:textStyle="italic|bold" />
+                android:text="@string/duration"/>
 
             <TextView
                 android:id="@+id/session_duration"
