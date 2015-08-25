@@ -5,15 +5,12 @@ import it.unipd.dei.esp1415.falldetector.service.FallDetectorService;
 public class SimpleFallAlgorithm {
 
 	public static double FALL_UPPER_BOUND = 20;
-	public static double FALL_LOWER_BOUND = 3;
+	public static double FALL_LOWER_BOUND = 6;
 	public static int ACC_DATA_SIZE = 1000;
 	public static int NUM_BLOCK = 3;
 	
 	private AccelData[] accDataBuffer;
 	private int accDataSize;
-	
-	//what to do?
-	//private AccelData[] fallData;
 	
 	private AccelData[]	accDataAnalyzer;
 

@@ -193,5 +193,15 @@ public class Fall {
 	public double getLongitude(){
 		return longitude;
 	}
+	
+	@Override
+	public String toString(){
+		String s;
+		if(isNotified)
+			s = "Sent";
+		else
+			s = "Not Sent";
+		return dateEvent.getTime().toString() + " " + s;
+	}
 }
 

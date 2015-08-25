@@ -6,6 +6,7 @@ import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.service.FallDetectorService;
 import it.unipd.dei.esp1415.falldetector.utility.ChartView;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
+import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
 import it.unipd.dei.esp1415.falldetector.utility.SimpleFallAlgorithm;
@@ -77,6 +78,13 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	private ImageView thmb;
 
 	private BroadcastReceiver broadcastDataReceiver;
+	
+	public static ArrayList<Fall> falls = null;
+	
+	public static ArrayAdapter<Fall> arrayAdapter = null;
+	
+	public static ListView lstvFalls = null;
+	
 
 	public CurrentSessionActivity() {
 
@@ -91,7 +99,12 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
 		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
 		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		
+//		falls = null;
+//		arrayAdapter = null;
+		
 	}
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +134,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		zChart = (ChartView) findViewById(R.id.chart_z_axis);
 		
 		// lstvFalls referes to the ListView in the layout
-		ListView lstvFalls = (ListView) findViewById(R.id.session_falls);
+		lstvFalls = (ListView) findViewById(R.id.session_falls);
 		
 		// end button
 		final ImageButton ibtnEnd = (ImageButton) findViewById(R.id.end_button);
@@ -130,8 +143,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		dm = new DatabaseManager(getApplicationContext());
 
 		// Fetch session from database
-		mCurrent = dm.getLastSession(null, DatabaseTable.COLUMN_SS_START_DATE
-				+ " " + DatabaseManager.DESC);
+		mCurrent = dm.getLastSession();
 		
 		sessionName.setText(mCurrent.getName());
 		
@@ -173,15 +185,23 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		}// timestamp
 
 		// List of falls occur during the session
-		final ArrayList<String> falls = new ArrayList<String>();
-
-		// Array adapter of the list view
-		final ArrayAdapter<String> arrayAdapter;
+		falls = new ArrayList<Fall>();
+		
+		falls = dm.getFallForSessionAsArray(mCurrent.getId(), DatabaseTable.COLUMN_FE_DATE
+				+ " " + DatabaseManager.DESC);
 
 		// bind the array adapter to the list view
-		arrayAdapter = new ArrayAdapter<String>(this,
+		arrayAdapter = new ArrayAdapter<Fall>(this,
 				android.R.layout.simple_list_item_1, falls);
 		lstvFalls.setAdapter(arrayAdapter);
+		
+//		 TODO this is just a TEMPORARY code
+//		sessionStartTime = Calendar.getInstance(TimeZone.getDefault());
+//		falls.add(0, sessionStartTime.getTime().toString() + "  SENT");
+//		arrayAdapter.notifyDataSetChanged();
+//		Toast.makeText(getApplicationContext(), "Item added",
+//				Toast.LENGTH_LONG).show();
+
 
 		// Manages play and pause events
 		ibtnPlayPause.setOnClickListener(new View.OnClickListener() {
@@ -423,7 +443,12 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
 		serviceIntent.putExtra(FallDetectorService.GET_ARRAY, true);
-		startService(serviceIntent); 
+		startService(serviceIntent);
+		
+		falls = dm.getFallForSessionAsArray(mCurrent.getId(), DatabaseTable.COLUMN_FE_DATE
+				+ " " + DatabaseManager.DESC);
+		arrayAdapter = new ArrayAdapter<Fall>(this,
+				android.R.layout.simple_list_item_1, falls);
 		super.onResume();
 	};
 
@@ -442,6 +467,9 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 		values.put(DatabaseTable.COLUMN_SS_DURATION, mCurrent.getDuration());
 		dm.upgradeASession(mCurrent.getId(), values);
+		
+		arrayAdapter = null;
+		falls = null;
 	};
 
 	@Override
@@ -547,4 +575,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		mMed.resetCurretnPosSessionFromBack();
 		super.onBackPressed();
 	}
+	
+	
+
 }

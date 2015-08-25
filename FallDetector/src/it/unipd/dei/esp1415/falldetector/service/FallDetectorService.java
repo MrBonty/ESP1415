@@ -1,5 +1,6 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
+import it.unipd.dei.esp1415.falldetector.CurrentSessionActivity;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
@@ -23,6 +24,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class FallDetectorService extends Service {
 	
@@ -323,13 +325,20 @@ public class FallDetectorService extends Service {
 	private void fallDetected(AccelData data){
 		Log.i("fallDetected", "fall!");
 		isPotentialFall = false;
-		Fall fall = new Fall(data.getTimestamp(), 
-							 dm.getLastSession(null,
-									 DatabaseTable.COLUMN_SS_START_DATE
-									 + " " + DatabaseManager.DESC).getId());
+		Fall fall = new Fall(data.getTimestamp(), dm.getLastSession().getId());
 		fall.setLatitude(latitude);
 		fall.setLongitude(longitude);
 		fall.setId(newData.getTimestamp());
 		dm.insertAFall(fall);
+		
+		if((CurrentSessionActivity.arrayAdapter != null) && (CurrentSessionActivity.falls != null)){
+			Log.e("Add fall:", "Adding fall");
+			CurrentSessionActivity.falls.add(fall);
+			CurrentSessionActivity.lstvFalls.setAdapter(CurrentSessionActivity.arrayAdapter);
+			
+			Toast toast = Toast.makeText(getApplicationContext(), "Item Added, size: " + CurrentSessionActivity.arrayAdapter.getCount()
+					, Toast.LENGTH_SHORT);
+			toast.show();
+		}
 	}
 }
