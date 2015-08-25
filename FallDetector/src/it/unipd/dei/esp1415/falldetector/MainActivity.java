@@ -12,11 +12,11 @@ import it.unipd.dei.esp1415.falldetector.service.AlarmService;
 import it.unipd.dei.esp1415.falldetector.utility.ConnectivityStatus;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
-
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
+import android.app.ListFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -46,6 +46,8 @@ public class MainActivity extends ActionBarActivity {
 	public static final String SAVE_ADD_DIALOG = "addDialog";
 	
 	public static final int NEW_SESSION_POSITION = 0;
+	
+	public static final String OPEN_UI2 = "Open_UI2";
 
 	
 	@SuppressLint("NewApi")
@@ -102,6 +104,12 @@ public class MainActivity extends ActionBarActivity {
 		}
 		
 		deleteService().run();
+		if(savedInstanceState != null && savedInstanceState.getBoolean(OPEN_UI2)){
+			if(listFragment != null && listFragment instanceof ListSessionFragment){
+				((ListSessionFragment) listFragment).showDetail(0);
+			}
+		}
+		
 		
 	}//[m] onCreate()
 	

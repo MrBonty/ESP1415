@@ -7,9 +7,9 @@ import it.unipd.dei.esp1415.falldetector.service.FallDetectorService;
 import it.unipd.dei.esp1415.falldetector.utility.ChartView;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
+import it.unipd.dei.esp1415.falldetector.utility.FallAlgorithmUtility;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
-import it.unipd.dei.esp1415.falldetector.utility.FallAlgorithmUtility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -417,11 +417,15 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				FallDetectorService.class);
 		serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
 		startService(serviceIntent);
-		
 		stopService(serviceIntent);
 		
 		// Clear tmp acc data from database
 		dm.deleteTempAccDataTable();
+		
+		
+		Intent activityIntent = new Intent(this, MainActivity.class);
+		activityIntent.putExtra(MainActivity.OPEN_UI2, true);
+		startActivity(activityIntent);
 		finish();
 	}
 

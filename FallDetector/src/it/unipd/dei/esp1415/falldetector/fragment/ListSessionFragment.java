@@ -173,7 +173,7 @@ public class ListSessionFragment extends ListFragment {
 	 * 
 	 * @param pos receive the position to show
 	 */
-	private void showDetail(int pos){
+	public void showDetail(int pos){
 		
 		mMed.setCurretnPosSession(pos);
 		mCurCheckPosition = pos;
