@@ -42,6 +42,7 @@ public class MainActivity extends ActionBarActivity {
 	private Mediator mMed;
 
 	private SessionDialog mDialog;
+	private ConnectionDialog mStatusDialog;
 	
 	// Constants
 	public static final int SCREENLAYOUT_SIZE_XLARGE = 0x04; //For compatibility with API 8 same value of Configuration.SCREENLAYOUT_SIZE_XLARGE
@@ -88,7 +89,6 @@ public class MainActivity extends ActionBarActivity {
 		transaction.commit();
 		
 		if(savedInstanceState != null && savedInstanceState.getBoolean(SAVE_ADD_DIALOG)){
-			
 			createAddDialog(true, savedInstanceState);
 		}
 		
@@ -158,6 +158,11 @@ public class MainActivity extends ActionBarActivity {
         	
         	outState.putBoolean(SAVE_ADD_DIALOG, true);
 		}
+        
+        if(mStatusDialog != null){
+        	mStatusDialog.setOnDismissListener(null);
+        	mStatusDialog.dismiss();
+        }
     }//[m] onSaveInstanceState()
 
 	/**
@@ -248,8 +253,15 @@ public class MainActivity extends ActionBarActivity {
 		boolean isMobileAvailable = conStat.isMobileConnectionAvailable();
 		
 		if(!isLocationOn || (isMobileAvailable && !isMobileOn) || !isWifiOn){
-			ConnectionDialog dialog = new ConnectionDialog(this, isWifiOn, isMobileOn, isMobileAvailable, isLocationOn);
-			dialog.show();
+			mStatusDialog = new ConnectionDialog(this, isWifiOn, isMobileOn, isMobileAvailable, isLocationOn);
+			mStatusDialog.setOnDismissListener(new OnDismissListener() {
+				
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+					mStatusDialog = null;
+				}
+			});
+			mStatusDialog.show();
 		}
 	}//[m] createConnectivityDialog()
 	

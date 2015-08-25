@@ -19,7 +19,6 @@ public class Session {
 	private boolean isActive;
 	private boolean isPause;
 	private long chrono_tmp;
-	private String xmlFile;
 	private ArrayList<Fall> fallsEvent; // TODO describe fall event with a
 											// class
 
@@ -278,41 +277,6 @@ public class Session {
 		else
 			this.isPause = false;
 	}
-
-	
-	/**
-	 * [m]
-	 * Method to get the name of the file xml
-	 * 
-	 * @return the name of the xml file
-	 */
-	public String getXmlFileName(){
-		return xmlFile;
-	}//[m] getXmlFileName()
-	
-	/**
-	 * [m]
-	 * Method to get the name of the file xml from existing on stored on db
-	 * 
-	 * @param xml the name get from db
-	 */
-	public void setXmlFileName(String xml){
-		xmlFile = xml;
-	}// [m] setXmlFileName()
-	
-	/**
-	 * [m]
-	 * Method to set name of file xml as hhmmssmmmddmmaaaa
-	 */
-	public void generateXmlName(){
-		xmlFile = "" + startDate.get(Calendar.HOUR)
-				+ startDate.get(Calendar.MINUTE)
-				+ startDate.get(Calendar.SECOND)
-				+ startDate.get(Calendar.MILLISECOND)
-				+ startDate.get(Calendar.DAY_OF_MONTH)
-				+ (startDate.get(Calendar.MONTH) + 1)
-				+ startDate.get(Calendar.YEAR);
-	}// [m] generateXmlName()
 	
 	/**
 	 * [m]
