@@ -81,9 +81,9 @@ public class SettingsMainFragment extends Fragment{
 	public static final String SAVE_MAIL_ACCOUNT = "account";
 	public static final String SAVE_MAIL_DATABASE64 = "data";
 
-	public static final int FREQ_LOW = 5;
-	public static final int FREQ_MIDDLE = 7; 
-	public static final int FREQ_HIGH = 9; 
+	public static final int FREQ_LOW = 9;
+	public static final int FREQ_MIDDLE = 13; 
+	public static final int FREQ_HIGH = 19; 
 
 	public static final String STANDARD_TIME = "8:00"; //default time 8:00 am
 	
