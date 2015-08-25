@@ -102,6 +102,12 @@ public class AlarmService extends Service{
 		super.onDestroy();
 	}
 
+	/**
+	 * [m]
+	 * Methods to verify if is the time to notify to start a new session
+	 * 
+	 * @return true if has to notify, false otherwise
+	 */
 	private boolean verifyNotification(){
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
