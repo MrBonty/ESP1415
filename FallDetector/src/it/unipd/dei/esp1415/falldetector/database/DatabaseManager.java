@@ -389,7 +389,9 @@ public class DatabaseManager {
 	
 	
 	// Metodo di prova Xu
-	public Session getLastSession(String selection, String orderBy){
+	public Session getLastSession(){
+		String selection = null;
+		String orderBy = DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.DESC; 
 		
 		Cursor c = getSessionAsCursor(selection, orderBy);
 		Session s = null;

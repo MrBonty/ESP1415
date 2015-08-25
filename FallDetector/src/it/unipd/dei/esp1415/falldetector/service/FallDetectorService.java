@@ -1,10 +1,11 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
+import it.unipd.dei.esp1415.falldetector.CurrentSessionActivity;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseTable;
 import it.unipd.dei.esp1415.falldetector.utility.AccelData;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
-import it.unipd.dei.esp1415.falldetector.utility.SimpleFallAlgorithm;
+import it.unipd.dei.esp1415.falldetector.utility.FallAlgorithmUtility;
 
 import java.util.ArrayList;
 
@@ -23,6 +24,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class FallDetectorService extends Service {
 	
@@ -82,9 +84,9 @@ public class FallDetectorService extends Service {
 		ArrayList<AccelData> tmpAccData 
 			= dm.getTempAccelDataAsArray(DatabaseTable.COLUMN_PK_ID + " " + DatabaseManager.ASC);
 		
-		accDataX = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
-		accDataY = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
-		accDataZ = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		accDataX = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
+		accDataY = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
+		accDataZ = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
 		
 		for(AccelData accData : tmpAccData){
 			
@@ -94,9 +96,9 @@ public class FallDetectorService extends Service {
 			accDataIndex++;
 		}
 		
-		if(accDataIndex >= SimpleFallAlgorithm.ACC_DATA_SIZE){
+		if(accDataIndex >= FallAlgorithmUtility.ACC_DATA_SIZE){
 			accDataIndex = dm.getTempAccelDataLastIndex();
-			accDataIndex = accDataIndex + SimpleFallAlgorithm.ACC_DATA_SIZE + 1;
+			accDataIndex = accDataIndex + FallAlgorithmUtility.ACC_DATA_SIZE + 1;
 		}
 		
 		newData = new AccelData();
@@ -263,14 +265,14 @@ public class FallDetectorService extends Service {
 					
 					if(isPlaying){
 						
-						if(accDataIndex >= SimpleFallAlgorithm.ACC_DATA_SIZE){
-							newData.setId(accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE);
+						if(accDataIndex >= FallAlgorithmUtility.ACC_DATA_SIZE){
+							newData.setId(accDataIndex % FallAlgorithmUtility.ACC_DATA_SIZE);
 							newData.setTimestamp(event.timestamp);
-							newData.setX((double) (accDataX[accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE]
+							newData.setX((double) (accDataX[accDataIndex % FallAlgorithmUtility.ACC_DATA_SIZE]
 									= event.values[0]));
-							newData.setY((double) (accDataY[accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE]
+							newData.setY((double) (accDataY[accDataIndex % FallAlgorithmUtility.ACC_DATA_SIZE]
 									= event.values[1]));
-							newData.setZ((double) (accDataZ[accDataIndex % SimpleFallAlgorithm.ACC_DATA_SIZE]
+							newData.setZ((double) (accDataZ[accDataIndex % FallAlgorithmUtility.ACC_DATA_SIZE]
 									= event.values[2]));
 							dm.upgradeATempAccelData(newData);
 							broadcastDataIntent
@@ -287,19 +289,19 @@ public class FallDetectorService extends Service {
 						}
 						
 						if(isPotentialFall){
-							if(SimpleFallAlgorithm.module(newData) <= SimpleFallAlgorithm.FALL_LOWER_BOUND)
+							if(FallAlgorithmUtility.module(newData) <= FallAlgorithmUtility.FALL_LOWER_BOUND)
 								fallDetected(newData);
 							potentialFallcount--;
 							if(potentialFallcount <= 0)
 								isPotentialFall = false; 
 						}
 						
-						if(SimpleFallAlgorithm.module(newData) >= SimpleFallAlgorithm.FALL_UPPER_BOUND){
+						if(FallAlgorithmUtility.module(newData) >= FallAlgorithmUtility.FALL_UPPER_BOUND){
 							isPotentialFall = true;
 							potentialFallcount = 5;
 						}
 						
-						Log.e("onSensorChanged", "module: " + SimpleFallAlgorithm.module(newData));
+						Log.e("onSensorChanged", "module: " + FallAlgorithmUtility.module(newData));
 						if(isPotentialFall)
 							Log.e("onSensorChanged", "isPotentialFall: true");
 						else
@@ -331,13 +333,23 @@ public class FallDetectorService extends Service {
 	private void fallDetected(AccelData data){
 		Log.i("fallDetected", "fall!");
 		isPotentialFall = false;
+
 		Fall fall = new Fall((myTime+ (data.getTimestamp()- sensorTime)/1000000l), 
-							 dm.getLastSession(null,
-									 DatabaseTable.COLUMN_SS_START_DATE
-									 + " " + DatabaseManager.DESC).getId());
+							 dm.getLastSession().getId());
+
 		fall.setLatitude(latitude);
 		fall.setLongitude(longitude);
 		fall.setId(newData.getTimestamp());
 		dm.insertAFall(fall);
+		
+		if((CurrentSessionActivity.arrayAdapter != null) && (CurrentSessionActivity.falls != null)){
+			Log.e("Add fall:", "Adding fall");
+			CurrentSessionActivity.falls.add(fall);
+			CurrentSessionActivity.lstvFalls.setAdapter(CurrentSessionActivity.arrayAdapter);
+			
+			Toast toast = Toast.makeText(getApplicationContext(), "Item Added, size: " + CurrentSessionActivity.arrayAdapter.getCount()
+					, Toast.LENGTH_SHORT);
+			toast.show();
+		}
 	}
 }

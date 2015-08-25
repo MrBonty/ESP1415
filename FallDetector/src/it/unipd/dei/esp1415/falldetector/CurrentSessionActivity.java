@@ -6,9 +6,10 @@ import it.unipd.dei.esp1415.falldetector.fragment.ListSessionFragment;
 import it.unipd.dei.esp1415.falldetector.service.FallDetectorService;
 import it.unipd.dei.esp1415.falldetector.utility.ChartView;
 import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
+import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
-import it.unipd.dei.esp1415.falldetector.utility.SimpleFallAlgorithm;
+import it.unipd.dei.esp1415.falldetector.utility.FallAlgorithmUtility;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -77,6 +78,13 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	private ImageView thmb;
 
 	private BroadcastReceiver broadcastDataReceiver;
+	
+	public static ArrayList<Fall> falls = null;
+	
+	public static ArrayAdapter<Fall> arrayAdapter = null;
+	
+	public static ListView lstvFalls = null;
+	
 
 	public CurrentSessionActivity() {
 
@@ -88,10 +96,15 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		
 		index = 0;
 		
-		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
-		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
-		xTmpArray = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
+		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
+		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
+		
+//		falls = null;
+//		arrayAdapter = null;
+		
 	}
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +134,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		zChart = (ChartView) findViewById(R.id.chart_z_axis);
 		
 		// lstvFalls referes to the ListView in the layout
-		ListView lstvFalls = (ListView) findViewById(R.id.session_falls);
+		lstvFalls = (ListView) findViewById(R.id.session_falls);
 		
 		// end button
 		final ImageButton ibtnEnd = (ImageButton) findViewById(R.id.end_button);
@@ -130,8 +143,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		dm = new DatabaseManager(getApplicationContext());
 
 		// Fetch session from database
-		mCurrent = dm.getLastSession(null, DatabaseTable.COLUMN_SS_START_DATE
-				+ " " + DatabaseManager.DESC);
+		mCurrent = dm.getLastSession();
 		
 		sessionName.setText(mCurrent.getName());
 		
@@ -173,15 +185,23 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		}// timestamp
 
 		// List of falls occur during the session
-		final ArrayList<String> falls = new ArrayList<String>();
-
-		// Array adapter of the list view
-		final ArrayAdapter<String> arrayAdapter;
+		falls = new ArrayList<Fall>();
+		
+		falls = dm.getFallForSessionAsArray(mCurrent.getId(), DatabaseTable.COLUMN_FE_DATE
+				+ " " + DatabaseManager.DESC);
 
 		// bind the array adapter to the list view
-		arrayAdapter = new ArrayAdapter<String>(this,
+		arrayAdapter = new ArrayAdapter<Fall>(this,
 				android.R.layout.simple_list_item_1, falls);
 		lstvFalls.setAdapter(arrayAdapter);
+		
+//		 TODO this is just a TEMPORARY code
+//		sessionStartTime = Calendar.getInstance(TimeZone.getDefault());
+//		falls.add(0, sessionStartTime.getTime().toString() + "  SENT");
+//		arrayAdapter.notifyDataSetChanged();
+//		Toast.makeText(getApplicationContext(), "Item added",
+//				Toast.LENGTH_LONG).show();
+
 
 		// Manages play and pause events
 		ibtnPlayPause.setOnClickListener(new View.OnClickListener() {
@@ -219,24 +239,24 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				yTmpArray = intent.getFloatArrayExtra(FallDetectorService.Y_AXIS_ARRAY);
 				zTmpArray = intent.getFloatArrayExtra(FallDetectorService.Z_AXIS_ARRAY);
 				
-				if(index >= SimpleFallAlgorithm.ACC_DATA_SIZE){
-					index = index % SimpleFallAlgorithm.ACC_DATA_SIZE;
+				if(index >= FallAlgorithmUtility.ACC_DATA_SIZE){
+					index = index % FallAlgorithmUtility.ACC_DATA_SIZE;
 					
 					xTmpArray = swapArrayData(xTmpArray, index);
-					xChart.setChartData(xTmpArray, SimpleFallAlgorithm.ACC_DATA_SIZE);
+					xChart.setChartData(xTmpArray, FallAlgorithmUtility.ACC_DATA_SIZE);
 					xChart.invalidate();
 					txtvAccDataX.setText("X: " + xChart.getLastElement());
 					txtvAccDataX.invalidate();
 					
 
 					yTmpArray = swapArrayData(yTmpArray, index);
-					yChart.setChartData(yTmpArray, SimpleFallAlgorithm.ACC_DATA_SIZE);
+					yChart.setChartData(yTmpArray, FallAlgorithmUtility.ACC_DATA_SIZE);
 					yChart.invalidate();
 					txtvAccDataY.setText("Y: " + yChart.getLastElement());
 					txtvAccDataY.invalidate();
 					
 					zTmpArray = swapArrayData(zTmpArray, index);
-					zChart.setChartData(zTmpArray, SimpleFallAlgorithm.ACC_DATA_SIZE);
+					zChart.setChartData(zTmpArray, FallAlgorithmUtility.ACC_DATA_SIZE);
 					zChart.invalidate();
 					txtvAccDataZ.setText("Z: " + zChart.getLastElement());
 					txtvAccDataZ.invalidate();
@@ -423,7 +443,12 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
 		serviceIntent.putExtra(FallDetectorService.GET_ARRAY, true);
-		startService(serviceIntent); 
+		startService(serviceIntent);
+		
+		falls = dm.getFallForSessionAsArray(mCurrent.getId(), DatabaseTable.COLUMN_FE_DATE
+				+ " " + DatabaseManager.DESC);
+		arrayAdapter = new ArrayAdapter<Fall>(this,
+				android.R.layout.simple_list_item_1, falls);
 		super.onResume();
 	};
 
@@ -442,6 +467,9 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 		values.put(DatabaseTable.COLUMN_SS_DURATION, mCurrent.getDuration());
 		dm.upgradeASession(mCurrent.getId(), values);
+		
+		arrayAdapter = null;
+		falls = null;
 	};
 
 	@Override
@@ -509,9 +537,9 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	};
 	
 	private float[] swapArrayData(float[] array, int index){
-		float[] tmp = new float[SimpleFallAlgorithm.ACC_DATA_SIZE];
+		float[] tmp = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
 		int i = 0;
-		while((i + index + 1) < SimpleFallAlgorithm.ACC_DATA_SIZE){
+		while((i + index + 1) < FallAlgorithmUtility.ACC_DATA_SIZE){
 			tmp[i] = array[i + index + 1];
 			i++;
 		}
@@ -547,4 +575,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		mMed.resetCurretnPosSessionFromBack();
 		super.onBackPressed();
 	}
+	
+	
+
 }
