@@ -70,6 +70,9 @@ public class FallDetectorService extends Service {
 	
 	private DatabaseManager dm;
 	
+	private long sensorTime = 0l;
+	private long myTime = 0l;
+	
 	public void onCreate() {
 		super.onCreate();
 		Log.i("onCreate: ", "onCreate called");
@@ -249,6 +252,11 @@ public class FallDetectorService extends Service {
 			// Ensure mutually exclusive access to the sensor.
 			synchronized (this) {
 				
+				if(sensorTime == 0l && myTime == 0l) {
+			        sensorTime = event.timestamp;
+			        myTime = System.currentTimeMillis();
+			    }
+				
 				elapsedTime = System.currentTimeMillis() - lastSampleTime;
 				
 				if(elapsedTime > MIN_SAMPLE_RATE){
@@ -323,7 +331,7 @@ public class FallDetectorService extends Service {
 	private void fallDetected(AccelData data){
 		Log.i("fallDetected", "fall!");
 		isPotentialFall = false;
-		Fall fall = new Fall(data.getTimestamp(), 
+		Fall fall = new Fall((myTime+ (data.getTimestamp()- sensorTime)/1000000l), 
 							 dm.getLastSession(null,
 									 DatabaseTable.COLUMN_SS_START_DATE
 									 + " " + DatabaseManager.DESC).getId());
