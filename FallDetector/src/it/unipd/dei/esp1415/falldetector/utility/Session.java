@@ -348,9 +348,9 @@ public class Session {
 	}
 
 	/**[m]
-	 * Method to get the duration as String HH:MM
+	 * Method to get the duration as String HH:MM:SS
 	 * 
-	 * @return the duration as HH:MM
+	 * @return the duration as HH:MM:SS
 	 */
 	public String getDurationString() {
 		String tmp = "00:00";
@@ -361,7 +361,7 @@ public class Session {
 			
 		    int m = (int) ((s % 3600)/60);
 		    
-		    tmp = h+ ":"+ m;
+		    tmp = h+ ":"+ m + ":"+ s;
 		}
 		return tmp;
 	}//[m] getDurationString()
