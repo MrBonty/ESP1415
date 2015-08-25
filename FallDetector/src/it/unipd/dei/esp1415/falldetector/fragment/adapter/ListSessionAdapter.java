@@ -397,6 +397,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 				}
 				
 				mViewHolder.playPause.setImageResource(R.drawable.pause_button_default);
+				notifyDataSetChanged();
 				
 				ContentValues values = new ContentValues();
 				values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, ses.isPauseAsInteger());
