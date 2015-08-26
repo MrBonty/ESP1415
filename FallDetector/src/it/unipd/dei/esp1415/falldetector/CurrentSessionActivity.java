@@ -59,6 +59,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	 * Button which start, play and pause the session
 	 */
 	private ImageButton ibtnPlayPause;
+	
+	private ImageButton ibtnEnd;
 
 	// Customize view for chart
 	private ChartView xChart;
@@ -137,7 +139,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		lstvFalls = (ListView) findViewById(R.id.session_falls);
 		
 		// end button
-		final ImageButton ibtnEnd = (ImageButton) findViewById(R.id.end_button);
+		ibtnEnd = (ImageButton) findViewById(R.id.end_button);
+		ibtnEnd.setClickable(false);
 		
 		mMed = new Mediator();
 		dm = new DatabaseManager(getApplicationContext());
@@ -295,6 +298,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		// Get the current time and set the session to active
 		mCurrent.setStartDateAndTimestamp(Calendar.getInstance(TimeZone.getDefault()));
 		mCurrent.setToActive(true);
+		ibtnEnd.setClickable(true);
 		
 		if(ListSessionFragment.mArray != null){
 			ListSessionFragment.mArray.get(0).setStartDateAndTimestamp(mCurrent.getStartDateCalendar());

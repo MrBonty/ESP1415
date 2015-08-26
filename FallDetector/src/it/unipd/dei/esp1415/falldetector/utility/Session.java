@@ -353,13 +353,15 @@ public class Session {
 	 * @return the duration as HH:MM:SS
 	 */
 	public String getDurationString() {
-		String tmp = "00:00";
+		String tmp = "00:00:00";
 		if(duration > 0){
-			int s = (int) (duration / 1000);
-		  
-		    int h = (int) (s / 3600);
+			int allS = (int) (duration / 1000);
+			  
+		    int h = (int) (allS / 3600);
 			
-		    int m = (int) ((s % 3600)/60);
+		    int m = (int) ((allS % 3600)/60);
+		    
+		    int s = allS-h*3600 - m*60;
 		    
 		    tmp = h+ ":"+ m + ":"+ s;
 		}

@@ -1,7 +1,6 @@
 package it.unipd.dei.esp1415.falldetector.service;
 
 import it.unipd.dei.esp1415.falldetector.CurrentSessionActivity;
-import it.unipd.dei.esp1415.falldetector.MainActivity;
 import it.unipd.dei.esp1415.falldetector.R;
 import it.unipd.dei.esp1415.falldetector.SettingsActivity;
 import it.unipd.dei.esp1415.falldetector.database.DatabaseManager;
@@ -432,7 +431,7 @@ public class FallDetectorService extends Service {
 
 			String msg = getApplicationContext().getResources().getString(R.string.mail_msg1);
 			msg = msg + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + " of "
-					+ cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH + 1) 
+					+ cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH + 1)  + "/" 
 					+ cal.get(Calendar.YEAR);
 			msg = msg + getApplicationContext().getResources().getString(R.string.mail_msg2) + "\n";
 			msg = msg + getApplicationContext().getResources().getString(R.string.latitude) + ":" 
