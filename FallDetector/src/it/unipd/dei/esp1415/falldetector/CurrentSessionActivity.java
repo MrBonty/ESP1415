@@ -140,7 +140,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		
 		// end button
 		ibtnEnd = (ImageButton) findViewById(R.id.end_button);
-		ibtnEnd.setClickable(false);
 		
 		mMed = new Mediator();
 		dm = new DatabaseManager(getApplicationContext());
@@ -167,6 +166,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		if (mCurrent.getStartTimestamp() <= 0) {
 			// Initialize txtvStartTime view
 			ibtnPlayPause.setImageResource(R.drawable.play_button_default);
+			ibtnEnd.setClickable(false);
 		} else {
 			// Fetch data from current session
 			txtvStartTime.setText(mCurrent.getStartDateCalendar().getTime()
