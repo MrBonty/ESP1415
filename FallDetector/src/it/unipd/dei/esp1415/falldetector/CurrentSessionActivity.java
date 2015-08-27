@@ -197,14 +197,6 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		arrayAdapter = new ArrayAdapter<Fall>(this,
 				android.R.layout.simple_list_item_1, falls);
 		lstvFalls.setAdapter(arrayAdapter);
-		
-//		 TODO this is just a TEMPORARY code
-//		sessionStartTime = Calendar.getInstance(TimeZone.getDefault());
-//		falls.add(0, sessionStartTime.getTime().toString() + "  SENT");
-//		arrayAdapter.notifyDataSetChanged();
-//		Toast.makeText(getApplicationContext(), "Item added",
-//				Toast.LENGTH_LONG).show();
-
 
 		// Manages play and pause events
 		ibtnPlayPause.setOnClickListener(new View.OnClickListener() {
@@ -223,12 +215,13 @@ public class CurrentSessionActivity extends ActionBarActivity {
 					sessionStart();
 			}
 		});
-
+		
 		// Manages end button event
 		ibtnEnd.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				sessionEnd();
+				if(mCurrent.isActive())
+					sessionEnd();
 			}
 		});
 		
