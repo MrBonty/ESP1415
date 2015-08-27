@@ -63,6 +63,8 @@ public class FallDetectorService extends Service {
 	private long lastSampleTime;
 	private long elapsedTime;
 	
+	private SharedPreferences preferences;
+	
 	private SensorManager sensorManager;
 	
 	private LocationManager locationManager;
@@ -83,6 +85,9 @@ public class FallDetectorService extends Service {
 	private int potentialFallcount;
 	
 	private DatabaseManager dm;
+	
+	private long sessionStartTime;
+	private long sessionMaxDuration;
 	
 	private long sensorTime = 0l;
 	private long myTime = 0l;
@@ -126,6 +131,13 @@ public class FallDetectorService extends Service {
 		isPotentialFall = false;
 		
 		potentialFallcount = 0;
+		
+		preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+		
+		sessionMaxDuration = (long) (preferences.getInt(SettingsMainFragment.SAVE_SESSION_DURATION,
+												SettingsMainFragment.DEFAULT_DURATION) * 60 * 60 * 1000);
+		
+		sessionStartTime = dm.getLastSession().getStartTimestamp();
 		
 		broadcaster = LocalBroadcastManager.getInstance(this);
 		broadcastDataIntent = new Intent(FallDetectorService.XYZ_ARRAY);
@@ -186,6 +198,12 @@ public class FallDetectorService extends Service {
 				
 				// for GPS, change the first parameter to GPS_PROVIDER
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, locationListener);
+				
+				sessionMaxDuration = (long) (preferences.getLong(SettingsMainFragment.SAVE_SESSION_DURATION,
+														 SettingsMainFragment.DEFAULT_DURATION) * 60 * 60 * 1000);
+				
+				sessionStartTime = dm.getLastSession().getStartTimestamp();
+				
 			}
 			
 			if(intent.getBooleanExtra(FallDetectorService.IS_PAUSE, false)){
@@ -214,6 +232,11 @@ public class FallDetectorService extends Service {
 				
 				// for GPS, change the first parameter to GPS_PROVIDER
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, locationListener);
+				
+				sessionMaxDuration = (long) (preferences.getLong(SettingsMainFragment.SAVE_SESSION_DURATION,
+														 SettingsMainFragment.DEFAULT_DURATION) * 60 * 60 * 1000);
+				
+				sessionStartTime = dm.getLastSession().getStartTimestamp();
 			}
 		}
 
@@ -268,6 +291,12 @@ public class FallDetectorService extends Service {
 		// Store the data from the accelerometer
 		public void onSensorChanged(final SensorEvent event) {
 
+			if(System.currentTimeMillis() - sessionStartTime >= sessionMaxDuration){
+				stopSelf();
+				isPlaying = false;
+			}
+				
+			
 			// Ensure mutually exclusive access to the sensor.
 			synchronized (this) {
 				
