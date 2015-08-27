@@ -47,7 +47,7 @@ public class FallDetectorService extends Service {
 	public static final String Z_AXIS_ARRAY = "Z_AXIS_ARRAY";
 	public static final String ARRAY_SIZE = "ARRAY_SIZE";
 	public static final String XYZ_ARRAY = "XYZ_DATA";
-	
+	public static final String TIME_EXCEED = "TIME_EXCEED";
 	public static final String IS_PLAY = "IS_PLAY";
 	public static final String IS_PAUSE = "IS_PAUSE";
 	public static final String GET_ARRAY = "GET_ARRAY";
@@ -86,6 +86,8 @@ public class FallDetectorService extends Service {
 	
 	private DatabaseManager dm;
 	
+	
+	private Session activeSession;
 	private long sessionStartTime;
 	private long sessionMaxDuration;
 	
@@ -95,6 +97,7 @@ public class FallDetectorService extends Service {
 	private int posTmp;
 	private Fall fallTmp;
 	private int isSaving = 0;
+	private boolean timeExceed;
 	 
 	
 	public void onCreate() {
@@ -102,7 +105,7 @@ public class FallDetectorService extends Service {
 		Log.i("onCreate: ", "onCreate called");
 		
 		dm = new DatabaseManager(this.getApplicationContext());
-		
+		activeSession = dm.getLastSession();
 		ArrayList<AccelData> tmpAccData 
 			= dm.getTempAccelDataAsArray(DatabaseTable.COLUMN_PK_ID + " " + DatabaseManager.ASC);
 		
@@ -129,6 +132,7 @@ public class FallDetectorService extends Service {
 		
 		isPlaying = false;
 		isPotentialFall = false;
+		timeExceed = false;
 		
 		potentialFallcount = 0;
 		
@@ -136,8 +140,6 @@ public class FallDetectorService extends Service {
 		
 		sessionMaxDuration = (long) (preferences.getInt(SettingsMainFragment.SAVE_SESSION_DURATION,
 												SettingsMainFragment.DEFAULT_DURATION) * 60 * 60 * 1000);
-		
-		sessionStartTime = dm.getLastSession().getStartTimestamp();
 		
 		broadcaster = LocalBroadcastManager.getInstance(this);
 		broadcastDataIntent = new Intent(FallDetectorService.XYZ_ARRAY);
@@ -170,6 +172,12 @@ public class FallDetectorService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if(intent != null){
+			activeSession = dm.getLastSession();
+			sessionStartTime = dm.getLastSession().getStartTimestamp();
+			
+			sessionMaxDuration = (long) (preferences.getLong(SettingsMainFragment.SAVE_SESSION_DURATION,
+					 SettingsMainFragment.DEFAULT_DURATION) * 60 * 60 * 1000);
+			
 			if(intent.getBooleanExtra(FallDetectorService.GET_ARRAY, false)){
 				
 				broadcastDataIntent.putExtra(FallDetectorService.ARRAY_SIZE, accDataIndex);
@@ -199,11 +207,6 @@ public class FallDetectorService extends Service {
 				// for GPS, change the first parameter to GPS_PROVIDER
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, locationListener);
 				
-				sessionMaxDuration = (long) (preferences.getLong(SettingsMainFragment.SAVE_SESSION_DURATION,
-														 SettingsMainFragment.DEFAULT_DURATION) * 60 * 60 * 1000);
-				
-				sessionStartTime = dm.getLastSession().getStartTimestamp();
-				
 			}
 			
 			if(intent.getBooleanExtra(FallDetectorService.IS_PAUSE, false)){
@@ -232,11 +235,6 @@ public class FallDetectorService extends Service {
 				
 				// for GPS, change the first parameter to GPS_PROVIDER
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 10, locationListener);
-				
-				sessionMaxDuration = (long) (preferences.getLong(SettingsMainFragment.SAVE_SESSION_DURATION,
-														 SettingsMainFragment.DEFAULT_DURATION) * 60 * 60 * 1000);
-				
-				sessionStartTime = dm.getLastSession().getStartTimestamp();
 			}
 		}
 
@@ -247,6 +245,13 @@ public class FallDetectorService extends Service {
 	@Override
 	public void onDestroy() {
 		Log.e("destroy", "distrutto");
+		
+		// Remove listener on sensorManager
+		sensorManager.unregisterListener(sensorEventListener);
+		
+		// Remove the listener on locationManager
+		locationManager.removeUpdates(locationListener);
+		
 		super.onDestroy();
 	}
 	
@@ -290,12 +295,6 @@ public class FallDetectorService extends Service {
 
 		// Store the data from the accelerometer
 		public void onSensorChanged(final SensorEvent event) {
-
-			if(System.currentTimeMillis() - sessionStartTime >= sessionMaxDuration){
-				stopSelf();
-				isPlaying = false;
-			}
-				
 			
 			// Ensure mutually exclusive access to the sensor.
 			synchronized (this) {
@@ -306,7 +305,6 @@ public class FallDetectorService extends Service {
 			    }
 				
 				elapsedTime = System.currentTimeMillis() - lastSampleTime;
-				
 				if(elapsedTime > FallAlgorithmUtility.MIN_SAMPLE_RATE){
 					
 					if(isPlaying){
@@ -375,11 +373,32 @@ public class FallDetectorService extends Service {
 						broadcastDataIntent.putExtra(FallDetectorService.X_AXIS_ARRAY, accDataX);
 						broadcastDataIntent.putExtra(FallDetectorService.Y_AXIS_ARRAY, accDataY);
 						broadcastDataIntent.putExtra(FallDetectorService.Z_AXIS_ARRAY, accDataZ);
+						broadcastDataIntent.putExtra(FallDetectorService.TIME_EXCEED, timeExceed);
 						broadcaster.sendBroadcast(broadcastDataIntent);
-
 						accDataIndex++;
+						
+						if(timeExceed){
+							ContentValues values = new ContentValues();
+							values.put(DatabaseTable.COLUMN_SS_DURATION, sessionMaxDuration);
+							values.put(DatabaseTable.COLUMN_SS_IS_ACTIVE, 0);
+							
+							dm.upgradeASession(activeSession.getId(), values);
+							if(ListSessionFragment.mArray != null){
+								ListSessionFragment.mArray.get(0).setDuration(sessionMaxDuration);
+								ListSessionFragment.mArray.get(0).setToActive(false);
+							}
+							
+							// Clear tmp acc data from database
+							dm.deleteTempAccDataTable();
+							
+							isPlaying = false;
+							stopSelf();
+
+						}
+						
+						if(sessionStartTime - System.currentTimeMillis() > sessionMaxDuration)
+							timeExceed = true;
 					}
-					
 				}
 			}
 		}

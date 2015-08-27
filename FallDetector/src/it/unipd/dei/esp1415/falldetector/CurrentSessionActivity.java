@@ -81,6 +81,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 	private BroadcastReceiver broadcastDataReceiver;
 	
+	private boolean timeExceed;
+	
 	public static ArrayList<Fall> falls = null;
 	
 	public static ArrayAdapter<Fall> arrayAdapter = null;
@@ -101,6 +103,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
 		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
 		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
+		
+		timeExceed = false;
 		
 //		falls = null;
 //		arrayAdapter = null;
@@ -234,6 +238,10 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				xTmpArray = intent.getFloatArrayExtra(FallDetectorService.X_AXIS_ARRAY);
 				yTmpArray = intent.getFloatArrayExtra(FallDetectorService.Y_AXIS_ARRAY);
 				zTmpArray = intent.getFloatArrayExtra(FallDetectorService.Z_AXIS_ARRAY);
+				timeExceed = intent.getBooleanExtra(FallDetectorService.TIME_EXCEED, false);
+				
+				if(timeExceed)
+					sessionEnd();
 				
 				if(index >= FallAlgorithmUtility.ACC_DATA_SIZE){
 					index = index % FallAlgorithmUtility.ACC_DATA_SIZE;
