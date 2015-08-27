@@ -396,8 +396,12 @@ public class FallDetectorService extends Service {
 
 						}
 						
-						if(sessionStartTime - System.currentTimeMillis() > sessionMaxDuration)
+						Log.w("onSensorchanged:", "time: " + System.currentTimeMillis());
+						if(System.currentTimeMillis() - sessionStartTime > sessionMaxDuration)
 							timeExceed = true;
+						
+//						if(accDataIndex > 100)
+//							timeExceed = true;
 					}
 				}
 			}
