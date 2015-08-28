@@ -88,7 +88,7 @@
 	<string name="password">Password\u2026</string>
 	
 	<string name="on_start_sign_in">Insert email address and password of a Gmail account</string>
-	<string name="not_valid_value">Email address or password not valid, please insert email address and password of a Gmail account, or control gmail permissions (control your mail and not worry)</string>
+	<string name="not_valid_value">Email address or password not valid, please insert email address and password of a Gmail account, or control gmail permissions (https://www.google.com/settings/security/lesssecureapps)</string>
 	<string name="not_valid_address">No a @gmail.com account, please insert email address and password of a Gmail account</string>
 	
 	<string name="not_start">Not Started</string>

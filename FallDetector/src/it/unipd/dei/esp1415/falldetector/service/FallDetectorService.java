@@ -436,9 +436,14 @@ public class FallDetectorService extends Service {
 		isSaving = FallAlgorithmUtility.GET_HALF_SEC;
 	}
 	
+	/**
+	 * [m]
+	 * Method to save Accelerator data on Database and share mail
+	 */
 	private void saveAndShare(){
 		isSaving = 0;
 		
+		//saving data
 		ArrayList<AccelData> array = new ArrayList<AccelData>();
 		int maxDataPos = (FallAlgorithmUtility.GET_HALF_SEC+posTmp) % FallAlgorithmUtility.ACC_DATA_SIZE;
 		
@@ -469,13 +474,14 @@ public class FallDetectorService extends Service {
 			ListSessionFragment.mArray.get(0).setFallsNum(last.getFallsNum() + 1);
 		}
 		
+		//verify  connection and share data
 		boolean isSend = false;
 		ConnectivityStatus status = new ConnectivityStatus(getApplicationContext());
 		
 		if(status.hasMobileConnectionON() || status.hasWifiConnectionON()){
 			ArrayList<MailAddress> receiversMail = dm.getMailAddressAsArray();
 			
-			
+			//compile message
 			Calendar cal = Calendar.getInstance();
 			cal.setTimeInMillis(fallTmp.getTimeStampFallEvent());
 
@@ -493,8 +499,12 @@ public class FallDetectorService extends Service {
 			msg = msg + getApplicationContext().getResources().getString(R.string.mail_end1) + "\n\n";
 			msg = msg + getApplicationContext().getResources().getString(R.string.mail_end2) + "\n";
 
+			//select method to send mail
+			//if rapid mail send is not active it use GMAIL intent
 			SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()); 
 			if(preferences.getBoolean(SettingsMainFragment.SAVE_MAIL_CHK, false)){
+				
+				//use smtp protocol
 				ArrayList<String> receivers = new ArrayList<String>();
 				for(int i = 0; i < receiversMail.size(); i++){
 					receivers.add(receiversMail.get(i).getAddress());
@@ -518,6 +528,7 @@ public class FallDetectorService extends Service {
 					}
 				}
 			}else{
+				// use GMAIL intent
 				String[] receivers = new String[receiversMail.size()];
 				for(int i = 0; i < receiversMail.size(); i++){
 					receivers[i] = receiversMail.get(i).getAddress();
@@ -550,5 +561,5 @@ public class FallDetectorService extends Service {
 				}
 			}
 		}
-	}
+	}//[m] saveAndShare()
 }
