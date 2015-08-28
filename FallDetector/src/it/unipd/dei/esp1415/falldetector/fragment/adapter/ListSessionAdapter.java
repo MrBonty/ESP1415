@@ -167,7 +167,6 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 		}// if(!mIsLandscape)... else...
 
-		// TODO get color from session
 		Bitmap image = null;
 		if ((image = session.getBitmap()) == null) {
 			image = BitmapFactory.decodeResource(mContext.getResources(),
@@ -179,19 +178,14 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 		mViewHolder.thumbnail.setImageBitmap(image);
 
-		mViewHolder.sessionName.setText(session.getName());// TODO get name from
-															// session
+		mViewHolder.sessionName.setText(session.getName());
 
 		if (session.getStartTimestamp() > 0) {
 			mViewHolder.date.setVisibility(View.VISIBLE);
 			mViewHolder.at.setVisibility(View.VISIBLE);
 
-			mViewHolder.date.setText(session.getStartDate());// TODO get date
-																// from session
-			mViewHolder.time.setText(session.getStartTimeToString());// TODO get
-																		// time
-																		// from
-																		// session
+			mViewHolder.date.setText(session.getStartDate());
+			mViewHolder.time.setText(session.getStartTimeToString());
 		} else {
 
 			mViewHolder.date.setVisibility(View.GONE);
@@ -263,8 +257,8 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 			}
 		    mViewHolder.stop.setImageResource(R.drawable.end_button_default);
 			
-			mViewHolder.playPause.setOnClickListener(manageSession()); // TODO listener
-			mViewHolder.stop.setOnClickListener(manageSession()); // TODO listener
+			mViewHolder.playPause.setOnClickListener(manageSession());
+			mViewHolder.stop.setOnClickListener(manageSession());
 
 			mViewHolder.playPause.setFocusable(false);
 			mViewHolder.playPause.setFocusableInTouchMode(false);
@@ -300,6 +294,12 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 
 	}// [m] collapse
 	
+	/**
+	 * [m]
+	 * Method to start and stop Session from buttons on main activity
+	 * 
+	 * @return the OnClickListener for Start, Stop and Pause buttons
+	 */
 	private OnClickListener manageSession(){
 		return new OnClickListener() {
 			private DatabaseManager dm = new DatabaseManager(mContext);;
@@ -327,10 +327,12 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 					break;
 				}
 				
-			}
+			}//[m] OnClick()
 			
-
-
+			/**
+			 * [m]
+			 * Method for starting the Session
+			 */
 			private void sessionStart(){
 				ses.setStartDateAndTimestamp(Calendar.getInstance(TimeZone.getDefault()));
 				ses.setToActive(true);
@@ -359,14 +361,19 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 						ses.isPauseAsInteger());
 				dm.upgradeASession(ses.getId(), values);
 				
+				// Start services
 				Intent serviceIntent = new Intent(mContext,
 						FallDetectorService.class);
 				serviceIntent.putExtra(FallDetectorService.IS_PLAY, true);
 				mContext.startService(serviceIntent);
-			}
+			}//[m] sessionStart()
 			
+			/**
+			 * [m]
+			 * Method to Pause a Session
+			 */
 			private void sessionPause(){
-				ses.setDuration(); // TODO DURATION
+				ses.setDuration(); 
 				ses.setPause(true);
 				
 				if(arr != null){
@@ -377,17 +384,23 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 				mViewHolder.playPause.setImageResource(R.drawable.play_button_default);
 				notifyDataSetChanged();
 				
+				// Update database
 				ContentValues values = new ContentValues();
 				values.put(DatabaseTable.COLUMN_SS_DURATION, ses.getDuration());
 				values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, ses.isPauseAsInteger());
 				dm.upgradeASession(ses.getId(), values);
 				
+				// Start services
 				Intent serviceIntent = new Intent(mContext,
 						FallDetectorService.class);
 				serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
 				mContext.startService(serviceIntent);
-			}
+			}//[m] sessionPause()
 
+			/**
+			 * [m]
+			 * Method to resume the Session after pause it
+			 */
 			private void sessionResume(){
 
 				ses.setPause(false);
@@ -397,21 +410,27 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 				
 				mViewHolder.playPause.setImageResource(R.drawable.pause_button_default);
 				notifyDataSetChanged();
-				
+
+				// Update database
 				ContentValues values = new ContentValues();
 				values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, ses.isPauseAsInteger());
 				dm.upgradeASession(ses.getId(), values);
-
+				
+				// Start services
 				Intent serviceIntent = new Intent(mContext,
 						FallDetectorService.class);
 				serviceIntent.putExtra(FallDetectorService.IS_PLAY, true);
 				mContext.startService(serviceIntent);
-			}
+			}// [m] sessionResume()
 			
+			/**
+			 * [m]
+			 * Method to end the Session
+			 */
 			private void sessionEnd(){
 				ContentValues values = new ContentValues();
 				if (!ses.isPause()) {
-					ses.setDuration(); // TODO DURATION
+					ses.setDuration(); 
 					
 
 					ses.setChrono_tmp(SystemClock.elapsedRealtime());
@@ -446,9 +465,14 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 				
 				// Clear tmp acc data from database
 				dm.deleteTempAccDataTable();
-			}
+			}//[m] sessionEnd()
 		};
-	}
+	}//[m] manageSession()
+	
+	/**
+	 *  inner class for hold the view
+	 *
+	 */
 	static class ViewHolder {
 		private ImageView thumbnail;
 		private TextView sessionName;
@@ -464,6 +488,13 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		private TextView falls;
 	}// {c} ViewHolder
 
+	/**
+	 * [m]
+	 * Method to reset the array that save the collapse/expand state
+	 * 
+	 * @param pos the position of of the session that is add or removed
+	 * @param hasNewElement if a new element is insert
+	 */
 	public void resetArray(int pos, boolean hasNewElement) {
 		int[] tmp = null;
 		
@@ -497,7 +528,7 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 				j++;
 			}
 		}
-	}
+	}//[m] resetArray()
 
 	private int[] copyArray(int[] ar) {
 		int[] tmp = new int[ar.length];
@@ -506,6 +537,6 @@ public class ListSessionAdapter extends ArrayAdapter<Session> {
 		}
 
 		return tmp;
-	}
+	}//[m] copyArray()
 	
 }// {c} ListSessionAdapter

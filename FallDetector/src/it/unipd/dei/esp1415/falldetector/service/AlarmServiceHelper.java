@@ -19,7 +19,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
- *  Receive BOOT_COMPLETED signal by 
+ *  This Class extends a BroadcastReceiver for manage alarm
+ *  Receive BOOT_COMPLETED signal by starting a device
+ *  Receive GET_A_NEW_ALARM and DELETE_ALARM 
  *
  */
 public class AlarmServiceHelper extends BroadcastReceiver{
@@ -86,7 +88,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 			
 			splitTime(preferences.getString(SettingsMainFragment.SAVE_ADVISE_TIME, SettingsMainFragment.STANDARD_TIME));
 
-			//
+			//get saved info
 			long currentNotificationDate = localPref.getLong(CURRENT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
 			long timeSaved = localPref.getLong(NEXT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
 			
@@ -118,6 +120,7 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 				Log.i("ADVISE", mCurrentNotificationDate.toString());
 				Log.i("EXPIRED", hasExpired(mCurrentNotificationDate) + "");
 				
+				//Start notification if the device was closed at notification hour
 				if(hasExpired(mCurrentNotificationDate)){
 					Intent intnt = new Intent(context, AlarmService.class);
 					intnt.putExtra(AlarmService.NOT_CONTROL, true);
@@ -162,11 +165,13 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		}
 		
 		editor.commit();
-	}
+	}//[m] setAlarm()
 	
 	/**[m]
-	 * @param notificationDate
-	 * @return 
+	 * Verify if the notification has expire
+	 * 
+	 * @param notificationDate the date to test
+	 * @return true if has expired, false otherwise
 	 */
 	private boolean hasExpired(Calendar notificationDate) {
 		Calendar nowDate = Calendar.getInstance();
@@ -176,10 +181,15 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		
 		
 		return (not - now) < 0;	
-	}
+	}//[m] hasExpired()
 
+	/**
+	 * [m]
+	 * Private method to delete an alarm
+	 * 
+	 * @param context
+	 */
 	private void deleteAlarm(Context context) {
-		
 		
 		if(localPref == null){
 			localPref = context.getSharedPreferences(PREF_FILE_NAME, Context.MODE_PRIVATE);
@@ -198,23 +208,37 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		editor.putLong(CURRENT_NOTIFICATION_DATE, NOT_NOTIFICATION_VALUE);
 
 		editor.commit();
-	}
+	}//[m] deleteAlarm()
 	
+	/**
+	 * [m]
+	 * Private method to delete an alarm
+	 * 
+	 * @param context
+	 * @param intent the intent of the alarm to delete
+	 */
 	private void deleteAlarm(Context context, PendingIntent intent){
 		if(mAlarm == null){
 			mAlarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		}
 		
 		mAlarm.cancel(intent);
-	}
+	}//[m] deleteAlarm()
  
+	/**
+	 * [m]
+	 * Method to create the pending intent for the AlarmManager
+	 * 
+	 * @param context
+	 * @param time the timestamp of the new alarm
+	 * @return the PendingIntent
+	 */
 	private static PendingIntent createPendingIntent(Context context, long time){
 		Intent intent = new Intent(context, AlarmService.class);
 		intent.putExtra(AlarmService.NOT_CONTROL, true);
 		
 		return PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-	}
-	
+	}//[m] createPendingIntent()
 	
 	/**
 	 * [m]
@@ -256,4 +280,4 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 		mNextNotificationDate.add(Calendar.MILLISECOND, - milli);
 	
 	}// [m] calculateNotificationDate()
-}
+}//{c} AlarmServiceHelper()

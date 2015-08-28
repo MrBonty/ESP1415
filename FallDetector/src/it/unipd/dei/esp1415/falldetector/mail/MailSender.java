@@ -136,7 +136,6 @@ public class MailSender {
 		try {		
 			smtp("QUIT\r\n");
 		    Thread.sleep(DELAY_LONG);
-			//TODO verify response and smtp
 			System.out.println(response);
 			
 			reader.interrupt();
@@ -169,7 +168,6 @@ public class MailSender {
 		try {
 			smtp("MAIL FROM:<"+ mail.getSender() + ">\r\n");
 			Thread.sleep(DELAY);
-			//TODO verify response and smtp
 			System.out.println(response);
 
 			if(mail.hasMore()){
@@ -177,57 +175,35 @@ public class MailSender {
 				for (int i = 0; i<receivers.size(); i++){
 					smtp("RCPT TO:<" + receivers.get(i) + ">\r\n");
 					Thread.sleep(DELAY);
-					//TODO verify response and smtp
 					System.out.println(response);
 				}
 			}else{
 				smtp("RCPT TO:<" + mail.getReceiver() + ">\r\n");
 				Thread.sleep(DELAY);
-				//TODO verify response and smtp
 				System.out.println(response);
 			}
 			
 			smtp("DATA" + "\r\n");
 			Thread.sleep(DELAY);
-			//TODO verify response and smtp
 			System.out.println(response);
 			
 			smtp("Date: " + date + ">\r\n");
-			//Thread.sleep(delay);
-			//TODO verify response and smtp
-			//System.out.println(response);
 			
 			smtp("From: <" + mail.getSender() + ">\r\n");
-			//Thread.sleep(delay);
-			//TODO verify response and smtp
-			//System.out.println(response);
 			if(mail.hasMore()){
 				ArrayList<String> receivers = mail.getReceivers();
 				for (int i = 0; i<receivers.size(); i++){
 					smtp("To: <" + receivers.get(i) + ">\r\n");
-					//Thread.sleep(delay);
-					//TODO verify response and smtp
-					//System.out.println(response);
 				}
 			}else{
 				smtp("To: <" + mail.getReceiver() + ">\r\n");
-				//Thread.sleep(delay);
-				//TODO verify response and smtp
-				//System.out.println(response);
 			}
 			smtp("Subject: " + mail.getSubject() + "\r\n");
-			//Thread.sleep(delay);
-			//TODO verify response and smtp
-			//System.out.println(response);
 
 			smtp(mail.getMessage() + "\r\n");
-			//Thread.sleep(delay);
-			//TODO verify response and smtp
-			//System.out.println(response);
 
 			smtp("\r\n.\r\n");
 			Thread.sleep(DELAY);
-			//TODO verify response and smtp
 			System.out.println(response);
 			
 		} catch (InterruptedException e) {

@@ -208,7 +208,7 @@ public class MailDialog extends Dialog{
 			viewHolder.info.setText(R.string.address_edit_info_no);
 			break;
 		}
-	}
+	}//[m] changeInfo()
 
 	/**
 	 * private inner class to hold the view
@@ -238,7 +238,7 @@ public class MailDialog extends Dialog{
 		mSurname = surname;
 		mAddress = address;
 		mState = state;
-	}
+	}//[m] restoreValue()
 	
 	/**
 	 * [m]

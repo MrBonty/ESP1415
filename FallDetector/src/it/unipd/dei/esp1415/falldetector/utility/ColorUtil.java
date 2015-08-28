@@ -4,14 +4,14 @@ import java.util.Random;
 
 import android.graphics.Bitmap;
 
+/**
+ * class to manage color for thumbnail 
+ *
+ */
 public class ColorUtil {
 	
 	public final static int START_COLOR = 0x00000000;
 	public final static int FINAL_COLOR = 0xFFFFFFFF;
-	/*private final static int[] COLOR_STEP = {0x020B060B, 0x00B0060C, 0x030003CC, 
-		  									 0x050F8001, 0x0C0601E0, 0x01010101, 
-		  									 0x02020602, 0x0B0C0500, 0x00C0A002,
-		  									 0x07080808};*/
 	
 	private final static int MAX_VAL = 0xFF;
 	//private final static int MIN_VAL = 0x00;
@@ -119,4 +119,4 @@ public class ColorUtil {
 		return image;
 	}// [m] recolorIconBicolor()
 	
-}
+}//{c} ColorUtil 

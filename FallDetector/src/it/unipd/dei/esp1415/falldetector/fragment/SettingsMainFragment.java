@@ -211,7 +211,7 @@ public class SettingsMainFragment extends Fragment{
 		});
 		if(Build.VERSION.SDK_INT <= 8){
 			viewHolder.mailChk.setVisibility(View.GONE);
-			//TODO check for a better solution (problem with asyngTask and thread)
+			//check for a better solution (problem with asyngTask and thread, can't change the a TextView)
 			viewHolder.mailSummary.setText("Android version not support it");
 		}else{
 			viewHolder.mailChk.setOnCheckedChangeListener(mailOnChkListener());
@@ -356,7 +356,6 @@ public class SettingsMainFragment extends Fragment{
 
 			@Override
 			public void onClick(View v) {
-				//TODO
 				v.startAnimation(animAlpha);
 				
 				createTimeDialog(false, null);

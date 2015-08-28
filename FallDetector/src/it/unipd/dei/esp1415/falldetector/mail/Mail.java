@@ -19,6 +19,7 @@ public class Mail {
 		receivers.add(receiver);
 		hasMore = false;
 	}//[c] Mail()
+	
 	public Mail(String sender, ArrayList<String> receivers){
 		this.sender = sender;
 		this.receivers = receivers;
@@ -33,7 +34,7 @@ public class Mail {
 	 */
 	public void setSubject(String subject){
 		this.subject= subject;
-	}
+	}//[m] setSubject()
 	
 	/**
 	 *	[m]
@@ -43,7 +44,7 @@ public class Mail {
 	 */
 	public void setMessage(String message){
 		this.message= message;
-	}
+	}//[m] setMessage()
 	
 	/** 
 	 * [m]
@@ -56,7 +57,7 @@ public class Mail {
 		if(receivers.size()> 0){
 			hasMore = true;
 		}
-	}
+	}//[m] addReceiver()
 	
 	/**
 	 * [m]
@@ -64,7 +65,7 @@ public class Mail {
 	 */
 	public String getMessage(){
 		return message;
-	}
+	}//[m] getMessage()
 	
 	/**
 	 * [m]
@@ -72,7 +73,7 @@ public class Mail {
 	 */
 	public String getSubject(){
 		return subject;
-	}
+	}//[m] getSubject()
 	
 	/**
 	 * [m]
@@ -80,7 +81,7 @@ public class Mail {
 	 */
 	public String getSender(){
 		return sender;
-	}
+	}//[m] getSender()
 	
 	/** 
 	 * [m]
@@ -88,7 +89,7 @@ public class Mail {
 	 */
 	public String getReceiver(){
 		return receivers.get(0);
-	}
+	}//[m] getReceiver()
 	
 	/**
 	 * [m]
@@ -96,7 +97,8 @@ public class Mail {
 	 */
 	public ArrayList<String> getReceivers() {
 		return receivers;
-	}
+	}//[m] getReceivers() 
+	
 	/**	 
 	 * [m]
 	 * @param receivers the arraylist of receivers to set
@@ -104,7 +106,7 @@ public class Mail {
 	public void setReceivers(ArrayList<String> receivers) {
 		this.receivers = receivers;
 		hasMore = receivers.size() > 1;
-	}
+	}//[m] setReceivers()
 	
 	/**
 	 * [m]
@@ -119,7 +121,7 @@ public class Mail {
 		}
 		hasMore = false;
 		return null;
-	}
+	}//[m] removeReceivers()
 	
 	/**
 	 * [m]
@@ -127,7 +129,7 @@ public class Mail {
 	 */
 	public boolean hasMore() {
 		return hasMore;
-	}
+	}//[m] hasMore() 
 	
 	/**
 	 * [m]
@@ -135,5 +137,5 @@ public class Mail {
 	 */
 	public int getReceiversSize(){
 		return receivers.size();
-	}
+	}//[m] getReceiversSize()
 }

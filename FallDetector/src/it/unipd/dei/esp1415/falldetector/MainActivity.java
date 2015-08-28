@@ -240,10 +240,7 @@ public class MainActivity extends ActionBarActivity {
 	
 	/**
 	 * [m]
-	 * @param isWifiOn
-	 * @param isMobileOn
-	 * @param isMobileAvailable
-	 * @param isLocationOn
+	 * Method to create the dialog for verify connection 
 	 */
 	private void createConnectivityDialog(){
 
@@ -267,6 +264,13 @@ public class MainActivity extends ActionBarActivity {
 		}
 	}//[m] createConnectivityDialog()
 	
+	
+	/**
+	 * [m]
+	 * Method to create a thread for delete service or Alarm, if it's running
+	 * 
+	 * @return the thread
+	 */
 	private Thread deleteService(){
 		return new Thread(){
 			@Override
@@ -289,7 +293,7 @@ public class MainActivity extends ActionBarActivity {
 				interrupt();
 			}
 		};
-	}
+	}//[m] deleteService()
 	
 	/**
 	 * [m]

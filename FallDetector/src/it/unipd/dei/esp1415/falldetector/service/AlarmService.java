@@ -84,14 +84,14 @@ public class AlarmService extends Service{
 		}
 		
 		return super.onStartCommand(intent, flags, startId);
-	}
+	}//[m] onStartCommand()
 
 
 	@Override
 	public IBinder onBind(Intent intent) {
 		// No bind needed, for avoid error
 		return null;
-	}
+	}//[m] onBind()
 	
 	@Override
 	public void onDestroy() {
@@ -100,7 +100,7 @@ public class AlarmService extends Service{
 		notificationManager.cancelAll();
 		
 		super.onDestroy();
-	}
+	}//[m] onDestroy()
 
 	/**
 	 * [m]
@@ -118,6 +118,6 @@ public class AlarmService extends Service{
 		int instMinute = instance.get(Calendar.HOUR_OF_DAY)*60 + instance.get(Calendar.MINUTE);
 		
 		return advMinute <= (instMinute + ADV_DELAY);
-	}
+	}//[m] verifyNotification()
 
-}
+}//{c} AlarmService

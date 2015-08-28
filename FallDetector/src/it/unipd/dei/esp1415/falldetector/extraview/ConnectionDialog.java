@@ -30,7 +30,6 @@ public class ConnectionDialog extends Dialog{
 	 */
 	public ConnectionDialog(Context context, boolean isWifiOn, boolean isMobileOn, boolean isMobileAvailable, boolean isLocationOn) {
 		super(context);
-		// TODO Auto-generated constructor stub
 		mCtx = context;
 		mMed = new Mediator();
 		

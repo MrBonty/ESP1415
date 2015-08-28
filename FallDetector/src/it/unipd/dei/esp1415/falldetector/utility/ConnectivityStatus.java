@@ -75,4 +75,4 @@ public class ConnectivityStatus {
 	public boolean hasLocationON(){
 		return mLocMan != null && mLocMan.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	}//[m] hasLocationON()
-}
+}//{c} ConnectivityStatus
