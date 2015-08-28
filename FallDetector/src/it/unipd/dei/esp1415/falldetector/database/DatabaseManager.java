@@ -131,7 +131,7 @@ public class DatabaseManager {
 	
 	/**
 	 * [m]
-	 * Method to insert a temporary accelerometer Data into the database
+	 * Method to insert a temporary accelerometer data into the database
 	 * 
 	 * @param data to insert in the database
 	 * @return the id of the temporary accelerometer data, or ON_OPEN_ERROR if an error is occurred on open the database,
@@ -314,7 +314,7 @@ public class DatabaseManager {
 	
 	/**
 	 * [m]
-	 * Method to upgrade all Accelerometer Data values (not ID)
+	 * Method to upgrade Temporary Accelerometer Data values (not ID)
 	 * 
 	 * @param data the data to upgrade
 	 * @return the number of rows affected, or ON_OPEN_ERROR if an error occurred on open the database, 
@@ -336,7 +336,7 @@ public class DatabaseManager {
 		}//if... else...
 		
 		return upgradeRow(DatabaseTable.TMP_ACC_TABLE, values, whereClause, null);
-	}//[m] upgradeAnAccelData()
+	}//[m] upgradeATempAccelData()
 	
 	
 	/**
@@ -388,7 +388,11 @@ public class DatabaseManager {
 	}//[m] upgradeRow()
 	
 	
-	// Metodo di prova Xu
+	/**
+	 * [m]
+	 * Method to get the last Session stored in database as ArrayList
+	 * @return The last session stored or a null Session if has no element or some error occured
+	 */
 	public Session getLastSession(){
 		String selection = null;
 		String orderBy = DatabaseTable.COLUMN_SS_START_DATE + " " + DatabaseManager.DESC; 
@@ -427,7 +431,7 @@ public class DatabaseManager {
 		}
 		close();
 		return s;
-	}//[m] getSessionAsArray()
+	}//[m] getLastSession()
 	
 	/**
 	 * [m]
@@ -629,14 +633,25 @@ public class DatabaseManager {
     }//[m] getMailAddressAsCursor()
 	
 	
-	//TODO aggiungere info
+	/**
+	 * [m]
+     * Method to get all Temporary Accelerometer Data stored in database as Cursor after read call close()
+     * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort order, which may be unordered.
+	 * @return A Cursor object, which is positioned before the first entry, or null if occurred an error on open the database. Note that Cursor are not synchronized, see the documentation for more details.
+     * @see Cursor 
+	 */
 	public Cursor getTempAccelDataAsCursor(String orderBy){ 
 		
     	Cursor tmp = queryDb(DatabaseTable.TMP_ACC_TABLE, null, null, orderBy);
     	return tmp;
-    }
+    }//[m] getTempAccelDataAsCursor()
 	
-	//TODO aggiungere info
+	/**
+	 * [m]
+     * Method to get all Temporary Accelerometer Data stored in database as Array List
+	 * @param orderBy How to order the rows, formatted as an SQL ORDER BY clause (excluding the ORDER BY itself). Passing null will use the default sort order, which may be unordered.
+	 * @return a void ArrayList if has no element, or null if occurred an error on open the database.
+	 */
 	public ArrayList<AccelData> getTempAccelDataAsArray(String orderBy){
 		ArrayList<AccelData> tmp = new ArrayList<AccelData>();
 		Cursor c = getTempAccelDataAsCursor(orderBy);
@@ -658,10 +673,14 @@ public class DatabaseManager {
 		}
 		close();
 		return tmp;
-	}
+	}//[m] getTempAccelDataAsArray()
 	
+	/**
+	 * [m]
+     * Method to get the last index of Temporary Accelerometer Data stored in database as Cursor after read call close()
+	 * @return A int associated with the last temporary accelerometer data or 0 if no data is stored in the database
+	 */
 	public int getTempAccelDataLastIndex(){
-		
 		String orderBy = DatabaseTable.COLUMN_TMP_AC_TS + " " + DatabaseManager.DESC;
 		Cursor c = getTempAccelDataAsCursor(orderBy);
     	if(c == null){
@@ -671,11 +690,8 @@ public class DatabaseManager {
     	
     	if(c.moveToFirst())
     		index = ((int) c.getLong(c.getColumnIndex(DatabaseTable.COLUMN_PK_ID)));
-    	
     	return index;
-    		
-
-	}
+	}//[m] getTempAccelDatalastIndex()
 	
 	/**
 	 * [m]

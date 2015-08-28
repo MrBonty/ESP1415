@@ -26,7 +26,6 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,122 +37,90 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class CurrentSessionActivity extends ActionBarActivity {
-
+	
+	/*---- Utilities variables ----*/
+	
+	// Temporary variables for update charts
+	private float[] xTmpArray;
+	private float[] yTmpArray;
+	private float[] zTmpArray;
+	private int index;
+	
+	// Indicates whether the session expired
+	private boolean timeExceed;
+	
+	private DatabaseManager dm;
 	private Mediator mMed;
 	
-	//current session
+	// Contains current session's information
 	private Session mCurrent;
+	
+	// Public variables used by the service
+	public static ArrayList<Fall> falls = null;
+	public static ArrayAdapter<Fall> arrayAdapter = null;
+	public static ListView lstvFalls = null;
 
-	private DatabaseManager dm;
+	// Receiver which receive data from service
+	private BroadcastReceiver broadcastDataReceiver;
 
-	//Text view for session name and session start time
+	/*---- Activity layout variables ----*/
+	
+	// TextView for session name and session start time
 	private TextView sessionName;
 	private TextView txtvStartTime;
 	
-	/**
-	 * Display the duration of the session
-	 */
+	// Display the duration of the session
 	private Chronometer chroDuration;
 
-	/**
-	 * Button which start, play and pause the session
-	 */
+	// Button which start, play, pause and end the session
 	private ImageButton ibtnPlayPause;
-	
 	private ImageButton ibtnEnd;
 
 	// Customize view for chart
 	private ChartView xChart;
 	private ChartView yChart;
 	private ChartView zChart;
-	private float[] xTmpArray;
-	private float[] yTmpArray;
-	private float[] zTmpArray;
 	
-	// Text view for displaying acceleromter data
+	// TextView for displaying acceleromter data
 	private TextView txtvAccDataX;
 	private TextView txtvAccDataY;
 	private TextView txtvAccDataZ;
-
-	private int index;
 	
+	// ImageView indicates the thumbnail
 	private ImageView thmb;
 
-	private BroadcastReceiver broadcastDataReceiver;
-	
-	private boolean timeExceed;
-	
-	public static ArrayList<Fall> falls = null;
-	
-	public static ArrayAdapter<Fall> arrayAdapter = null;
-	
-	public static ListView lstvFalls = null;
-	
-
 	public CurrentSessionActivity() {
-
+		
 		// Initialize variables
-
-		txtvStartTime = null;
-		ibtnPlayPause = null;
-		chroDuration = null;
+		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
+		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
+		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
 		
 		index = 0;
 		
-		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
-		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
-		xTmpArray = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
-		
 		timeExceed = false;
-		
-//		falls = null;
-//		arrayAdapter = null;
-		
 	}
 	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.current_session_interface);
-
-		sessionName = (TextView) findViewById(R.id.current_sesstion_name);
 		
-		thmb = (ImageView) findViewById(R.id.current_thumbnail);
-		
-		txtvStartTime = (TextView) findViewById(R.id.session_start_time);
-		
-		// Initialize the chronometer
-		chroDuration = (Chronometer) findViewById(R.id.session_duration);
-		
-		// Initialize the play-pause button view
-		ibtnPlayPause = (ImageButton) findViewById(R.id.play_button);
-		
-		// Shows the acceleration axises data in a graphic way
-		txtvAccDataX = (TextView) findViewById(R.id.acc_data_x);
-		xChart = (ChartView) findViewById(R.id.chart_x_axis);
-		
-		txtvAccDataY = (TextView) findViewById(R.id.acc_data_y);
-		yChart = (ChartView) findViewById(R.id.chart_y_axis);
-		
-		txtvAccDataZ = (TextView) findViewById(R.id.acc_data_z);
-		zChart = (ChartView) findViewById(R.id.chart_z_axis);
-		
-		// lstvFalls referes to the ListView in the layout
-		lstvFalls = (ListView) findViewById(R.id.session_falls);
-		
-		// end button
-		ibtnEnd = (ImageButton) findViewById(R.id.end_button);
-		
+		// Initialize variables
 		mMed = new Mediator();
 		dm = new DatabaseManager(getApplicationContext());
-
-		// Fetch session from database
+		
+		// Fetch session's information from database
 		mCurrent = dm.getLastSession();
 		
+		/*---- Initialize activity interface ----*/
+		setContentView(R.layout.current_session_interface);
+		
+		sessionName = (TextView) findViewById(R.id.current_sesstion_name);
 		sessionName.setText(mCurrent.getName());
 		
-		// Set up thumbnail
+		// Initialize thumbnail
+		thmb = (ImageView) findViewById(R.id.current_thumbnail);
 		if (mCurrent.getBitmap() == null) {
 			Bitmap image = null;
 			image = BitmapFactory.decodeResource(getApplicationContext()
@@ -162,42 +129,62 @@ public class CurrentSessionActivity extends ActionBarActivity {
 					image);
 			mCurrent.setBitmap(image);
 		}
-		
 		thmb.setImageBitmap(ColorUtil.recolorIconBicolor(
 				mCurrent.getColorThumbnail(), mCurrent.getBitmap()));
 		
-		// Set up start time
+		// Initialize session start time
+		txtvStartTime = (TextView) findViewById(R.id.session_start_time);
+		
+		// Initialize the chronometer
+		chroDuration = (Chronometer) findViewById(R.id.session_duration);
+		
+		// Initialize the play-pause button view
+		ibtnPlayPause = (ImageButton) findViewById(R.id.play_button);
+		
+		// Initialize the end button
+		ibtnEnd = (ImageButton) findViewById(R.id.end_button);
+		
+		// Set the start time, the button status and the chronometer 
 		if (mCurrent.getStartTimestamp() <= 0) {
-			// Initialize txtvStartTime view
 			ibtnPlayPause.setImageResource(R.drawable.play_button_default);
 			ibtnEnd.setClickable(false);
 		} else {
-			// Fetch data from current session
 			txtvStartTime.setText(mCurrent.getStartDateCalendar().getTime()
 					.toString());
-			// Set up chronometer
 			if (mCurrent.isPause()){
 				chroDuration.setBase(SystemClock.elapsedRealtime()
 						- mCurrent.getDuration());
 				ibtnPlayPause.setImageResource(R.drawable.play_button_default);
-			}
-			else {
+			} else {
 				chroDuration.setBase(mCurrent.getChrono_tmp()
 						- mCurrent.getDuration());
 				ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
-			}
-
+			}// else
 			if (mCurrent.isActive() && !mCurrent.isPause())
 				chroDuration.start();
-		}// timestamp
-
+		}// else
+		
+		// Initialize the x axis chart
+		txtvAccDataX = (TextView) findViewById(R.id.acc_data_x);
+		xChart = (ChartView) findViewById(R.id.chart_x_axis);
+		
+		// Initialize the y axis chart		
+		txtvAccDataY = (TextView) findViewById(R.id.acc_data_y);
+		yChart = (ChartView) findViewById(R.id.chart_y_axis);
+		
+		// Initialize the z axis chart
+		txtvAccDataZ = (TextView) findViewById(R.id.acc_data_z);
+		zChart = (ChartView) findViewById(R.id.chart_z_axis);
+		
+		// Initialize ListView for falls
+		lstvFalls = (ListView) findViewById(R.id.session_falls);
+		
 		// List of falls occur during the session
 		falls = new ArrayList<Fall>();
-		
 		falls = dm.getFallForSessionAsArray(mCurrent.getId(), DatabaseTable.COLUMN_FE_DATE
 				+ " " + DatabaseManager.DESC);
 
-		// bind the array adapter to the list view
+		// bind the array adapter to the ListView of falls
 		arrayAdapter = new ArrayAdapter<Fall>(this,
 				android.R.layout.simple_list_item_1, falls);
 		lstvFalls.setAdapter(arrayAdapter);
@@ -217,8 +204,8 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				// First time starting the session
 				else
 					sessionStart();
-			}
-		});
+			} // onClick
+		}); // Listener
 		
 		// Manages end button event
 		ibtnEnd.setOnClickListener(new View.OnClickListener() {
@@ -226,10 +213,10 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				if(mCurrent.isActive())
 					sessionEnd();
-			}
-		});
+			} // onClick
+		}); // End button listener
 		
-		// Updating chartView
+		// Updating charts
 		broadcastDataReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -244,21 +231,25 @@ public class CurrentSessionActivity extends ActionBarActivity {
 					sessionEnd();
 				
 				if(index >= FallAlgorithmUtility.ACC_DATA_SIZE){
+					
+					// Fix the index of the array
 					index = index % FallAlgorithmUtility.ACC_DATA_SIZE;
 					
+					// Updates x axis chart and data
 					xTmpArray = swapArrayData(xTmpArray, index);
 					xChart.setChartData(xTmpArray, FallAlgorithmUtility.ACC_DATA_SIZE);
 					xChart.invalidate();
 					txtvAccDataX.setText("X: " + xChart.getLastElement());
 					txtvAccDataX.invalidate();
 					
-
+					// Updates y axis chart and data
 					yTmpArray = swapArrayData(yTmpArray, index);
 					yChart.setChartData(yTmpArray, FallAlgorithmUtility.ACC_DATA_SIZE);
 					yChart.invalidate();
 					txtvAccDataY.setText("Y: " + yChart.getLastElement());
 					txtvAccDataY.invalidate();
 					
+					// Updates z axis chart and data
 					zTmpArray = swapArrayData(zTmpArray, index);
 					zChart.setChartData(zTmpArray, FallAlgorithmUtility.ACC_DATA_SIZE);
 					zChart.invalidate();
@@ -267,48 +258,48 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				}
 					
 				else{
-					// Update chart X axis data and text
+					
+					// Updates x axis chart and data
 					xChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.X_AXIS_ARRAY), index);
 					xChart.invalidate();
 					txtvAccDataX.setText("X: " + xChart.getLastElement());
 					txtvAccDataX.invalidate();
 
-					// Update chart Y axis data and text
+					// Updates y axis chart and data
 					yChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.Y_AXIS_ARRAY), index);
 					yChart.invalidate();
 					txtvAccDataY.setText("Y: " + yChart.getLastElement());
 					txtvAccDataY.invalidate();
 
-					// Update chart Z axis data and text
+					// Updates z axis chart and data
 					zChart.setChartData(intent.getFloatArrayExtra(FallDetectorService.Z_AXIS_ARRAY), index);
 					zChart.invalidate();
 					txtvAccDataZ.setText("Z: " + zChart.getLastElement());
 					txtvAccDataZ.invalidate();
-				}
-				
-				Log.w("x: ", xChart.getLastElement() + "");
-				Log.w("y: ", yChart.getLastElement() + "");
-				Log.w("z: ", zChart.getLastElement() + "");
-				Log.w("index: ", index + " index");
-			}
-		};
+					
+				} // else
+			} // onReceive
+		}; // broadcastReceiver
 	}
 
+	// private method for session start event
 	private void sessionStart() {
-
+		
 		// Get the current time and set the session to active
-		mCurrent.setStartDateAndTimestamp(Calendar.getInstance(TimeZone.getDefault()));
+		mCurrent.setStartDateAndTimestamp(
+				Calendar.getInstance(TimeZone.getDefault()));
 		mCurrent.setToActive(true);
+		mCurrent.setPause(false);
 		ibtnEnd.setClickable(true);
 		
+		// Updates other activities
 		if(ListSessionFragment.mArray != null){
-			ListSessionFragment.mArray.get(0).setStartDateAndTimestamp(mCurrent.getStartDateCalendar());
-			ListSessionFragment.mArray.get(0).setToActive(true);
-			
+			ListSessionFragment.mArray.get(0)
+				.setStartDateAndTimestamp(mCurrent.getStartDateCalendar());
+			ListSessionFragment.mArray.get(0).setToActive(true);	
 		}
-		mCurrent.setPause(false);
 		
-		// Update database
+		// Updates database
 		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_SS_START_DATE,
 				mCurrent.getStartTimestamp());
@@ -318,7 +309,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 				mCurrent.isPauseAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);
 
-		// Set the current time to the text view field
+		// Updates start time
 		txtvStartTime.setText(mCurrent.getStartDateCalendar().getTime()
 				.toString());
 
@@ -326,7 +317,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		chroDuration.setBase(SystemClock.elapsedRealtime());
 		chroDuration.start();
 
-		// Change the icon of play-pause button
+		// Change play-pause button status
 		ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
 		
 		// Start service
@@ -336,51 +327,53 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		startService(serviceIntent);
 	}
 
+	// private method for session pause event
 	private void sessionPause() {
-
-		// Save the passed time and stop the chronometer
+		
+		// Saves the passed time and stops the chronometer
 		mCurrent.setDuration(SystemClock.elapsedRealtime()
 				- chroDuration.getBase());
 		chroDuration.stop();
-		
-		if(ListSessionFragment.mArray != null){
-			ListSessionFragment.mArray.get(0).setDuration(mCurrent.getDuration());
-			
-		}
-
 		mCurrent.setPause(true);
 		
-		// Update duration in db
+		// Updates other activities
+		if(ListSessionFragment.mArray != null)
+			ListSessionFragment.mArray.get(0).setDuration(mCurrent.getDuration());
+		
+		// Updates duration in the database
 		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_SS_DURATION, mCurrent.getDuration());
 		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, mCurrent.isPauseAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);
 
-		// Change the icon of play-pause button to play
+		// Changes the play-pause button status
 		ibtnPlayPause.setImageResource(R.drawable.play_button_default);
 
-		// Stop service after button press
+		// Stops service after
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
 		serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
 		startService(serviceIntent);
 	}
 
+	// private method for session resume event
 	private void sessionResume() {
-		// Resume the chronometer from the stopped time
+		
+		// Resumes the chronometer from the stopped time
 		chroDuration.setBase(SystemClock.elapsedRealtime()
 				- mCurrent.getDuration());
 		chroDuration.start();
-
 		mCurrent.setPause(false);
 		
+		// Updates the database
 		ContentValues values = new ContentValues();
 		values.put(DatabaseTable.COLUMN_SS_IS_PAUSE, mCurrent.isPauseAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);
 
-		// Change the icon of play-pause button to pause
+		// Changes play-pause button status
 		ibtnPlayPause.setImageResource(R.drawable.pause_button_default);
 
+		// Resumes the service
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
 		serviceIntent.putExtra(FallDetectorService.IS_PLAY, true);
@@ -388,46 +381,54 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 	}
 
+	// Private method for session end event
 	private void sessionEnd() {
-		ContentValues values = new ContentValues();
 
-		// Save the passed time and stop the chronometer
+		ContentValues values = new ContentValues();
+		
+		// Set the current session status to not active
+		mCurrent.setToActive(false);
+		
+		// Saves the passed time and stops the chronometer
 		if (!mCurrent.isPause()) {
 			mCurrent.setDuration(SystemClock.elapsedRealtime()
 					- chroDuration.getBase());
 			chroDuration.stop();
 			
-			if(ListSessionFragment.mArray != null){
+			// Updates other activities
+			if(ListSessionFragment.mArray != null)
 				ListSessionFragment.mArray.get(0).setDuration(mCurrent.getDuration());
-				
-			}
 
-			
+			// Preparing data for database update
 			mCurrent.setChrono_tmp(SystemClock.elapsedRealtime());
 			values.put(DatabaseTable.COLUMN_SS_CHRONO_TMP, mCurrent.getChrono_tmp());
 			values.put(DatabaseTable.COLUMN_SS_DURATION, mCurrent.getDuration());
 		}
 
-		mCurrent.setToActive(false);
+		// Updates other activities
 		if(ListSessionFragment.mArray != null){
 			ListSessionFragment.mArray.get(0).setDuration(mCurrent.getDuration());
 			ListSessionFragment.mArray.get(0).setToActive(false);
 		}
+		
+		// Updates the database
 		values.put(DatabaseTable.COLUMN_SS_IS_ACTIVE,
 				mCurrent.isActiveAsInteger());
 		dm.upgradeASession(mCurrent.getId(), values);
 		
-		// Stop service after button press
+		// Stops service
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
 		serviceIntent.putExtra(FallDetectorService.IS_PAUSE, true);
 		startService(serviceIntent);
+		
+		// Ends service
 		stopService(serviceIntent);
 		
-		// Clear tmp acc data from database
+		// Clear temporary accelerometer data from database
 		dm.deleteTempAccDataTable();
 		
-		
+		// Finish the UI3 and pass to UI2
 		Intent activityIntent = new Intent(this, MainActivity.class);
 		activityIntent.putExtra(MainActivity.OPEN_UI2, true);
 		activityIntent.setFlags(activityIntent.getFlags() | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -435,6 +436,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		finish();
 	}
 
+	
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -450,6 +452,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 
 	@Override
 	protected void onResume() {
+		
 		Intent serviceIntent = new Intent(getApplicationContext(),
 				FallDetectorService.class);
 		serviceIntent.putExtra(FallDetectorService.GET_ARRAY, true);
@@ -465,6 +468,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		
 		ContentValues values = new ContentValues();
 		
 		if (mCurrent.isActive() && !mCurrent.isPause()) {
@@ -546,6 +550,7 @@ public class CurrentSessionActivity extends ActionBarActivity {
 			chroDuration.stop();
 	};
 	
+	// private method used for fix chart array data updates
 	private float[] swapArrayData(float[] array, int index){
 		float[] tmp = new float[FallAlgorithmUtility.ACC_DATA_SIZE];
 		int i = 0;
@@ -584,7 +589,4 @@ public class CurrentSessionActivity extends ActionBarActivity {
 		mMed.resetCurretnPosSessionFromBack();
 		super.onBackPressed();
 	}
-	
-	
-
 }

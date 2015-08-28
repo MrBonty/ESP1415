@@ -107,7 +107,8 @@ public class DetailSessionFragment extends Fragment {
 			
 			//creation of EditOk and definition of the method ok(String result)
 	        mEditOk = new EditOk() {
-	            @Override
+	            @SuppressWarnings("unused")
+				@Override
 	            public void ok(String result) {
 	            	Log.i("INPUT", "result " + result);
 	            	Toast show = null;
