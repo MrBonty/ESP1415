@@ -31,6 +31,7 @@ import android.widget.Toast;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.res.Configuration;
 import android.widget.EditText;
 import android.app.Activity;
 import android.widget.AdapterView;
@@ -122,6 +123,11 @@ public class DetailSessionFragment extends Fragment {
 							
 						if(!(name.equals(mArray.get(mIndex).getName()))){
 							mArray.get(mIndex).setName(name);
+							
+							ListSessionFragment.mArray.get(mIndex).setName(name);
+							if(mMod.isLarge() && mMod.isLand(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)){
+								ListSessionFragment.mAdapter.notifyDataSetChanged();
+							}
 
 							ContentValues cv = new ContentValues();
 							cv.put(DatabaseTable.COLUMN_SS_NAME, name);
