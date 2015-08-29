@@ -19,7 +19,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,7 +109,6 @@ public class DetailSessionFragment extends Fragment {
 	            @SuppressWarnings("unused")
 				@Override
 	            public void ok(String result) {
-	            	Log.i("INPUT", "result " + result);
 	            	Toast show = null;
 	            	
 	            	viewHolder.sessionName.setText(result);
@@ -163,8 +161,8 @@ public class DetailSessionFragment extends Fragment {
 						 boolean send = mFallsEvent.get(i).isNotified();
 						 
 						 String s;
-						 if(send) s = "Sended";
-						 else s = "Not sended";
+						 if(send) s = "Sent";
+						 else s = "Not sent";
 					     
 						 mList.add(tmp[0]+" "+tmp[1]+"\n"+s+""); 
 					} 
@@ -195,7 +193,6 @@ public class DetailSessionFragment extends Fragment {
         if(savedInstanceState != null){
 			String restore = savedInstanceState.getString(SAVE_MODIFY_DIALOG);
 			if(restore != null){
-				Log.i("INPUT", "restore " + restore);
 				editTextDialog(R.string.dialog_modify_name, restore, mEditOk);
 			}
 		}
@@ -206,14 +203,12 @@ public class DetailSessionFragment extends Fragment {
 	@Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //Log.i("SAVE1 "+(alert==null), "save of " + mIndex);
         if(!mMod.isCalledFromBack()){
             mMod.setCurretnPosSession(mIndex);
         }else {
         	mMod.resetIsCalledFromBack();
         }
         if(create){
-            Log.i("INPUT", "save of " + input.getText().toString());
         	outState.putString(SAVE_MODIFY_DIALOG, input.getText().toString());
 		}
     }
@@ -240,7 +235,6 @@ public class DetailSessionFragment extends Fragment {
             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             String newName = input.getText().toString();
-                            Log.i("INPUT", "newName " + newName);
                             if (newName.length() != 0) {
                                 ok.ok(newName);
                                 create=false; //the AlertDialog can disappear
@@ -255,9 +249,7 @@ public class DetailSessionFragment extends Fragment {
             });
         alert = builder.create();
         create = true; //the AlertDialog must appear until create becomes false
-        //Log.i("SAVE ALERT "+(alert==null), "save of " + mIndex);
         alert.show();
-        //Log.i("SAVE ALERT "+(alert==null), "save of " + mIndex);
         alert.setOnDismissListener(new OnDismissListener() {
 			@Override
 			public void onDismiss(DialogInterface dialog) {

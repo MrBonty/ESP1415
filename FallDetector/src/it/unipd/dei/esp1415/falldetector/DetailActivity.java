@@ -1,11 +1,7 @@
 package it.unipd.dei.esp1415.falldetector;
 
-//import java.util.ArrayList;
-
 import it.unipd.dei.esp1415.falldetector.fragment.DetailSessionFragment;
-//import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
-//import it.unipd.dei.esp1415.falldetector.utility.Session;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;

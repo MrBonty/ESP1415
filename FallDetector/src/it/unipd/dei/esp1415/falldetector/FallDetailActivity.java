@@ -9,9 +9,7 @@ import it.unipd.dei.esp1415.falldetector.utility.ColorUtil;
 import it.unipd.dei.esp1415.falldetector.utility.Fall;
 import it.unipd.dei.esp1415.falldetector.utility.Mediator;
 import it.unipd.dei.esp1415.falldetector.utility.Session;
-
 import java.util.ArrayList;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -19,7 +17,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,8 +56,6 @@ public class FallDetailActivity extends ActionBarActivity {
 		
 		mCurrentFall = getIntent().getExtras().getInt("nFall");
 		
-    	Log.i("Fall Session", "Activity");
-		
 		mMod = new Mediator();
 		mArray = mMod.getDataSession();
 		
@@ -81,9 +76,6 @@ public class FallDetailActivity extends ActionBarActivity {
 		
 		mIndex = mMod.getCurretnPosSession();
 		
-		Log.i("Fall Session", "Activity "+mIndex);
-		Log.i("Fall Session", "Activity "+mCurrentFall);
-		
 		current = dm.getFallForSessionAsArray(mArray.get(mIndex).getId(), DatabaseTable.COLUMN_FE_DATE).get(mCurrentFall); //get the current Fall
 		
 		String[] tmp = current.dateTimeStampFallEven();
@@ -103,14 +95,11 @@ public class FallDetailActivity extends ActionBarActivity {
 		viewHolder.sessionLatitude.setText("Latitude: "+current.getLatitude()); 
 		viewHolder.sessionLongitude.setText("Longitude: "+current.getLongitude()); 
 		
-		Log.i("Fall Session", "Activity "+tmp[0]);
-		Log.i("Fall Session", "Activity "+tmp[1]);
-		
 		boolean send = current.isNotified();
 		 
 		String s;
-		if(send) s = "Sended";
-		else s = "Not sended";
+		if(send) s = "Sent";
+		else s = "Not sent";
 		
 		viewHolder.sessionSended.setText(s);
 		
