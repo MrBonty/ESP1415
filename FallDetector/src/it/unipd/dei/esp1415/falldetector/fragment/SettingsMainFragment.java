@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -293,7 +292,6 @@ public class SettingsMainFragment extends Fragment{
 				broadcasting.registerReceiver(broadcaster, new IntentFilter(AlarmServiceHelper.GET_A_NEW_ALARM));
 				Intent i = new Intent(AlarmServiceHelper.GET_A_NEW_ALARM);
 				broadcasting.sendBroadcast(i);
-				Log.i("SEND", "sended");
 			} else {
 				broadcasting.registerReceiver(broadcaster, new IntentFilter(AlarmServiceHelper.DELETE_ALARM));
 				Intent i = new Intent(AlarmServiceHelper.DELETE_ALARM);

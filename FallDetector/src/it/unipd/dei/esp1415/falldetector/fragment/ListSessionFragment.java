@@ -19,7 +19,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
-import android.util.Log;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -62,7 +61,6 @@ public class ListSessionFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) { 
-		Log.i("CLICK", "[onListItemClick] Selected Position "+ position);
 		showDetail(position);
 		
 	}// [m] onListItemClick
@@ -117,7 +115,6 @@ public class ListSessionFragment extends ListFragment {
 				mDualPanel);
 	
 		mCurCheckPosition = mMed.getCurretnPosSession();
-		Log.i("POSITION","Current pos= " + mCurCheckPosition);
 
 		if (mDualPanel) {
 			// In dual-pane mode, the list view highlights the selected item.
@@ -126,7 +123,6 @@ public class ListSessionFragment extends ListFragment {
 
 			if(mCurCheckPosition != Mediator.START_FRAG_POS){
 				tmp.setItemChecked(mCurCheckPosition, true);
-				Log.i("CHECKED", "Checked Pos = " + mCurCheckPosition);
 				tmp.requestFocus();
 			}			
 
@@ -135,7 +131,6 @@ public class ListSessionFragment extends ListFragment {
 			
 		}else{
 
- 			Log.i("CALLOF", "on " + mCurCheckPosition);
 			showDetail(mCurCheckPosition);
 		}
 		
@@ -148,9 +143,7 @@ public class ListSessionFragment extends ListFragment {
 
 	@Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);        
-        Log.i("SAVE", "save of " + mCurCheckPosition);
-        //outState.putInt(SAVE_CURRENT_CHOICE, mCurCheckPosition);
+        super.onSaveInstanceState(outState);
         if(!mMed.isCalledFromBack()){
             mMed.setCurretnPosSession(mCurCheckPosition);
         }else {

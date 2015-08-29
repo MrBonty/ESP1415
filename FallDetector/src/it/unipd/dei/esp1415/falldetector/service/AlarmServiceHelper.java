@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 /**
  *  This Class extends a BroadcastReceiver for manage alarm
@@ -53,8 +52,6 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 	@Override
 	public void onReceive(Context context, Intent intent){
 		String action = intent.getAction();
-		
-		Log.i("NEW BROAD", action);
 		
 		if(action.equals(Intent.ACTION_BOOT_COMPLETED) || action.equals(GET_A_NEW_ALARM)){
 			setAlarm(context);
@@ -116,10 +113,6 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 				PendingIntent intent = createPendingIntent(context, mCurrentNotificationDate.getTimeInMillis());
 				deleteAlarm(context, intent);
 				
-
-				Log.i("ADVISE", mCurrentNotificationDate.toString());
-				Log.i("EXPIRED", hasExpired(mCurrentNotificationDate) + "");
-				
 				//Start notification if the device was closed at notification hour
 				if(hasExpired(mCurrentNotificationDate)){
 					Intent intnt = new Intent(context, AlarmService.class);
@@ -131,12 +124,8 @@ public class AlarmServiceHelper extends BroadcastReceiver{
 				}
 			}
 			
-			Log.i("DELETE ON", mCurrentNotificationDate.toString());
-			
 			mCurrentNotificationDate.setTimeInMillis(mNextNotificationDate.getTimeInMillis());
 			mNextNotificationDate.add(Calendar.DAY_OF_YEAR, 1);
-
-			Log.i("ADVISE ON", mCurrentNotificationDate.toString());
 			
 			PendingIntent intent = createPendingIntent(context, mCurrentNotificationDate.getTimeInMillis());
 			if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {

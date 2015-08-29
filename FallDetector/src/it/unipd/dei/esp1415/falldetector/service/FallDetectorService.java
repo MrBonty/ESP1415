@@ -185,7 +185,7 @@ public class FallDetectorService extends Service {
 			activeSession = dm.getLastSession();
 			sessionStartTime = dm.getLastSession().getStartTimestamp();
 
-			sessionMaxDuration = (long) (preferences.getLong(
+			sessionMaxDuration = (long) (preferences.getInt(
 					SettingsMainFragment.SAVE_SESSION_DURATION,
 					SettingsMainFragment.DEFAULT_DURATION) * 60 * 60 * 1000);
 
@@ -446,8 +446,7 @@ public class FallDetectorService extends Service {
 
 			Toast toast = Toast.makeText(
 					getApplicationContext(),
-					"Item Added, size: "
-							+ CurrentSessionActivity.arrayAdapter.getCount(),
+					"New Fall",
 					Toast.LENGTH_SHORT);
 			toast.show();
 		}

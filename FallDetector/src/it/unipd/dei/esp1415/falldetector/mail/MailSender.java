@@ -92,25 +92,19 @@ public class MailSender {
 			reader.start();
 
 			Thread.sleep(DELAY);
-			System.out.println(response);
 
 			smtp("EHLO smtp.gmail.com\r\n");
 			Thread.sleep(DELAY);
-			System.out.println(response);
 
 			smtp("AUTH LOGIN\r\n");
 			Thread.sleep(DELAY);
-			System.out.println(response);
 
 			smtp(user+"\r\n");
 			Thread.sleep(DELAY);
-			System.out.println(response);
 
 			smtp(password+"\r\n");
 			Thread.sleep(DELAY);
 			char[] controll= response.toCharArray();
-
-			System.out.println(response);
 
 			for(int i = 0; i<controll.length-2 ; i++){
 				if((controll[i] == '2') && (controll[i+1] == '3') && (controll[i+2] == '5')){ // Look for value 235 ->Connection accepted
@@ -136,7 +130,6 @@ public class MailSender {
 		try {		
 			smtp("QUIT\r\n");
 		    Thread.sleep(DELAY_LONG);
-			System.out.println(response);
 			
 			reader.interrupt();
 			
@@ -175,17 +168,14 @@ public class MailSender {
 				for (int i = 0; i<receivers.size(); i++){
 					smtp("RCPT TO:<" + receivers.get(i) + ">\r\n");
 					Thread.sleep(DELAY);
-					System.out.println(response);
 				}
 			}else{
 				smtp("RCPT TO:<" + mail.getReceiver() + ">\r\n");
 				Thread.sleep(DELAY);
-				System.out.println(response);
 			}
 			
 			smtp("DATA" + "\r\n");
 			Thread.sleep(DELAY);
-			System.out.println(response);
 			
 			smtp("Date: " + date + ">\r\n");
 			
@@ -204,7 +194,6 @@ public class MailSender {
 
 			smtp("\r\n.\r\n");
 			Thread.sleep(DELAY);
-			System.out.println(response);
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();

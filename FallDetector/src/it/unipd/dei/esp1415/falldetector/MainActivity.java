@@ -28,7 +28,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -95,8 +94,6 @@ public class MainActivity extends ActionBarActivity {
 			boolean newSession  = intent.getBooleanExtra(AlarmService.NEW_TASK, false);
 			
 			if(newSession){
-
-				Log.i("SERVER MSG", "Received");
 				
 				openAdd();
 			}
@@ -284,8 +281,6 @@ public class MainActivity extends ActionBarActivity {
 					if(info.service.getClassName().equals("it.unipd.dei.esp1415.falldetector.service.AlarmService")){
 						Intent intnt = new Intent(mContext, AlarmService.class);
 						stopService(intnt);
-						
-						Log.i("DELETE SERVICE", "Service stopped");
 						break;
 					}
 				}
