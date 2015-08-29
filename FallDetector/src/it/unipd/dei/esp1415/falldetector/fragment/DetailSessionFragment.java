@@ -238,7 +238,7 @@ public class DetailSessionFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(act);
         builder.setTitle(titleId)
             .setView(layout)
-            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+            .setPositiveButton(R.string.save, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             String newName = input.getText().toString();
                             if (newName.length() != 0) {
@@ -246,7 +246,7 @@ public class DetailSessionFragment extends Fragment {
                                 create=false; //the AlertDialog can disappear
                             }
                         }})
-            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     act.setResult(Activity.RESULT_CANCELED);
